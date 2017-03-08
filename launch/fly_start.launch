@@ -1,0 +1,7 @@
+<!-- Starts up everything needed to run the example listener/talker nodes. -->
+<launch>
+  <!-- The talker node will publish a custom message. -->
+  <node pkg="ardronepkg" type="flytest.cpp" name="flytest" output="screen">
+
+  </node>
+</launch>

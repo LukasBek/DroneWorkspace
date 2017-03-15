@@ -17,8 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 
  catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES ardronepkg
+  
   CATKIN_DEPENDS ardrone_autonomy cv_bridge geographic_msgs geometry_msgs image_transport roscpp sensor_msgs std_msgs
 #  DEPENDS system_lib
  )
@@ -30,5 +29,5 @@ include_directories(
 )
 
 ## Declare a C++ executable
-add_executable(flytest src/flytest.cpp)
-target_link_libraries(flytest ${catkin_LIBRARIES})
+add_executable(testclass src/testclass.cpp)
+target_link_libraries(testclass ${catkin_LIBRARIES})

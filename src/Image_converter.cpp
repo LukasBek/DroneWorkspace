@@ -31,17 +31,19 @@ public:
     cv::destroyWindow(OPENCV_WINDOW);
   }
 
-  void imageCb(const sensor_msgs::ImageConstPtr& msg)
+  public cv_bridge::CvImagePtr imageCb(const sensor_msgs::ImageConstPtr& msg)
   {
     cv_bridge::CvImagePtr cv_ptr;
     try
     {
       cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+      FindCirclesWebcam fc;
+      fc.sendImage(cv_ptr);
     }
     catch (cv_bridge::Exception& e)
     {
       ROS_ERROR("cv_bridge exception: %s", e.what());
-      return;
+      return cv_ptr;
     }
 
     // Draw an example circle on the video stream

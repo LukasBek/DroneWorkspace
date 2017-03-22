@@ -34,99 +34,108 @@
 using namespace cv;
 using namespace std;
 // #include "opencv2/imgcodecs.hpp"
-
+public void sendImage (cv_bridge::CvImagePtr cv_ptr);
 int thresh = 100;
 int max_thresh = 255;
- ros::NodeHandle node;
+ 
+cv_bridge::CvImagePtr cv_ptr;
 
 
-void imageCb(const sensor_msgs::ImageConstPtr& msg)
-  {
-    cv_bridge::CvImagePtr cap;
-    try
-    {
-      // cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-      cap = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-    }
-    catch (cv_bridge::Exception& e)
-    {
-      ROS_ERROR("cv_bridge exception: %s", e.what());
-      return;
-    }
-  }
 
 int main(int argc, char** argv)
 {
+
+}
+  ros::init(argc, argv, "hejsa");
+  ros::NodeHandle node;
     //  VideoCapture cap;
-
-
 
 image_transport::ImageTransport it(node);
     image_transport::Subscriber sub = it.subscribe("/ardrone/front/image_raw", 1, 
-      &ImageConverter::imageCb, this);
+      imageCb);
+
+    
+public void sendImage (cv_bridge::CvImagePtr cv_ptr){
+
+cv::Mat HSVImage;
+    cv::cvtColor(cv_ptr -> image, HSVImage, CV_BGR2HSV);
+    cv::Size size = HSVImage.size();
+    cv::Mat mask = cvCreateMat(size.height, size.width, CV_8UC1);
+    cv::inRange(HSVImage, cv::Scalar(1,115,119), cv::Scalar(8,255,255), mask);
+
+dilate(mask, mask, getStructuringElement(MORPH_RECT, Size(21,21)));
+erode(mask, mask, getStructuringElement(MORPH_RECT, Size(10,10)));
+
+
+erode(mask, mask, getStructuringElement(MORPH_RECT, Size(11,11)));
+dilate(mask, mask, getStructuringElement(MORPH_RECT, Size(5,5)));
+
+GaussianBlur(mask, mask, Size(15,15),2,2);
+
+
+
+
 
 
 
 
     // open the default camera, use something different from 0 otherwise;
     // Check VideoCapture documentation.
-    queue <Vec3i> circleQueue; /* Declare a queue */
-    struct videoSize {
-      int width;
-      int height;
-    };
-    struct acceptSize {
-      int minHeight;
-      int maxHeight;
-      int maxLeft;
-      int maxRight;
-    };
+    // queue <Vec3i> circleQueue; /* Declare a queue */
+    // struct videoSize {
+    //   int width;
+    //   int height;
+    // };
+    // struct acceptSize {
+    //   int minHeight;
+    //   int maxHeight;
+    //   int maxLeft;
+    //   int maxRight;
+    // };
 
-    videoSize vSize;
-    vSize.width  = 0;
-    vSize.height = 0;
+    // videoSize vSize;
+    // vSize.width  = 0;
+    // vSize.height = 0;
 
-    acceptSize aSize;
-    aSize.minHeight = 0;
-    aSize.maxHeight = 0;
-    aSize.maxLeft   = 0;
-    aSize.maxRight  = 0;
+    // acceptSize aSize;
+    // aSize.minHeight = 0;
+    // aSize.maxHeight = 0;
+    // aSize.maxLeft   = 0;
+    // aSize.maxRight  = 0;
 
-    if(!cap.open(0))
-        return 0;
+    // if(!cap.open(0))
+    //     return 0;
     for(;;)
     {
       ros::spinOnce();
-          Mat frame;
-          cap >> frame;
-          if( frame.empty() ) break; // end of video stream
+          if( mask.empty() ) break; // end of video stream
 
-          if (vSize.width == 0 || vSize.height == 0){
-            vSize.width = frame.cols;
-            vSize.height = frame.rows;
+          // if (vSize.width == 0 || vSize.height == 0){
+          //   vSize.width = frame.cols;
+          //   vSize.height = frame.rows;
 
-            aSize.minHeight = vSize.height / 3;
-            aSize.maxHeight = vSize.height / 3 * 2;
-            aSize.maxLeft  = vSize.width / 3.2;
-            aSize.maxRight = vSize.width / 1.4545;
+          //   aSize.minHeight = vSize.height / 3;
+          //   aSize.maxHeight = vSize.height / 3 * 2;
+          //   aSize.maxLeft  = vSize.width / 3.2;
+          //   aSize.maxRight = vSize.width / 1.4545;
 
-            cout << "Frame Dimensions - "  << vSize.width     << " " << vSize.height << endl;
-            cout << "Minimum Height   - "  << aSize.minHeight << endl;
-            cout << "Maximum Height   - "  << aSize.maxHeight << endl;
-            cout << "Maximum Left     - "  << aSize.maxLeft   << endl;
-            cout << "Maximum Right    - "  << aSize.maxRight  << endl;
+          //   cout << "Frame Dimensions - "  << vSize.width     << " " << vSize.height << endl;
+          //   cout << "Minimum Height   - "  << aSize.minHeight << endl;
+          //   cout << "Maximum Height   - "  << aSize.maxHeight << endl;
+          //   cout << "Maximum Left     - "  << aSize.maxLeft   << endl;
+          //   cout << "Maximum Right    - "  << aSize.maxRight  << endl;
 
-          }
+          // }
 
           Mat cimg;
 
-          blur(frame, frame, Size(3,3));
-          cvtColor(frame,frame,CV_RGB2GRAY);
+          // blur(frame, frame, Size(3,3));
+          // cvtColor(frame,frame,CV_RGB2GRAY);
 
-          // const char* source_window = "Source";
+          // // const char* source_window = "Source";
 
 
-          cimg = frame;
+          // cimg = frame;
 
           vector<Vec3f> circles;
           int dp = 1;             // The inverse ratio of resolution
@@ -143,7 +152,7 @@ image_transport::ImageTransport it(node);
           int min_radius = 20;    // Minimum radio to be detected. If unknown, put zero as default
           int max_radius = 200;   // Maximum radius to be detected. If unknown, put zero as default
           
-          HoughCircles(frame, circles, CV_HOUGH_GRADIENT, dp, min_dist, param_1, param_2, min_radius, max_radius);
+          HoughCircles(mask, circles, CV_HOUGH_GRADIENT, dp, min_dist, param_1, param_2, min_radius, max_radius);
           for( size_t i = 0; i < circles.size(); i++ )
           {
               Vec3i c = circles[i];
@@ -180,31 +189,31 @@ image_transport::ImageTransport it(node);
 
             // Command section start //
 
-            std::string message;
+            // std::string message;
 
-            if (c[0] < aSize.maxLeft){
-              // Go Left
-              message = "Go left ";
-            }
-            if (c[0] > aSize.maxRight){
-              // Go Right
-              message = "Go right ";
-            }
-            if (c[1] > aSize.maxHeight){
-              // GO Down
-              message = "Go down ";
-            }
-            if (c[1] < aSize.minHeight){
-              // Go Up
-              message = "Go up ";
-            }
+            // if (c[0] < aSize.maxLeft){
+            //   // Go Left
+            //   message = "Go left ";
+            // }
+            // if (c[0] > aSize.maxRight){
+            //   // Go Right
+            //   message = "Go right ";
+            // }
+            // if (c[1] > aSize.maxHeight){
+            //   // GO Down
+            //   message = "Go down ";
+            // }
+            // if (c[1] < aSize.minHeight){
+            //   // Go Up
+            //   message = "Go up ";
+            // }
 
-            if(message != "" && message != "DEF"){
-                cout << message << endl;
-                message = "";
-            } else {
-              message = "DEF";
-            }
+            // if(message != "" && message != "DEF"){
+            //     cout << message << endl;
+            //     message = "";
+            // } else {
+            //   message = "DEF";
+            // }
             
             // Command section end //
 

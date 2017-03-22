@@ -45,17 +45,18 @@ void takeoff(void)
     std_msgs::Empty empty;
     geometry_msgs::Twist msg_vel;
     pub_empty_takeoff.publish(empty);
-    printf("Starter");
-    usleep(250000);
-    printf("Den er lettet");
+    ROS_INFO("Starter");
     msg_vel = changeTwist(0, 0, 0, 0);
     pub_cmd_vel.publish(msg_vel);
+    // ros::Duration(3).sleep();
+    ROS_INFO("Starter");
 }
 
 void land(void)
 {
     std_msgs::Empty empty;
     pub_empty_land.publish(empty);
+    ros::Duration(2).sleep();
 }
 
 void forwardx(void)
@@ -83,12 +84,12 @@ void imageCallback(const sensor_msgs::ImageConstPtr &msg)
 {
     try
     {
-	cv::imshow("view", cv_bridge::toCvShare(msg, "bgr8")->image);
-	cv::waitKey(30);
+        cv::imshow("view", cv_bridge::toCvShare(msg, "bgr8")->image);
+        cv::waitKey(30);
     }
     catch (cv_bridge::Exception &e)
     {
-	ROS_ERROR("Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
+        ROS_ERROR("Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
     }
 }
 
@@ -111,27 +112,32 @@ int main(int argc, char **argv)
     int count = 0;
     start_time = (double)ros::Time::now().toSec();
 
+    // takeoff();
+
     while (ros::ok())
     {
-	ros::spinOnce();
+    ros::spinOnce();
 
-	while ((double)ros::Time::now().toSec() < start_time + takeoff_time)
-	{ //takeoff
-	    ros::spinOnce();
-	    takeoff();
-	    ROS_INFO("Drone taking off - Nicki");
-	}
+    while ((double)ros::Time::now().toSec() < start_time + takeoff_time)
+    { //takeoff
+        ros::spinOnce();
+        takeoff();
+        ROS_INFO("Drone taking off - Nicki");
+    }
 
-	while ((double)ros::Time::now().toSec() < start_time + takeoff_time + 5)
-	{ 
-	    ros::spinOnce();
-	    turnAround();
-	}
-	ROS_INFO("testing %d", count);
+    while ((double)ros::Time::now().toSec() < start_time + takeoff_time + 5)
+    {
+        ROS_INFO("tid til at sove");
+        // ros::Duration(5).sleep();
+        ROS_INFO("færdig med at sove");
+        ros::spinOnce();
+        
+    }
+    ROS_INFO("testing %d", count);
 
-	land();
-	count++;
-	loop_rate.sleep();
+    land();
+    count++;
+    loop_rate.sleep();
     }
     cv::destroyWindow("view");
     return 0;

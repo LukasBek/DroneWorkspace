@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
 )
+find_package( OpenCV 2 REQUIRED )
 
 
 
@@ -22,6 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
 #  DEPENDS system_lib
  )
 
+ 
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
@@ -29,5 +31,13 @@ include_directories(
 )
 
 ## Declare a C++ executable
-add_executable(testclass src/testclass.cpp)
-target_link_libraries(testclass ${catkin_LIBRARIES})
+##add_executable(testclass src/testclass.cpp)
+add_executable(main src/main.cpp)
+target_link_libraries(main ${catkin_LIBRARIES})
+target_link_libraries(main ${OpenCV_LIBRARIES})
+add_executable(Image_converter src/Image_converter.cpp)
+target_link_libraries(Image_converter ${catkin_LIBRARIES})
+target_link_libraries(Image_converter ${OpenCV_LIBRARIES})
+add_executable(FindCirclesWebcam src/FindCirclesWebcam.cpp)
+target_link_libraries(FindCirclesWebcam ${catkin_LIBRARIES})
+target_link_libraries(FindCirclesWebcam ${OpenCV_LIBRARIES})

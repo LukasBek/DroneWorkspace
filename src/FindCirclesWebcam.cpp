@@ -8,11 +8,83 @@
 #include <deque>
 #include <string>
 #include <vector>
+
+#include <ros/ros.h>
+#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.h>
+
 using namespace cv;
 using namespace std;
 
 // Primary working frame //
-Mat frame;
+Mat frameRBG;
+
+// -------------------------------------------------------------------------------------------------------------
+
+static const std::string OPENCV_WINDOW = "Image window";
+
+
+class ImageConverter
+{
+  
+  public: cv_bridge::CvImagePtr cv_ptr;
+  ros::NodeHandle nh_;
+  image_transport::ImageTransport it_;
+  image_transport::Subscriber image_sub_;
+  image_transport::Publisher image_pub_;
+ 
+
+public:
+  ImageConverter()
+    : it_(nh_)
+  {
+   
+    // Subscrive to input video feed and publish output video feed
+    image_sub_ = it_.subscribe("/ardrone/front/image_raw", 1, 
+      &ImageConverter::imageCb, this);
+    image_pub_ = it_.advertise("/image_converter/output_video", 1);
+
+    cv::namedWindow(OPENCV_WINDOW);
+  }
+
+  ~ImageConverter()
+  {
+    cv::destroyWindow(OPENCV_WINDOW);
+  }
+
+void imageCb(const sensor_msgs::ImageConstPtr& msg)
+  {
+    // public cv_bridge::CvImagePtr cv_ptr;
+    try
+    {
+      cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+     
+    }
+    catch (cv_bridge::Exception& e)
+    {
+      ROS_ERROR("cv_bridge exception: %s", e.what());
+      return;
+    }
+
+    // Draw an example circle on the video stream
+    if (cv_ptr->image.rows > 60 && cv_ptr->image.cols > 60)
+      cv::circle(cv_ptr->image, cv::Point(50, 50), 10, CV_RGB(255,0,0));
+
+    // Update GUI Window
+    frameRBG = cv_ptr->image;
+    
+    cv::waitKey(3);
+    
+    // Output modified video stream
+    // image_pub_.publish(cv_ptr->toImageMsg());
+  }
+};
+
+// -------------------------------------------------------------------------------------------------------------
+
+
+
 
 
 
@@ -52,13 +124,15 @@ void qrDetector(Mat frame)
 
 
 
-
 }
 
 
 int main(int argc, char** argv)
 {
-    VideoCapture cap;
+  ros::init(argc, argv, "image_converter");
+  ImageConverter ic;
+  ros::Rate loop_rate(20);
+    // VideoCapture cap;
 
     // open the default camera, use something different from 0 otherwise;
     // Check VideoCapture documentation.
@@ -84,16 +158,17 @@ int main(int argc, char** argv)
     aSize.maxLeft   = 0;
     aSize.maxRight  = 0;
 
-    if(!cap.open(0))
-        return 0;
-    for(;;)
-    {
-          cap >> frame;
-          if( frame.empty() ) break; // end of video stream
+    // if(!cap.open(0))
+    //     return 0;
+    while (ros::ok())
+    { 
+      ros::spinOnce();
+
+          if( frameRBG.empty() ) break; // end of video stream
 
           if (vSize.width == 0 || vSize.height == 0){
-            vSize.width = frame.cols;
-            vSize.height = frame.rows;
+            vSize.width = frameRBG.cols;
+            vSize.height = frameRBG.rows;
 
             aSize.minHeight = vSize.height / 3;
             aSize.maxHeight = vSize.height / 3 * 2;
@@ -109,8 +184,9 @@ int main(int argc, char** argv)
           }
 
 
-          blur(frame, frame, Size(3,3));
-          cvtColor(frame,frame,CV_RGB2GRAY);
+          blur(frameRBG, frameRBG, Size(3,3));
+          Mat frame;
+          cvtColor(frameRBG,frame,CV_RGB2GRAY);
 /*
           Mat3b hsv;
           cvtColor(frame, hsv, COLOR_BGR2HSV);
@@ -181,6 +257,9 @@ int main(int argc, char** argv)
 
             }
 
+            
+          
+
             // Queue end //
 
             // Command section start //
@@ -240,8 +319,9 @@ int main(int argc, char** argv)
           }
 
           imshow("detected circles", frame);
-
+loop_rate.sleep();
           if( waitKey(10) == 27 ) break; // stop capturing by pressing ESC
+          
     }
     // the camera will be closed automatically upon exit
     //cap.close();

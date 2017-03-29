@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "image_converter");
   ImageConverter ic;
- while (ROS::OK()) {
+ while (ros::ok()) {
 ros::spinOnce();
  }
   

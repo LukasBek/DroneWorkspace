@@ -16,7 +16,8 @@
             "includePath": [
                 "/usr/include",
                 "/usr/local/include",
-                "/opt/ros/indigo/include"
+                "/opt/ros/indigo/include",
+                "/home/parallels/Documents/openCV/OpenCV/opencv-3.2.0"
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,

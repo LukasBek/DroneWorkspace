@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: ardronepkg
+Description: Description of ardronepkg
+Version: 0.0.0
+Cflags: 
+Libs: -L/usr/local/lib 
+Requires: ardrone_autonomy cv_bridge geographic_msgs geometry_msgs image_transport roscpp sensor_msgs std_msgs

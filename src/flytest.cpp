@@ -68,7 +68,7 @@ int main(int argc, char** argv)
 	
     pub_twist = node.advertise<geometry_msgs::Twist>("/cmd_vel", 1); /* Message queue length is just 1 */
 	pub_empty_takeoff = node.advertise<std_msgs::Empty>("/ardrone/takeoff", 1); /* Message queue length is just 1 */
-	pub_empty_land = node.advertise<std_msgs::Empty>("/ardrone/land", 1); /* Message queue length is just 1 */
+	pub_empty_land    = node.advertise<std_msgs::Empty>("/ardrone/land", 1); /* Message queue length is just 1 */
 	pub_empty_reset = node.advertise<std_msgs::Empty>("/ardrone/reset", 1); /* Message queue length is just 1 */
 
 	

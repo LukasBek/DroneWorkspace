@@ -84,6 +84,7 @@ void imageCallback(const sensor_msgs::ImageConstPtr &msg)
 {
     try
     {
+        
         cv::imshow("view", cv_bridge::toCvShare(msg, "bgr8")->image);
         cv::waitKey(30);
     }
@@ -98,7 +99,6 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "test1");
     ros::NodeHandle node;
     ros::Rate loop_rate(50);
-    // droneMovement *p_dm = new droneMovement();
 
     pub_empty_takeoff = node.advertise<std_msgs::Empty>("/ardrone/takeoff", 1); /* Message queue length is just 1 */
     pub_empty_land = node.advertise<std_msgs::Empty>("/ardrone/land", 1);

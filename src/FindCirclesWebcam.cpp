@@ -243,7 +243,7 @@ int main(int argc, char **argv)
   pub_empty_land = node.advertise<std_msgs::Empty>("/ardrone/land", 1);
   pub_cmd_vel = node.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 
-  ros::Rate loop_rate(1);
+  ros::Rate loop_rate(10);
   // VideoCapture cap;
 
   // open the default camera, use something different from 0 otherwise;
@@ -327,7 +327,7 @@ int main(int argc, char **argv)
     int dp = 1;           // The inverse ratio of resolution
     int min_dist = 100;   // Minimum distance between detected centers
     int param_1 = 100;    // Upper threshold for the internal Canny edge detector
-    int param_2 = 150;    // Threshold for center detection
+    int param_2 = 100;    // Threshold for center detection
                           // 200 Has hard time finding perfect circles
                           // 100 Only very clear circles
                           // 80 detects random round suff

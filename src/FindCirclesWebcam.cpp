@@ -267,10 +267,12 @@ int main(int argc, char **argv)
   vSize.height = 0;
 
   acceptSize aSize;
-  aSize.minHeight = 0;
-  aSize.maxHeight = 0;
-  aSize.maxLeft = 0;
-  aSize.maxRight = 0;
+    aSize.minHeight = 0;
+    aSize.maxHeight = 0;
+    aSize.maxLeft   = 0;
+    aSize.maxRight  = 0;
+    aSize.maxSize   = 0;
+    aSize.minSize   = 0;
 
   // if(!cap.open(0))
   //     return 0;
@@ -299,12 +301,16 @@ int main(int argc, char **argv)
       aSize.maxHeight = vSize.height / 3 * 2;
       aSize.maxLeft = vSize.width / 3.2;
       aSize.maxRight = vSize.width / 1.4545;
+      aSize.maxSize   = vSize.height  / 4;
+      aSize.minSize   = vSize.height  / 8;
 
-      cout << "Frame Dimensions - " << vSize.width << " " << vSize.height << endl;
-      cout << "Minimum Height   - " << aSize.minHeight << endl;
-      cout << "Maximum Height   - " << aSize.maxHeight << endl;
-      cout << "Maximum Left     - " << aSize.maxLeft << endl;
-      cout << "Maximum Right    - " << aSize.maxRight << endl;
+      cout << "Frame Dimensions - " << vSize.width      << " " << vSize.height << endl;
+      cout << "Minimum Height   - " << aSize.minHeight  << endl;
+      cout << "Maximum Height   - " << aSize.maxHeight  << endl;
+      cout << "Maximum Left     - " << aSize.maxLeft    << endl;
+      cout << "Maximum Right    - " << aSize.maxRight   << endl;
+      cout << "Maximum Size     - " << aSize.maxSize    << endl;
+      cout << "Minimum Size     - " << aSize.minSize    << endl;
     }
 
     blur(frameRBG, frameRBG, Size(3, 3));
@@ -382,7 +388,16 @@ int main(int argc, char **argv)
       // Command section start //
       
             
-
+            if (c[2] > aSize.maxSize){
+              // Go Back
+              message = "Go back ";
+              backwardx();
+            }
+            if (c[2] < aSize.minSize){
+              // Go Forward
+              message = "Go forward ";
+              forwardx();
+            }
             if (c[0] < aSize.maxLeft){
               // Go Left
               message = "Go left ";

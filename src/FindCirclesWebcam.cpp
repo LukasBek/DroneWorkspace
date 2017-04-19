@@ -2,6 +2,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include <math.h>
+#include <zbar.h>
 #include <sstream>
 #include <iostream>
 #include <queue>
@@ -23,6 +24,7 @@
 
 using namespace cv;
 using namespace std;
+using namespace zbar;
 
 // Primary working frame //
 Mat frameRBG;
@@ -84,7 +86,6 @@ public:
 };
 
 // -------------------------------------------------------------------------------------------------------------
-
 
 // -------------------------------------------------------------------------------------------------------------
 //DroneMovements
@@ -218,9 +219,6 @@ void hover(void)
     turnAround(0.1);
   }
 
-
-
-
 // -------------------------------------------------------------------------------------------------------------
 
 // qrReader qr = qrReader();
@@ -235,22 +233,24 @@ double eDistance(Vec3i a, Vec3i b)
 {
   return sqrt(pow(a[0] - b[0], 2) + pow(a[1] - b[1], 2));
 }
-
-// Mat cannyEdgeDetector(Mat frame)
-// {
-//   Mat canny_output;
-//   vector<vector<Point>> contours;
-//   vector<Vec4i> hierarchy;
-//   Canny(frame, canny_output, lowThreshold, lowThreshold * ratio, kernel_size);
-//   findContours(canny_output, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0));
-//   Mat drawing = Mat::zeros(canny_output.size(), CV_8UC3);
-//   for (size_t i = 0; i < contours.size(); i++)
-//   {
-//     Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-//     drawContours(drawing, contours, (int)i, color, 2, 8, hierarchy, 0, Point());
-//   }
-//   return canny_output;
-// }
+// Canny Edge Detection //
+/*
+ Mat cannyEdgeDetector(Mat frame)
+ {
+   Mat canny_output;
+   vector<vector<Point>> contours;
+   vector<Vec4i> hierarchy;
+   Canny(frame, canny_output, lowThreshold, lowThreshold * ratio, kernel_size);
+   findContours(canny_output, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0));
+   Mat drawing = Mat::zeros(canny_output.size(), CV_8UC3);
+   for (size_t i = 0; i < contours.size(); i++)
+   {
+     Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+     drawContours(drawing, contours, (int)i, color, 2, 8, hierarchy, 0, Point());
+   }
+   return canny_output;
+ }
+*/
 
 void qrDetector(Mat frame)
 {
@@ -289,7 +289,7 @@ int main(int argc, char **argv)
   };
 
   videoSize vSize;
-  vSize.width = 0;
+  vSize.width  = 0;
   vSize.height = 0;
 
   acceptSize aSize;
@@ -320,13 +320,13 @@ int main(int argc, char **argv)
 
     if (vSize.width == 0 || vSize.height == 0)
     {
-      vSize.width = frameRBG.cols;
-      vSize.height = frameRBG.rows;
+      vSize.width   = frameRBG.cols;
+      vSize.height  = frameRBG.rows;
 
       aSize.minHeight = vSize.height / 3;
       aSize.maxHeight = vSize.height / 3 * 2;
-      aSize.maxLeft = vSize.width / 3.2;
-      aSize.maxRight = vSize.width / 1.4545;
+      aSize.maxLeft   = vSize.width / 3.2;
+      aSize.maxRight  = vSize.width / 1.4545;
       aSize.maxSize   = vSize.height  / 4;
       aSize.minSize   = vSize.height  / 8;
 
@@ -342,16 +342,30 @@ int main(int argc, char **argv)
     blur(frameRBG, frameRBG, Size(3, 3));
     Mat frame;
     cvtColor(frameRBG, frame, CV_RGB2GRAY);
-    
-          // Mat3b hsv;
-          // cvtColor(frame, hsv, COLOR_BGR2HSV);
+    // Zbar Start //
+    // TODO Need to be made see :
+    // https://github.com/ZBar/ZBar/blob/master/examples/scan_image.cpp
+    // http://zbar.sourceforge.net/api/index.html
+/*
+    ImageScanner scanner;
+    scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);
 
-          // Mat1b mask1, mask2;
-          // inRange(hsv, Scalar(0, 70, 50), Scalar(10, 255, 255), mask1);
-          // inRange(hsv, Scalar(170, 70, 50), Scalar(180, 255, 255), mask2);
+    int n = scanner.scan(frame);
+*/
+    // Zbar End //
 
-          // Mat1b mask = mask1 | mask2;
+    // Red Filter start //
+/*
+    Mat3b hsv;
+    cvtColor(frame, hsv, COLOR_BGR2HSV);
 
+    Mat1b mask1, mask2;
+    inRange(hsv, Scalar(0, 70, 50), Scalar(10, 255, 255), mask1);
+    inRange(hsv, Scalar(170, 70, 50), Scalar(180, 255, 255), mask2);
+
+    Mat1b mask = mask1 | mask2;
+*/
+    // Red Filter start //
 
     // putText(frame, "Test", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);
 
@@ -374,7 +388,7 @@ int main(int argc, char **argv)
     {
       Vec3i c = circles[i];
       circle(frame, Point(c[0], c[1]), c[2], Scalar(255, 255, 255), 3, CV_AA);
-      circle(frame, Point(c[0], c[1]), 2, Scalar(255, 255, 255), 3, CV_AA);
+      circle(frame, Point(c[0], c[1]), 2,    Scalar(255, 255, 255), 3, CV_AA);
     }
 
     //  frame = cannyEdgeDetector(frame);
@@ -392,7 +406,7 @@ int main(int argc, char **argv)
     {
       Vec3i c = circles[0];
 
-      // Queue start //
+      // Queue start // // TODO - May need a check if logic is correct //
 
       if (circleQueue.size() < 10)
       {
@@ -427,17 +441,12 @@ int main(int argc, char **argv)
             break;
           }
         }
-
-
-        // cout << "The result is " << eDistance (p2,p1) << endl;
-
         circleQueue.pop();
       }
 
       // Queue end //
 
       // Command section start //
-      /*
             
             if (c[2] > aSize.maxSize){
               // Go Back
@@ -478,7 +487,7 @@ int main(int argc, char **argv)
               message = "DEF";
               goThrough();
             }
-            */
+            
       // Command section end //
 
       std::string number0;
@@ -519,6 +528,4 @@ int main(int argc, char **argv)
   // the camera will be closed automatically upon exit
   //cap.close();
   return 0;
-
- 
 }

@@ -108,6 +108,7 @@ float fly_time = 7.0;
 float land_time = 3.0;
 float kill_time = 2.0;
 float sleepD = 0.1;
+int circleFound;
 
 geometry_msgs::Twist changeTwist(float x, float y, float z, float turn)
 {
@@ -188,11 +189,12 @@ void goDown(void)
     ros::Duration(sleepD).sleep();
 }
 
-void turnAround(void)
+void turnAround(double turnTime)
 {
     geometry_msgs::Twist msg_vel;
-    msg_vel = changeTwist(0, 0, 0, 1);
+    msg_vel = changeTwist(0, 0, 0, 0.2);
     pub_cmd_vel.publish(msg_vel);
+    ros::Duration(turnTime).sleep();
 }
 
 void goThrough(void)
@@ -209,6 +211,12 @@ void hover(void)
     msg_vel = changeTwist(0, 0, 0, 0);
     pub_cmd_vel.publish(msg_vel);
 }
+
+ void findCircle(){
+    circleFound = -1;
+    
+    turnAround(0.1);
+  }
 
 
 
@@ -473,7 +481,7 @@ int main(int argc, char **argv)
       // Setting text on screen end //
     } else {
        cout << "Hover" << endl;
-      hover();
+      turnAround(0.1);
     }
 
     imshow("detected circles", frame);
@@ -484,4 +492,6 @@ int main(int argc, char **argv)
   // the camera will be closed automatically upon exit
   //cap.close();
   return 0;
+
+ 
 }

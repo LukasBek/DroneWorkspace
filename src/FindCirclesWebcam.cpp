@@ -99,13 +99,15 @@ ros::Publisher pub_empty_takeoff;
 ros::Publisher pub_empty_land;
 ros::Publisher pub_cmd_vel;
 
-double start_time;
+
 
 //command message
+double start_time = 2;
 float takeoff_time = 5.0;
 float fly_time = 7.0;
 float land_time = 3.0;
 float kill_time = 2.0;
+float sleepD = 0.1;
 
 geometry_msgs::Twist changeTwist(float x, float y, float z, float turn)
 {
@@ -143,6 +145,7 @@ void forwardx(void)
     geometry_msgs::Twist msg_vel;
     msg_vel = changeTwist(1, 0, 0, 0);
     pub_cmd_vel.publish(msg_vel);
+    ros::Duration(sleepD).sleep();
 }
 
 void backwardx(void)
@@ -150,6 +153,7 @@ void backwardx(void)
     geometry_msgs::Twist msg_vel;
     msg_vel = changeTwist(-1, 0, 0, 0);
     pub_cmd_vel.publish(msg_vel);
+    ros::Duration(sleepD).sleep();
 }
 
 void goLeft(void)
@@ -157,6 +161,7 @@ void goLeft(void)
     geometry_msgs::Twist msg_vel;
     msg_vel = changeTwist(0, 1, 0, 0);
     pub_cmd_vel.publish(msg_vel);
+    ros::Duration(sleepD).sleep();
 }
 
 void goRight(void)
@@ -164,6 +169,7 @@ void goRight(void)
     geometry_msgs::Twist msg_vel;
     msg_vel = changeTwist(0, -1, 0, 0);
     pub_cmd_vel.publish(msg_vel);
+    ros::Duration(sleepD).sleep();
 }
 
 void goUp(void)
@@ -171,6 +177,7 @@ void goUp(void)
     geometry_msgs::Twist msg_vel;
     msg_vel = changeTwist(0, 0, 1, 0);
     pub_cmd_vel.publish(msg_vel);
+    ros::Duration(sleepD).sleep();
 }
 
 void goDown(void)
@@ -178,6 +185,7 @@ void goDown(void)
     geometry_msgs::Twist msg_vel;
     msg_vel = changeTwist(0, 0, -1, 0);
     pub_cmd_vel.publish(msg_vel);
+    ros::Duration(sleepD).sleep();
 }
 
 void turnAround(void)
@@ -260,6 +268,8 @@ int main(int argc, char **argv)
     int maxHeight;
     int maxLeft;
     int maxRight;
+    int maxSize;
+    int minSize;
   };
 
   videoSize vSize;
@@ -282,12 +292,12 @@ int main(int argc, char **argv)
   {
     ros::spinOnce();
 
-    // while ((double)ros::Time::now().toSec() < start_time + takeoff_time)
-    // { //takeoff
-    //     ros::spinOnce();
-    //     takeoff();
-    //     ROS_INFO("Drone taking off - Nicki");
-    // }
+    while ((double)ros::Time::now().toSec() < start_time + takeoff_time + 2)
+    { //takeoff
+        ros::spinOnce();
+        takeoff();
+        ROS_INFO("Drone taking off - Nicki");
+    }
 
     if (frameRBG.empty())
       break; // end of video stream
@@ -316,16 +326,16 @@ int main(int argc, char **argv)
     blur(frameRBG, frameRBG, Size(3, 3));
     Mat frame;
     cvtColor(frameRBG, frame, CV_RGB2GRAY);
-    /*
-          Mat3b hsv;
-          cvtColor(frame, hsv, COLOR_BGR2HSV);
+    
+          // Mat3b hsv;
+          // cvtColor(frame, hsv, COLOR_BGR2HSV);
 
-          Mat1b mask1, mask2;
-          inRange(hsv, Scalar(0, 70, 50), Scalar(10, 255, 255), mask1);
-          inRange(hsv, Scalar(170, 70, 50), Scalar(180, 255, 255), mask2);
+          // Mat1b mask1, mask2;
+          // inRange(hsv, Scalar(0, 70, 50), Scalar(10, 255, 255), mask1);
+          // inRange(hsv, Scalar(170, 70, 50), Scalar(180, 255, 255), mask2);
 
-          Mat1b mask = mask1 | mask2;
-*/
+          // Mat1b mask = mask1 | mask2;
+
 
     // putText(frame, "Test", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);
 
@@ -333,7 +343,7 @@ int main(int argc, char **argv)
     int dp = 1;           // The inverse ratio of resolution
     int min_dist = 100;   // Minimum distance between detected centers
     int param_1 = 100;    // Upper threshold for the internal Canny edge detector
-    int param_2 = 100;    // Threshold for center detection
+    int param_2 = 80;     // Threshold for center detection
                           // 200 Has hard time finding perfect circles
                           // 100 Only very clear circles
                           // 80 detects random round suff

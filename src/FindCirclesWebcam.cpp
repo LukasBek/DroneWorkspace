@@ -195,6 +195,14 @@ void turnAround(void)
     pub_cmd_vel.publish(msg_vel);
 }
 
+void goThrough(void)
+{
+  geometry_msgs::Twist msg_vel;
+  msg_vel = changeTwist(1, 0, 0, 0);
+  pub_cmd_vel.publish(msg_vel);
+  ros::Duration(1).sleep();
+}
+
 void hover(void)
 {
     geometry_msgs::Twist msg_vel;
@@ -433,9 +441,9 @@ int main(int argc, char **argv)
                 cout << message << endl;
                 message = "DEF";
             } else {
-               cout << "Hover inside" << endl;
+               cout << "Going through the circle" << endl;
               message = "DEF";
-              hover();
+              goThrough();
             }
             
       // Command section end //

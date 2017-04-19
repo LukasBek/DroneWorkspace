@@ -31,7 +31,6 @@ include_directories(
 )
 
 ## Declare a C++ executable
-##add_executable(testclass src/testclass.cpp)
 add_executable(main src/main.cpp)
 target_link_libraries(main ${catkin_LIBRARIES})
 target_link_libraries(main ${OpenCV_LIBRARIES})

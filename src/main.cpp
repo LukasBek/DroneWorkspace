@@ -23,6 +23,7 @@ ros::Publisher pub_cmd_vel;
 double start_time;
 
 //command message
+//test
 float takeoff_time = 5.0;
 float fly_time = 7.0;
 float land_time = 3.0;

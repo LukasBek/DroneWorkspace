@@ -386,15 +386,40 @@ int main(int argc, char **argv)
 
       // Queue start //
 
-      if (circleQueue.size() < 5)
+      if (circleQueue.size() < 10)
       {
         circleQueue.push(c); //  Add some values to the queue
       }
       else
       {
+        queue<Vec3i> circleQueueTemp;
+        circleQueueTemp = circleQueue;
+        double iterator = 1;
+        cout << "Accept" << endl;
 
-        Vec3i p1 = circleQueue.front();
-        Vec3i p2 = circleQueue.back();
+        while (circleQueueTemp.size() > 0){
+
+          // cout << "Round " << iterator << ", Distance " << eDistance(circleQueueTemp.front(),c) << ", max distance " << (iterator/20)*vSize.width << endl; 
+
+          if (eDistance(circleQueueTemp.front(),c) < iterator/20*vSize.width){
+            //cout << "Accept circle into que" << endl;
+            cout << "Accept" << endl;
+            circleQueue.pop();
+            circleQueue.push(c);
+            break;
+          }
+          else {
+            //cout << "Deny circle into que" << endl;
+            cout << "Deny" << endl;
+
+            circleQueueTemp.pop();
+          }
+          iterator = iterator + 1;
+          if (iterator > 100){
+            break;
+          }
+        }
+
 
         // cout << "The result is " << eDistance (p2,p1) << endl;
 
@@ -404,7 +429,7 @@ int main(int argc, char **argv)
       // Queue end //
 
       // Command section start //
-      
+      /*
             
             if (c[2] > aSize.maxSize){
               // Go Back
@@ -445,7 +470,7 @@ int main(int argc, char **argv)
               message = "DEF";
               goThrough();
             }
-            
+            */
       // Command section end //
 
       std::string number0;
@@ -472,7 +497,7 @@ int main(int argc, char **argv)
 
       // Setting text on screen end //
     } else {
-       cout << "Hover" << endl;
+      // cout << "Hover" << endl;
       hover();
     }
 

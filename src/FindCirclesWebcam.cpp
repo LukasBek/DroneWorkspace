@@ -505,13 +505,10 @@ int main(int argc, char **argv)
 
       // Setting text on screen end //
     } else {
-<<<<<<< HEAD
       // cout << "Hover" << endl;
       hover();
-=======
-       cout << "Hover" << endl;
+      cout << "Hover" << endl;
       turnAround(0.1);
->>>>>>> 27011942a63c20853fcda090142a684983fcfeee
     }
 
     imshow("detected circles", frame);

@@ -26,8 +26,7 @@ using namespace cv;
 using namespace std;
 using namespace zbar;
 
-// Primary working frame //
-Mat frameRBG;
+Mat frameRBG; // Primary working frame from capture //
 
 // -------------------------------------------------------------------------------------------------------------
 //Getting the video stream and converting it to openCV
@@ -221,7 +220,6 @@ void hover(void)
 
 // -------------------------------------------------------------------------------------------------------------
 
-// qrReader qr = qrReader();
 
 RNG rng(12345);
 int lowThreshold = 60;
@@ -258,6 +256,13 @@ void qrDetector(Mat frame)
 
 int main(int argc, char **argv)
 {
+
+  // Main scope variables //
+  Mat frame;                // Primary working frame //
+  queue<Vec3i> circleQueue; // Que for circle positions //
+  std::string message;      // Message for console prints //
+
+
   ros::init(argc, argv, "image_converter");
   ImageConverter ic;
 
@@ -268,17 +273,13 @@ int main(int argc, char **argv)
   pub_cmd_vel = node.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 
   ros::Rate loop_rate(10);
-  // VideoCapture cap;
 
-  // open the default camera, use something different from 0 otherwise;
-  // Check VideoCapture documentation.
-  queue<Vec3i> circleQueue; /* Declare a queue */
-  struct videoSize
+  struct videoSize // Struct for video size //
   {
     int width;
     int height;
   };
-  struct acceptSize
+  struct acceptSize // Dimensions for accept //
   {
     int minHeight;
     int maxHeight;
@@ -287,10 +288,10 @@ int main(int argc, char **argv)
     int maxSize;
     int minSize;
   };
-
+ // Ini of structs //
   videoSize vSize;
-  vSize.width  = 0;
-  vSize.height = 0;
+    vSize.width  = 0;
+    vSize.height = 0;
 
   acceptSize aSize;
     aSize.minHeight = 0;
@@ -300,9 +301,6 @@ int main(int argc, char **argv)
     aSize.maxSize   = 0;
     aSize.minSize   = 0;
 
-  // if(!cap.open(0))
-  //     return 0;
-  std::string message;
   ros::Duration(1).sleep();
   while (ros::ok())
   {
@@ -320,8 +318,8 @@ int main(int argc, char **argv)
 
     if (vSize.width == 0 || vSize.height == 0)
     {
-      vSize.width   = frameRBG.cols;
-      vSize.height  = frameRBG.rows;
+      vSize.width     = frameRBG.cols;
+      vSize.height    = frameRBG.rows;
 
       aSize.minHeight = vSize.height / 3;
       aSize.maxHeight = vSize.height / 3 * 2;
@@ -339,9 +337,10 @@ int main(int argc, char **argv)
       cout << "Minimum Size     - " << aSize.minSize    << endl;
     }
 
+    // Blur and convertion to grayscale //
     blur(frameRBG, frameRBG, Size(3, 3));
-    Mat frame;
     cvtColor(frameRBG, frame, CV_RGB2GRAY);
+
     // Zbar Start //
     // TODO Need to be made see :
     // https://github.com/ZBar/ZBar/blob/master/examples/scan_image.cpp
@@ -369,6 +368,8 @@ int main(int argc, char **argv)
 
     // putText(frame, "Test", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);
 
+    // HoughCircles Start //
+
     vector<Vec3f> circles;
     int dp = 1;           // The inverse ratio of resolution
     int min_dist = 100;   // Minimum distance between detected centers
@@ -391,7 +392,7 @@ int main(int argc, char **argv)
       circle(frame, Point(c[0], c[1]), 2,    Scalar(255, 255, 255), 3, CV_AA);
     }
 
-    //  frame = cannyEdgeDetector(frame);
+    // HoughCircles End //
 
     // Setting text on screen start //
 
@@ -436,12 +437,8 @@ int main(int argc, char **argv)
 
             circleQueueTemp.pop();
           }
-          iterator = iterator + 1;
-          if (iterator > 100){
-            break;
-          }
+          iterator++;
         }
-        circleQueue.pop();
       }
 
       // Queue end //

@@ -250,6 +250,49 @@ double eDistance(Vec3i a, Vec3i b)
  }
 */
 
+
+void zbarScan(Mat frame, int width, int height){
+ 
+  // See http://blog.ayoungprogrammer.com/2013/07/tutorial-scanning-barcodes-qr-codes.html/ //
+
+  ImageScanner scanner;  
+    scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);  
+      // obtain image data  
+     char file[256];  
+     //cin>>file;  
+     //Mat img = imread(file,0);  
+     Mat imgout;  
+     cvtColor(frame,imgout,CV_GRAY2RGB);  
+     //int width = img.cols;  
+     //int height = img.rows;  
+    uchar *raw = (uchar *)frame.data;  
+    // wrap image data  
+    Image image(width, height, "Y800", raw, width * height);  
+    // scan the image for barcodes  
+    int n = scanner.scan(image);  
+    // extract results  
+    for(Image::SymbolIterator symbol = image.symbol_begin();  
+      symbol != image.symbol_end();  
+      ++symbol) {  
+        vector<Point> vp;  
+        // do something useful with results  
+        cout << "decoded " << symbol->get_type_name() << " symbol " << symbol->get_data() << '"' <<" "<< endl;  
+        int n = symbol->get_location_size();  
+        for(int i=0;i<n;i++){  
+          vp.push_back(Point(symbol->get_location_x(i),symbol->get_location_y(i))); 
+          }  
+        RotatedRect r = minAreaRect(vp);  
+        Point2f pts[4];  
+        r.points(pts);  
+        for(int i=0;i<4;i++){  
+          line(imgout,pts[i],pts[(i+1)%4],Scalar(255,0,0),3);  
+        }  
+        cout<<"Angle: "<<r.angle<<endl;  
+   }  
+      imshow("imgout.jpg",imgout);  
+} // End ZbarScan 
+
+
 void qrDetector(Mat frame)
 {
 }
@@ -341,16 +384,13 @@ int main(int argc, char **argv)
     blur(frameRBG, frameRBG, Size(3, 3));
     cvtColor(frameRBG, frame, CV_RGB2GRAY);
 
+    
     // Zbar Start //
-    // TODO Need to be made see :
     // https://github.com/ZBar/ZBar/blob/master/examples/scan_image.cpp
     // http://zbar.sourceforge.net/api/index.html
-/*
-    ImageScanner scanner;
-    scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);
 
-    int n = scanner.scan(frame);
-*/
+    zbarScan(frame, vSize.width, vSize.height);
+
     // Zbar End //
 
     // Red Filter start //

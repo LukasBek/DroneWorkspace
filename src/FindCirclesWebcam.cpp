@@ -251,12 +251,12 @@ double eDistance(Vec3i a, Vec3i b)
 */
 
 
-void zbarScan(Mat frame, int width, int height){
+string zbarScan(Mat frame, int width, int height){
  
   // See http://blog.ayoungprogrammer.com/2013/07/tutorial-scanning-barcodes-qr-codes.html/ //
-
-  ImageScanner scanner;  
-    scanner.set_config(ZBAR_NONE, ZBAR_CFG_ENABLE, 1);  
+  std::string res;
+  zbar::ImageScanner scanner;  
+    scanner.set_config(zbar::ZBAR_NONE, zbar::ZBAR_CFG_ENABLE, 1);  
       // obtain image data  
      char file[256];  
      //cin>>file;  
@@ -267,16 +267,16 @@ void zbarScan(Mat frame, int width, int height){
      //int height = img.rows;  
     uchar *raw = (uchar *)frame.data;  
     // wrap image data  
-    Image image(width, height, "Y800", raw, width * height);  
+    zbar::Image image(width, height, "Y800", raw, width * height);  
     // scan the image for barcodes  
-    int n = scanner.scan(image);  
+    int n = scanner.scan(image);  // TODO
     // extract results  
     for(Image::SymbolIterator symbol = image.symbol_begin();  
       symbol != image.symbol_end();  
       ++symbol) {  
         vector<Point> vp;  
         // do something useful with results  
-        cout << "decoded " << symbol->get_type_name() << " symbol " << symbol->get_data() << '"' <<" "<< endl;  
+        // cout << "decoded " << symbol->get_type_name() << " symbol " << symbol->get_data() << endl;  
         int n = symbol->get_location_size();  
         for(int i=0;i<n;i++){  
           vp.push_back(Point(symbol->get_location_x(i),symbol->get_location_y(i))); 
@@ -287,15 +287,14 @@ void zbarScan(Mat frame, int width, int height){
         for(int i=0;i<4;i++){  
           line(imgout,pts[i],pts[(i+1)%4],Scalar(255,0,0),3);  
         }  
-        cout<<"Angle: "<<r.angle<<endl;  
+          std::stringstream strstream;
+          strstream << symbol->get_data();
+          strstream >> res;
+        // cout<<"Angle: "<<r.angle<<endl;  
    }  
       imshow("imgout.jpg",imgout);  
+      return res;
 } // End ZbarScan 
-
-
-void qrDetector(Mat frame)
-{
-}
 
 int main(int argc, char **argv)
 {
@@ -389,7 +388,10 @@ int main(int argc, char **argv)
     // https://github.com/ZBar/ZBar/blob/master/examples/scan_image.cpp
     // http://zbar.sourceforge.net/api/index.html
 
-    zbarScan(frame, vSize.width, vSize.height);
+    string res = zbarScan(frame, vSize.width, vSize.height);
+    if (!res.empty()){
+      cout << "Symbol: " << zbarScan(frame, vSize.width, vSize.height) << endl;
+    }
 
     // Zbar End //
 
@@ -414,7 +416,7 @@ int main(int argc, char **argv)
     int dp = 1;           // The inverse ratio of resolution
     int min_dist = 100;   // Minimum distance between detected centers
     int param_1 = 100;    // Upper threshold for the internal Canny edge detector
-    int param_2 = 80;     // Threshold for center detection
+    int param_2 = 100;    // Threshold for center detection
                           // 200 Has hard time finding perfect circles
                           // 100 Only very clear circles
                           // 80 detects random round suff
@@ -458,7 +460,7 @@ int main(int argc, char **argv)
         queue<Vec3i> circleQueueTemp;
         circleQueueTemp = circleQueue;
         double iterator = 1;
-        cout << "Accept" << endl;
+        // cout << "Accept" << endl;
 
         while (circleQueueTemp.size() > 0){
 
@@ -466,7 +468,7 @@ int main(int argc, char **argv)
 
           if (eDistance(circleQueueTemp.front(),c) < iterator/20*vSize.width){
             //cout << "Accept circle into que" << endl;
-            cout << "Accept" << endl;
+            //cout << "Accept" << endl;
             circleQueue.pop();
             circleQueue.push(c);
             break;
@@ -517,10 +519,10 @@ int main(int argc, char **argv)
             } 
             // if(message != "" && message != "DEF"){
             if(message != "DEF"){
-                cout << message << endl;
+              //cout << message << endl;
                 message = "DEF";
             } else {
-               cout << "Going through the circle" << endl;
+               //cout << "Going through the circle" << endl;
               message = "DEF";
               goThrough();
             }
@@ -553,7 +555,7 @@ int main(int argc, char **argv)
     } else {
       // cout << "Hover" << endl;
       hover();
-      cout << "Hover" << endl;
+      // cout << "Hover" << endl;
       turnAround(0.1);
     }
 

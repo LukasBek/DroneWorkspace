@@ -251,6 +251,57 @@ double eDistance(Vec3i a, Vec3i b)
 */
 
 
+// Histogram Calculation //
+// Source - http://docs.opencv.org/2.4/doc/tutorials/imgproc/histograms/histogram_calculation/histogram_calculation.html
+ int histogramCalculation(Mat frame)
+ {
+   Mat src, dst;
+
+  /// Load image
+  src = frame;
+
+  /// Separate the image in 3 places ( B, G and R )
+  vector<Mat> bgr_planes;
+  split( src, bgr_planes );
+
+  /// Establish the number of bins
+  int histSize = 256;
+
+  /// Set the ranges ( for B,G,R) )
+  float range[] = { 0, 256 } ;
+  const float* histRange = { range };
+
+  bool uniform = true; 
+  bool accumulate = false;
+
+  Mat b_hist, g_hist, r_hist;
+  /// Compute the histograms:
+  calcHist( &bgr_planes[0], 1, 0, Mat(), b_hist, 1, &histSize, &histRange, uniform, accumulate );
+  calcHist( &bgr_planes[1], 1, 0, Mat(), g_hist, 1, &histSize, &histRange, uniform, accumulate );
+  calcHist( &bgr_planes[2], 1, 0, Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate );
+
+
+  /// Normalize the result to [ 0, histImage.rows ]
+  //normalize(b_hist, b_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+  //normalize(g_hist, g_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+  //normalize(r_hist, r_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+
+  int hist_w = 256;
+
+  float top = 0;
+  int indeks = 0;
+  for (int i = 1 + 30; i < hist_w - 30; i++)
+  {
+      if (cvRound(r_hist.at<float>(i)) > top){
+        top = (cvRound(r_hist.at<float>(i)));
+        indeks = i;
+      }
+  }
+ // cout << "Top: " << top << ", indeks: " << indeks << endl;
+
+  return indeks;
+ }
+
 string zbarScan(Mat frame, int width, int height){
  
   // See http://blog.ayoungprogrammer.com/2013/07/tutorial-scanning-barcodes-qr-codes.html/ //
@@ -292,7 +343,7 @@ string zbarScan(Mat frame, int width, int height){
           strstream >> res;
         // cout<<"Angle: "<<r.angle<<endl;  
    }  
-      imshow("imgout.jpg",imgout);  
+      imshow("Zbar",imgout);  
       return res;
 } // End ZbarScan 
 
@@ -303,6 +354,7 @@ int main(int argc, char **argv)
   Mat frame;                // Primary working frame //
   queue<Vec3i> circleQueue; // Que for circle positions //
   std::string message;      // Message for console prints //
+  int variance20 = 20;
 
 
   ros::init(argc, argv, "image_converter");
@@ -381,6 +433,13 @@ int main(int argc, char **argv)
 
     // Blur and convertion to grayscale //
     blur(frameRBG, frameRBG, Size(3, 3));
+
+    // Histogram Start //
+
+    int redHue = histogramCalculation(frameRBG);
+
+    // Histogram end //
+
     cvtColor(frameRBG, frame, CV_RGB2GRAY);
 
     
@@ -392,20 +451,36 @@ int main(int argc, char **argv)
     if (!res.empty()){
       cout << "Symbol: " << zbarScan(frame, vSize.width, vSize.height) << endl;
     }
-
+  
     // Zbar End //
 
     // Red Filter start //
-/*
-    Mat3b hsv;
-    cvtColor(frame, hsv, COLOR_BGR2HSV);
 
+    Mat redColorOnly;
+    inRange(frameRBG, Scalar(30, 30, 200), Scalar(60, 60, 255), redColorOnly);
+
+    /*
+    Mat hsv = frameRBG;
+    cvtColor(hsv, hsv, CV_RGB2HSV);
+
+    if (redHue > 255 - variance20){
+      redHue = 255;
+    }
+    if (redHue < 0 + variance20){
+      redHue = 0;
+    } 
     Mat1b mask1, mask2;
-    inRange(hsv, Scalar(0, 70, 50), Scalar(10, 255, 255), mask1);
-    inRange(hsv, Scalar(170, 70, 50), Scalar(180, 255, 255), mask2);
+    inRange(hsv, Scalar(0,   0, 0),Scalar(20, 255, 255), mask1);
+    inRange(hsv, Scalar(340, 0, 0),Scalar(0,  255, 255), mask2);
 
-    Mat1b mask = mask1 | mask2;
-*/
+    inRange(hsv, Scalar(0, 70, 50), Scalar(10, 500, 255), mask1);
+    inRange(hsv, Scalar(170, 70, 50), Scalar(360, 255, 255), mask2);
+    
+    Mat1b mask = mask1 + mask2;
+    */
+
+    imshow("Red Filter",redColorOnly);  
+
     // Red Filter start //
 
     // putText(frame, "Test", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);
@@ -435,8 +510,6 @@ int main(int argc, char **argv)
     }
 
     // HoughCircles End //
-
-    // Setting text on screen start //
 
     // Finds the amount of circles in the image
     unsigned long ul = circles.size();
@@ -475,8 +548,7 @@ int main(int argc, char **argv)
           }
           else {
             //cout << "Deny circle into que" << endl;
-            cout << "Deny" << endl;
-
+            //cout << "Deny" << endl;
             circleQueueTemp.pop();
           }
           iterator++;
@@ -487,8 +559,6 @@ int main(int argc, char **argv)
 
       // Command section start //
 
-      
-            
             if (c[2] > aSize.maxSize){
               // Go Back
               message = "Go back ";
@@ -555,13 +625,13 @@ int main(int argc, char **argv)
 
       // Setting text on screen end //
     } else {
-      cout << "Hover" << endl;
+      // cout << "Hover" << endl;
       hover();
       // cout << "Hover" << endl;
       turnAround(0.1);
     }
 
-    imshow("detected circles", frame);
+    imshow("Detected circles", frame);
     loop_rate.sleep();
     // if (waitKey(10) == 27)
     //   break; // stop capturing by pressing ESC

@@ -486,8 +486,6 @@ int main(int argc, char **argv)
       // Command section start //
 
       
-=======
->>>>>>> 683f09d0c918563d79432de966537a9493e968ff
             
             if (c[2] > aSize.maxSize){
               // Go Back
@@ -555,8 +553,7 @@ int main(int argc, char **argv)
 
       // Setting text on screen end //
     } else {
-       cout << "Hover" << endl
-      // cout << "Hover" << endl;
+      cout << "Hover" << endl;
       hover();
       cout << "Hover" << endl;
       turnAround(0.1);

@@ -31,9 +31,9 @@ include_directories(
 )
 
 ## Declare a C++ executable
-add_executable(main src/main.cpp)
-target_link_libraries(main ${catkin_LIBRARIES})
-target_link_libraries(main ${OpenCV_LIBRARIES})
+##add_executable(main src/main.cpp)
+##target_link_libraries(main ${catkin_LIBRARIES})
+##target_link_libraries(main ${OpenCV_LIBRARIES})
 add_executable(Image_converter src/Image_converter.cpp)
 target_link_libraries(Image_converter ${catkin_LIBRARIES})
 target_link_libraries(Image_converter ${OpenCV_LIBRARIES})

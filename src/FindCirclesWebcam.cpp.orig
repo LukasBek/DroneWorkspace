@@ -455,6 +455,15 @@ int main(int argc, char **argv)
       }
       else
       {
+<<<<<<< HEAD
+
+        Vec3i p1 = circleQueue.front();
+        Vec3i p2 = circleQueue.back();
+
+        // cout << "The result is " << eDistance (p2,p1) << endl;
+
+        circleQueue.pop();
+=======
         queue<Vec3i> circleQueueTemp;
         circleQueueTemp = circleQueue;
         double iterator = 1;
@@ -479,12 +488,13 @@ int main(int argc, char **argv)
           }
           iterator++;
         }
+>>>>>>> 683f09d0c918563d79432de966537a9493e968ff
       }
 
       // Queue end //
 
       // Command section start //
-
+<<<<<<< HEAD
       
 =======
 >>>>>>> 683f09d0c918563d79432de966537a9493e968ff
@@ -555,10 +565,13 @@ int main(int argc, char **argv)
 
       // Setting text on screen end //
     } else {
-       cout << "Hover" << endl
+<<<<<<< HEAD
+       cout << "Hover" << endl;
+=======
       // cout << "Hover" << endl;
       hover();
       cout << "Hover" << endl;
+>>>>>>> 683f09d0c918563d79432de966537a9493e968ff
       turnAround(0.1);
     }
 

@@ -19,7 +19,40 @@ geometry_msgs::Twist twist_msg_up;
 ros::Publisher pub_empty_takeoff;
 ros::Publisher pub_empty_land;
 ros::Publisher pub_cmd_vel;
+;
+float fly_time = 7.0;
+float land_time = 3.0;
+float kill_time = 2.0;
 
+geometry_msgs::Twist changeTwist(float x, float y, float z, float turn)
+{
+    geometry_msgs::Twist msg_vel;
+    msg_vel.angular.x = 0;
+    msg_vel.angular.y = 0;
+    msg_vel.angular.z = turn;
+    msg_vel.linear.x = x;
+    msg_vel.linear.y = y;
+    msg_vel.linear.z = z;
+    return (msg_vel);
+}
+
+ void takeoff(void)
+{
+    std_msgs::Empty empty;
+    geometry_msgs::Twist msg_vel;
+    pub_empty_takeoff.publish(empty);
+    ROS_INFO("Starter");
+    msg_vel = changeTwist(0, 0, 0, 0);
+    pub_cmd_vel.publish(msg_vel);
+    // ros::Duration(3).sleep();
+    ROS_INFO("Starter");
+}
+
+void land(void)
+{
+    std_msgs::Empty empty;
+    pub_empty_land.publish(empty);
+    ros::Duration(2).sleep();
 double start_time;
 
 //command message
@@ -28,6 +61,7 @@ float takeoff_time = 5.0;
 float fly_time = 7.0;
 float land_time = 3.0;
 float kill_time = 2.0;
+}
 
 geometry_msgs::Twist changeTwist(float x, float y, float z, float turn)
 {
@@ -111,7 +145,7 @@ int main(int argc, char **argv)
     image_transport::Subscriber sub = it.subscribe("/ardrone/front/image_raw", 1, imageCallback);
 
     int count = 0;
-    start_time = (double)ros::Time::now().toSec();
+    double start_time = (double)ros::Time::now().toSec();
 
     // takeoff();
 

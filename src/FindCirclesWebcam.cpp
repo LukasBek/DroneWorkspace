@@ -22,6 +22,8 @@
 #include <std_msgs/Empty.h>
 #include <geometry_msgs/Twist.h>
 
+#include "qrScan.h"
+
 using namespace cv;
 using namespace std;
 using namespace zbar;
@@ -218,8 +220,7 @@ void hover(void)
     turnAround(0.1);
   }
 
-// -------------------------------------------------------------------------------------------------------------
-
+// ----------------------  vvv  -----------------------  vvv   OpenCV   vvv  ----------------------  vvv  ----------------------- //
 
 RNG rng(12345);
 int lowThreshold = 60;
@@ -227,10 +228,60 @@ int const max_lowThreshold = 200;
 int ratio = 3;
 int kernel_size = 3;
 
+
+// eDistance - Calculates distance between two vectors //
 double eDistance(Vec3i a, Vec3i b)
 {
   return sqrt(pow(a[0] - b[0], 2) + pow(a[1] - b[1], 2));
 }
+
+// Rectangle detection //
+// Has to return the 
+void pRectangle (Mat src){
+
+  Mat threshold_output;
+  vector<vector<Point> > contours;
+  vector<Vec4i> hierarchy;
+
+  int thresh = 100;
+  int max_thresh = 255;
+  /// Detect edges using Threshold
+  threshold(src, threshold_output, thresh, max_thresh, THRESH_BINARY );
+
+  /// Find contours
+  findContours( threshold_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+  /// Find the rotated rectangles and ellipses for each contour
+  vector<RotatedRect> minRect( contours.size() );
+  // vector<RotatedRect> minEllipse( contours.size() );
+
+  for( int i = 0; i < contours.size(); i++ )
+     { minRect[i] = minAreaRect( Mat(contours[i]) );
+      // if( contours[i].size() > 5 )
+      //   { minEllipse[i] = fitEllipse( Mat(contours[i]) ); }
+     }
+
+  /// Draw contours + rotated rects + ellipses
+  Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );
+  for( int i = 0; i< contours.size(); i++ )
+     {
+       Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+       // contour
+       drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+       // ellipse
+       // ellipse( drawing, minEllipse[i], color, 2, 8 );
+       // rotated rectangle
+       Point2f rect_points[4]; minRect[i].points( rect_points );
+       for( int j = 0; j < 4; j++ )
+          line( drawing, rect_points[j], rect_points[(j+1)%4], color, 1, 8 );
+     }
+
+  /// Show in a window
+  imshow( "Contours", drawing );
+
+}
+
+
 // Canny Edge Detection //
 /*
  Mat cannyEdgeDetector(Mat frame)
@@ -301,7 +352,7 @@ double eDistance(Vec3i a, Vec3i b)
 
   return indeks;
  }
-
+/*
 string zbarScan(Mat frame, int width, int height){
  
   // See http://blog.ayoungprogrammer.com/2013/07/tutorial-scanning-barcodes-qr-codes.html/ //
@@ -320,7 +371,7 @@ string zbarScan(Mat frame, int width, int height){
     // wrap image data  
     zbar::Image image(width, height, "Y800", raw, width * height);  
     // scan the image for barcodes  
-    int n = scanner.scan(image);  // TODO
+    int n = scanner.scan(image);
     // extract results  
     for(Image::SymbolIterator symbol = image.symbol_begin();  
       symbol != image.symbol_end();  
@@ -346,6 +397,7 @@ string zbarScan(Mat frame, int width, int height){
       imshow("Zbar",imgout);  
       return res;
 } // End ZbarScan 
+*/
 
 int main(int argc, char **argv)
 {
@@ -356,15 +408,16 @@ int main(int argc, char **argv)
   std::string message;      // Message for console prints //
   int variance20 = 20;
 
+  imwrite( "./home/magnus/Desktop/src.jpg", frame );
 
   ros::init(argc, argv, "image_converter");
   ImageConverter ic;
 
   ros::NodeHandle node;
 
-  pub_empty_takeoff = node.advertise<std_msgs::Empty>("/ardrone/takeoff", 1); /* Message queue length is just 1 */
-  pub_empty_land = node.advertise<std_msgs::Empty>("/ardrone/land", 1);
-  pub_cmd_vel = node.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+  pub_empty_takeoff   = node.advertise<std_msgs::Empty>     ("/ardrone/takeoff", 1); /* Message queue length is just 1 */
+  pub_empty_land      = node.advertise<std_msgs::Empty>     ("/ardrone/land", 1);
+  pub_cmd_vel         = node.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 
   ros::Rate loop_rate(10);
 
@@ -417,10 +470,10 @@ int main(int argc, char **argv)
 
       aSize.minHeight = vSize.height / 3;
       aSize.maxHeight = vSize.height / 3 * 2;
-      aSize.maxLeft   = vSize.width / 3.2;
-      aSize.maxRight  = vSize.width / 1.4545;
-      aSize.maxSize   = vSize.height  / 4;
-      aSize.minSize   = vSize.height  / 8;
+      aSize.maxLeft   = vSize.width  / 3.2;
+      aSize.maxRight  = vSize.width  / 1.4545;
+      aSize.maxSize   = vSize.height / 4;
+      aSize.minSize   = vSize.height / 8;
 
       cout << "Frame Dimensions - " << vSize.width      << " " << vSize.height << endl;
       cout << "Minimum Height   - " << aSize.minHeight  << endl;
@@ -432,7 +485,7 @@ int main(int argc, char **argv)
     }
 
     // Blur and convertion to grayscale //
-    blur(frameRBG, frameRBG, Size(3, 3));
+    blur(frameRBG, frameRBG, Size(7, 7));
 
     // Histogram Start //
 
@@ -440,8 +493,15 @@ int main(int argc, char **argv)
 
     // Histogram end //
 
+
+
     cvtColor(frameRBG, frame, CV_RGB2GRAY);
 
+    // pRect //
+
+    pRectangle(frame);
+
+    // pRect //
     
     // Zbar Start //
     // https://github.com/ZBar/ZBar/blob/master/examples/scan_image.cpp
@@ -454,12 +514,16 @@ int main(int argc, char **argv)
   
     // Zbar End //
 
+
+
+
+
     // Red Filter start //
+    /*
 
     Mat redColorOnly;
     inRange(frameRBG, Scalar(30, 30, 200), Scalar(60, 60, 255), redColorOnly);
 
-    /*
     Mat hsv = frameRBG;
     cvtColor(hsv, hsv, CV_RGB2HSV);
 
@@ -477,9 +541,9 @@ int main(int argc, char **argv)
     inRange(hsv, Scalar(170, 70, 50), Scalar(360, 255, 255), mask2);
     
     Mat1b mask = mask1 + mask2;
-    */
 
     imshow("Red Filter",redColorOnly);  
+    */
 
     // Red Filter start //
 

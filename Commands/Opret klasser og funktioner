@@ -1,0 +1,89 @@
+Tilføj i main:
+
+#include "myFile.h"
+
+--------------------
+
+Tilføj i CMakeList.txt
+add_executable(FindCirclesWebcam src/FindCirclesWebcam.cpp src/qrScan.h src/qrScan.cpp "src/myFile.h src/myFile.cpp")
+
+--------------------
+
+Funktion
+
+Tilføj .cpp og .h i /src
+
+I .cpp 	tilføj - #include "myFile.h"
+I .h 	tilføj - #pragma once
+
+I både .cpp og .h tilføj eventuelle ekstra biblioteker ex - #include "opencv2/opencv.hpp"
+Husk evt. namespaces
+
+I .h tilføj metode ex    - string myFunction(Mat frame);
+I .cpp tilføj metoden ex - string myFunction(Mat frame){ ... }
+
+
+Eksempel:
+
+.cpp
+#include "qrScan.h"
+#include "opencv2/opencv.hpp"
+
+#include <zbar.h>
+
+using namespace zbar;
+
+string zbarScan(Mat frame, int width, int height){
+
+} 
+
+-----
+
+.h
+#pragma once
+
+#include "opencv2/opencv.hpp"
+
+using namespace cv;
+
+string zbarScan(Mat frame, int width, int height);
+
+--------------------
+
+Klasse
+Tilføj også:
+
+I .h
+
+class myClass{
+
+...
+
+};
+
+-----
+
+I .cpp
+
+myClass::myObject(){}
+myClass::~myObject(){}
+
+string myClass::myFunction(Mat frame){
+
+...
+
+}
+
+
+For at kalde funktion
+
+myFunction(frame);
+
+-----
+
+For at kalde klasse
+
+myClass myObject;
+
+myObject.myFunction();
+

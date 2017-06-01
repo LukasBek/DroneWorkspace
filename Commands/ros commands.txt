@@ -1,0 +1,26 @@
+Compile
+~/droneWorkspace catkin_make
+
+> New terminal < - Minimize
+roscore
+
+> New terminal < - Minimize
+roslaunch ardronepkg launch_drone.launch
+
+rostopic list
+> New terminal <
+rostopic pub -1 ardrone/reset std_msgs/Empty
+rostopic pub -1 ardrone/takeoff std_msgs/Empty
+rostopic pub -1 ardrone/land std_msgs/Empty
+
+> New terminal <
+rosrun ardronepkg FindCirclesWebcam
+
+Git
+Pull: 	~droneWorkspace/src/DroneWorkspace git pull origin master
+
+New files:
+	~droneWorkspace/src/DroneWorkspace git add .
+
+Commit: ~droneWorkspace/src/DroneWorkspace git commit -m "MESSAGE"
+push: 	~droneWorkspace/src/DroneWorkspace git push origin master

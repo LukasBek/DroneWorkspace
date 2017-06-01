@@ -28,6 +28,8 @@ find_package( OpenCV 2 REQUIRED )
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
+  src/
+  
 )
 
 ## Declare a C++ executable
@@ -37,7 +39,7 @@ include_directories(
 add_executable(Image_converter src/Image_converter.cpp)
 target_link_libraries(Image_converter ${catkin_LIBRARIES})
 target_link_libraries(Image_converter ${OpenCV_LIBRARIES})
-add_executable(FindCirclesWebcam src/FindCirclesWebcam.cpp)
+add_executable(FindCirclesWebcam src/FindCirclesWebcam.cpp src/qrScan.h src/qrScan.cpp)
 target_link_libraries(FindCirclesWebcam ${catkin_LIBRARIES})
 target_link_libraries(FindCirclesWebcam ${OpenCV_LIBRARIES})
 target_link_libraries(FindCirclesWebcam zbar ${catkin_LIBRARIES})

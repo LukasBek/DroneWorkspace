@@ -26,9 +26,13 @@
 #include "featureDetection.h"
 #include "DroneMovement.h"
 
+// #include <chrono>
+
 using namespace cv;
 using namespace std;
 using namespace zbar;
+
+// typedef std::chrono::high_resolution_clock Clock;
 
 Mat frameRBG; // Primary working frame from capture //
 
@@ -154,6 +158,8 @@ int main(int argc, char **argv)
 
   ros::Duration(1).sleep();
   int b = 0;
+  // auto t1 = Clock::now();
+  // cout << "clock: " << t1 << endl;
   while (ros::ok())
   {
     ros::spinOnce();
@@ -167,7 +173,7 @@ int main(int argc, char **argv)
     {
       ros::spinOnce();
       //// Denne skal udkommenteres for kun at teste kamera og så dronen ikke letter
-      // move.takeoff();
+      move.takeoff();
 
       if (b == 99)
       {
@@ -195,12 +201,13 @@ int main(int argc, char **argv)
       vSize.width     = frameRBG.cols;
       vSize.height    = frameRBG.rows;
 
-      aSize.minHeight = vSize.height / 3;
-      aSize.maxHeight = vSize.height / 3 * 2;
-      aSize.maxLeft   = vSize.width  / 3.2;
-      aSize.maxRight  = vSize.width  / 1.4545;
+      aSize.minHeight = vSize.height / 2.5;
+      aSize.maxHeight = vSize.height / 7;
+      aSize.maxLeft   = vSize.width  / 2.5;
+      aSize.maxRight  = vSize.width  / 1.6;
       aSize.maxSize   = vSize.height / 4;
-      aSize.minSize   = vSize.height / 8;
+      //Jo mindre tal, jo tættere på kommer dronen
+      aSize.minSize   = vSize.height / 12;
 
       cout << "Frame Dimensions - " << vSize.width      << " " << vSize.height << endl;
       cout << "Minimum Height   - " << aSize.minHeight  << endl;
@@ -212,7 +219,7 @@ int main(int argc, char **argv)
     }
 
     // Blur and convertion to grayscale //
-    blur(frameRBG, frameRBG, Size(7, 7));
+    blur(frameRBG, frameRBG, Size(5, 5));
 
 
     cvtColor(frameRBG, frame, CV_RGB2GRAY);
@@ -315,8 +322,10 @@ int main(int argc, char **argv)
             if (c[2] > aSize.maxSize){
               //Go through
               message = "Go Through ";
-              move.goThrough(2);
+              move.goThrough(1.7);
             }
+
+
             if (c[2] < aSize.minSize){
               // Go Forward
               message = "Go forward ";

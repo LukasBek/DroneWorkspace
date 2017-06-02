@@ -9,9 +9,9 @@ roslaunch ardronepkg launch_drone.launch
 
 rostopic list
 > New terminal <
-rostopic pub -1 ardrone/reset std_msgs/Empty
-rostopic pub -1 ardrone/takeoff std_msgs/Empty
-rostopic pub -1 ardrone/land std_msgs/Empty
+rostopic pub ardrone/reset std_msgs/Empty
+rostopic pub ardrone/takeoff std_msgs/Empty
+rostopic pub ardrone/land std_msgs/Empty
 
 > New terminal <
 rosrun ardronepkg FindCirclesWebcam
@@ -21,6 +21,7 @@ Pull: 	~droneWorkspace/src/DroneWorkspace git pull origin master
 
 New files:
 	~droneWorkspace/src/DroneWorkspace git add .
+	~droneWorkspace/src/DroneWorkspace git add /src/newFile.cpp
 
 Commit: ~droneWorkspace/src/DroneWorkspace git commit -m "MESSAGE"
 push: 	~droneWorkspace/src/DroneWorkspace git push origin master

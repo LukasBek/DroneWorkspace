@@ -14,7 +14,7 @@ Funktion
 Tilføj .cpp og .h i /src
 
 I .cpp 	tilføj - #include "myFile.h"
-I .h 	tilføj - #pragma once
+I .h 	tilføj - #pragma once // Ikke med alm. klasser
 
 I både .cpp og .h tilføj eventuelle ekstra biblioteker ex - #include "opencv2/opencv.hpp"
 Husk evt. namespaces
@@ -68,6 +68,7 @@ I .cpp
 myClass::myObject(){}
 myClass::~myObject(){}
 
+// TODO MANGLER NOGET
 string myClass::myFunction(Mat frame){
 
 ...

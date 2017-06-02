@@ -122,7 +122,7 @@ int main(int argc, char **argv)
 
   move.init(node);
 
-  ros::Rate loop_rate(20);
+  ros::Rate loop_rate(10);
 
 
   struct videoSize // Struct for video size //
@@ -163,15 +163,26 @@ int main(int argc, char **argv)
     //{ //takeoff
 
     //cout << "Variabler " << move.takeoff_time << endl;
-   // while (b < 1000) {
-     // ros::spinOnce();
-      //Denne skal udkommenteres for kun at teste kamera og så dronen ikke letter
-     // move.takeoff();
-      //b++;
-      //if (b == 0) {
-       // ROS_INFO("Drone taking off - Nicki");
-      //}
-    //}
+    while (b < 100)
+    {
+      ros::spinOnce();
+      //// Denne skal udkommenteres for kun at teste kamera og så dronen ikke letter
+      // move.takeoff();
+
+      if (b == 99)
+      {
+        cout << "Taking off" << endl;
+        ros::Duration(6).sleep();
+      }
+      b++;
+    }
+    while (b < 101)
+    {
+      cout << "OPSADASSE!" << endl;
+      ros::spinOnce();
+      move.goUp(1.6);
+      b++;
+    }
 
     //cout << "TRY ME" << endl;
     if (frameRBG.empty()){
@@ -302,9 +313,9 @@ int main(int argc, char **argv)
       // Command section start //
 
             if (c[2] > aSize.maxSize){
-              // Go Back
-              message = "Go back ";
-              move.backwardx();
+              //Go through
+              message = "Go Through ";
+              move.goThrough(2);
             }
             if (c[2] < aSize.minSize){
               // Go Forward
@@ -329,16 +340,16 @@ int main(int argc, char **argv)
             if (c[1] < aSize.minHeight){
               // Go Up
               message = "Go up ";
-              move.goUp();
+              move.goUp(0.1);
             }
             // if(message != "" && message != "DEF"){
             if(message != "DEF"){
-              //cout << message << endl;
+              cout << message << endl;
                 message = "DEF";
             } else {
-               //cout << "Going through the circle" << endl;
+               cout << "Going through the circle" << endl;
               message = "DEF";
-              move.goThrough();
+             move.goThrough(1.0);
             }
 
       // Command section end //
@@ -370,7 +381,7 @@ int main(int argc, char **argv)
       // cout << "Hover" << endl;
       move.hover();
       // cout << "Hover" << endl;
-      move.turnAround(0.1);
+    //  move.turnAround(0.1);
     }
 
     imshow("Detected circles", frame);

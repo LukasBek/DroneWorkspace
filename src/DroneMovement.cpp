@@ -6,8 +6,10 @@
 #include <geometry_msgs/Twist.h>
 #include <ros/ros.h>
 
+using namespace std;
 
-
+//DroneMovements
+    
 std_msgs::Empty emp_msg;
 geometry_msgs::Twist twist_msg;
 geometry_msgs::Twist twist_msg_neg;
@@ -18,33 +20,32 @@ ros::Publisher pub_empty_takeoff;
 ros::Publisher pub_empty_land;
 ros::Publisher pub_cmd_vel;
 
-double start_time;
+class DroneMovement{    
+public:
+    //command message
+    double start_time;
+    float takeoff_time;
+    float fly_time;
+    float land_time;
+    float kill_time;
+    float sleepD;
+    int circleFound;
+    void init(ros::NodeHandle node);
+    void takeoff(void);
+    void land(void);
+    void forwardx(void);
+    void backwardx(void);
+    void goLeft(void);
+    void goRight(void);
+    void goUp(void);
+    void goDown(void);
+    void turnAround(double turnTime);
+    void goThrough(void);
+    void hover(void);
+    void findCircle();
+};
 
-//command message
-float takeoff_time = 5.0;
-float fly_time = 7.0;
-float land_time = 3.0;
-float kill_time = 2.0;
 
-std_msgs::Empty emp_msg;
-geometry_msgs::Twist twist_msg;
-geometry_msgs::Twist twist_msg_neg;
-geometry_msgs::Twist twist_msg_hover;
-geometry_msgs::Twist twist_msg_up;
-
-ros::Publisher pub_empty_takeoff;
-ros::Publisher pub_empty_land;
-ros::Publisher pub_cmd_vel;
-
-
-
-//command message
-double start_time = 2;
-float takeoff_time = 5.0;
-float fly_time = 7.0;
-float land_time = 3.0;
-float kill_time = 2.0;
-float sleepD = 0.1;
 
 geometry_msgs::Twist changeTwist(float x, float y, float z, float turn)
 {
@@ -58,26 +59,39 @@ geometry_msgs::Twist changeTwist(float x, float y, float z, float turn)
     return (msg_vel);
 }
 
- void takeoff(void)
+void DroneMovement::init(ros::NodeHandle node){
+    pub_empty_takeoff = node.advertise<std_msgs::Empty>("/ardrone/takeoff", 1); /* Message queue length is just 1 */
+    pub_empty_land = node.advertise<std_msgs::Empty>("/ardrone/land", 1);
+    pub_cmd_vel = node.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+
+start_time = 2;
+takeoff_time = 5.0;
+fly_time = 7.0;
+land_time = 3.0;
+kill_time = 2.0;
+sleepD = 0.1;
+circleFound;
+}
+
+ void DroneMovement::takeoff(void)
 {
-    std_msgs::Empty empty;
+      std_msgs::Empty empty;
     geometry_msgs::Twist msg_vel;
     pub_empty_takeoff.publish(empty);
     ROS_INFO("Starter");
     msg_vel = changeTwist(0, 0, 0, 0);
     pub_cmd_vel.publish(msg_vel);
-    // ros::Duration(3).sleep();
-    ROS_INFO("Starter");
+    ROS_INFO("Efter Starter");
 }
 
-void land(void)
+void DroneMovement::land(void)
 {
     std_msgs::Empty empty;
     pub_empty_land.publish(empty);
     ros::Duration(2).sleep();
 }
 
-void forwardx(void)
+void DroneMovement::forwardx(void)
 {
     geometry_msgs::Twist msg_vel;
     msg_vel = changeTwist(1, 0, 0, 0);
@@ -85,7 +99,7 @@ void forwardx(void)
     ros::Duration(sleepD).sleep();
 }
 
-void backwardx(void)
+void DroneMovement::backwardx(void)
 {
     geometry_msgs::Twist msg_vel;
     msg_vel = changeTwist(-1, 0, 0, 0);
@@ -93,7 +107,7 @@ void backwardx(void)
     ros::Duration(sleepD).sleep();
 }
 
-void goLeft(void)
+void DroneMovement::goLeft(void)
 {
     geometry_msgs::Twist msg_vel;
     msg_vel = changeTwist(0, 1, 0, 0);
@@ -101,7 +115,7 @@ void goLeft(void)
     ros::Duration(sleepD).sleep();
 }
 
-void goRight(void)
+void DroneMovement::goRight(void)
 {
     geometry_msgs::Twist msg_vel;
     msg_vel = changeTwist(0, -1, 0, 0);
@@ -109,7 +123,7 @@ void goRight(void)
     ros::Duration(sleepD).sleep();
 }
 
-void goUp(void)
+void DroneMovement::goUp(void)
 {
     geometry_msgs::Twist msg_vel;
     msg_vel = changeTwist(0, 0, 1, 0);
@@ -117,7 +131,7 @@ void goUp(void)
     ros::Duration(sleepD).sleep();
 }
 
-void goDown(void)
+void DroneMovement::goDown(void)
 {
     geometry_msgs::Twist msg_vel;
     msg_vel = changeTwist(0, 0, -1, 0);
@@ -125,14 +139,15 @@ void goDown(void)
     ros::Duration(sleepD).sleep();
 }
 
-void turnAround(void)
+void DroneMovement::turnAround(double turnTime)
 {
     geometry_msgs::Twist msg_vel;
-    msg_vel = changeTwist(0, 0, 0, 1);
+    msg_vel = changeTwist(0, 0, 0, 0.2);
     pub_cmd_vel.publish(msg_vel);
+    ros::Duration(turnTime).sleep();
 }
 
-void goThrough(void)
+void DroneMovement::goThrough(void)
 {
   geometry_msgs::Twist msg_vel;
   msg_vel = changeTwist(1, 0, 0, 0);
@@ -140,9 +155,15 @@ void goThrough(void)
   ros::Duration(1).sleep();
 }
 
-void hover(void)
+void DroneMovement::hover(void)
 {
     geometry_msgs::Twist msg_vel;
     msg_vel = changeTwist(0, 0, 0, 0);
     pub_cmd_vel.publish(msg_vel);
 }
+
+ void DroneMovement::findCircle(){
+    
+    
+    turnAround(0.1);
+  }

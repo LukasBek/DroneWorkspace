@@ -15,15 +15,11 @@ Mat sobel(Mat src){
 
   Mat src_gray;
   Mat grad;
-  char* window_name = "Sobel Demo - Simple Edge Detector";
   int scale = 1;
   int delta = 0;
   int ddepth = CV_16S;
 
   int c;
-
-  if( !src.data )
-  { return NULL; }
 
   /// Generate grad_x and grad_y
   Mat grad_x, grad_y;
@@ -47,7 +43,11 @@ Mat sobel(Mat src){
 
 // -------------------------------------------------- //
 
+// Blur and gray the image before call //
 Mat minBoundingRotatedBoxes (Mat src){
+
+
+  RNG rng(12345);
 
   Mat threshold_output;
   vector<vector<Point> > contours;
@@ -88,4 +88,85 @@ Mat minBoundingRotatedBoxes (Mat src){
 
   /// Show in a window
   return drawing;
+}
+
+// -------------------------------------------------- //
+
+vector<Vec3f> getCircles(Mat src){
+
+  vector<Vec3f> circles;
+  int dp = 1;           // The inverse ratio of resolution
+  int min_dist = 100;   // Minimum distance between detected centers
+  int param_1 = 100;    // Upper threshold for the internal Canny edge detector
+  int param_2 = 100;    // Threshold for center detection
+                        // 200 Has hard time finding perfect circles
+                        // 100 Only very clear circles
+                        // 80 detects random round suff
+                        // 60 begins detecting faces
+                        // 50 sees faces
+                        // 40 sees circles in square objects
+                        // 20 or below, finds circles everywhere
+  int min_radius = 20;  // Minimum radio to be detected. If unknown, put zero as default
+  int max_radius = 200; // Maximum radius to be detected. If unknown, put zero as default
+  HoughCircles(src, circles, CV_HOUGH_GRADIENT, dp, min_dist, param_1, param_2, min_radius, max_radius);
+  for (size_t i = 0; i < circles.size(); i++)
+  {
+    Vec3i c = circles[i];
+    circle(src, Point(c[0], c[1]), c[2], Scalar(255, 255, 255), 3, CV_AA);
+    circle(src, Point(c[0], c[1]), 2,    Scalar(255, 255, 255), 3, CV_AA);
+  }
+
+  // cout << "Amount of circles: " << circles.size() << endl;
+
+  return circles;
+}
+
+  // Histogram Calculation //
+  // Source - http://docs.opencv.org/2.4/doc/tutorials/imgproc/histograms/histogram_calculation/histogram_calculation.html
+int histogramCalculation(Mat src)
+{
+cout << "DONT WORK" << endl;
+/*
+  Mat dst;
+
+  /// Separate the image in 3 places ( B, G and R )
+  vector<Mat> bgr_planes;
+  split( src, bgr_planes );
+
+  /// Establish the number of bins
+  int histSize = 256;
+
+  /// Set the ranges ( for B,G,R) )
+  float range[] = { 0, 256 } ;
+  const float* histRange = { range };
+
+  bool uniform = true;
+  bool accumulate = false;
+
+  Mat b_hist, g_hist, r_hist;
+  /// Compute the histograms:
+  calcHist( &bgr_planes[0], 1, 0, Mat(), b_hist, 1, &histSize, &histRange, uniform, accumulate );
+  calcHist( &bgr_planes[1], 1, 0, Mat(), g_hist, 1, &histSize, &histRange, uniform, accumulate );
+  calcHist( &bgr_planes[2], 1, 0, Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate );
+
+
+  /// Normalize the result to [ 0, histImage.rows ]
+  //normalize(b_hist, b_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+  //normalize(g_hist, g_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+  //normalize(r_hist, r_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
+
+  int hist_w = 256;
+
+  float top = 0;
+  int indeks = 0;
+  for (int i = 1 + 30; i < hist_w - 30; i++)
+  {
+    if (cvRound(r_hist.at<float>(i)) > top){
+        top = (cvRound(r_hist.at<float>(i)));
+        indeks = i;
+    }
+}
+   // cout << "Top: " << top << ", indeks: " << indeks << endl;
+*/
+   return -1;
 }

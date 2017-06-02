@@ -11,3 +11,5 @@ using namespace cv;
 
 Mat sobel(Mat src);
 Mat minBoundingRotatedBoxes (Mat src);
+vector<Vec3f> getCircles(Mat src);
+int histogramCalculation(Mat src);

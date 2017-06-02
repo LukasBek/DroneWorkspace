@@ -5,7 +5,7 @@
 
 using namespace zbar;
 
-string zbarScan(Mat frame, int width, int height){
+std::string zbarScan(Mat frame, int width, int height){
  
   // See http://blog.ayoungprogrammer.com/2013/07/tutorial-scanning-barcodes-qr-codes.html/ //
   std::string res;
@@ -28,7 +28,7 @@ string zbarScan(Mat frame, int width, int height){
     for(Image::SymbolIterator symbol = image.symbol_begin();  
       symbol != image.symbol_end();  
       ++symbol) {  
-        vector<Point> vp;  
+        std::vector<Point> vp;  
         // do something useful with results  
         // cout << "decoded " << symbol->get_type_name() << " symbol " << symbol->get_data() << endl;  
         int n = symbol->get_location_size();  

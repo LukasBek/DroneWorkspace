@@ -23,6 +23,7 @@
 #include <geometry_msgs/Twist.h>
 
 #include "qrScan.h"
+#include "DroneMovement.h"
 
 using namespace cv;
 using namespace std;
@@ -85,141 +86,6 @@ public:
     // image_pub_.publish(cv_ptr->toImageMsg());
   }
 };
-
-// -------------------------------------------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------------------------------------------
-//DroneMovements
-
-std_msgs::Empty emp_msg;
-geometry_msgs::Twist twist_msg;
-geometry_msgs::Twist twist_msg_neg;
-geometry_msgs::Twist twist_msg_hover;
-geometry_msgs::Twist twist_msg_up;
-
-ros::Publisher pub_empty_takeoff;
-ros::Publisher pub_empty_land;
-ros::Publisher pub_cmd_vel;
-
-
-
-//command message
-double start_time = 2;
-float takeoff_time = 5.0;
-float fly_time = 7.0;
-float land_time = 3.0;
-float kill_time = 2.0;
-float sleepD = 0.1;
-int circleFound;
-
-geometry_msgs::Twist changeTwist(float x, float y, float z, float turn)
-{
-    geometry_msgs::Twist msg_vel;
-    msg_vel.angular.x = 0;
-    msg_vel.angular.y = 0;
-    msg_vel.angular.z = turn;
-    msg_vel.linear.x = x;
-    msg_vel.linear.y = y;
-    msg_vel.linear.z = z;
-    return (msg_vel);
-}
-
- void takeoff(void)
-{
-    std_msgs::Empty empty;
-    geometry_msgs::Twist msg_vel;
-    pub_empty_takeoff.publish(empty);
-    ROS_INFO("Starter");
-    msg_vel = changeTwist(0, 0, 0, 0);
-    pub_cmd_vel.publish(msg_vel);
-    // ros::Duration(3).sleep();
-    ROS_INFO("Starter");
-}
-
-void land(void)
-{
-    std_msgs::Empty empty;
-    pub_empty_land.publish(empty);
-    ros::Duration(2).sleep();
-}
-
-void forwardx(void)
-{
-    geometry_msgs::Twist msg_vel;
-    msg_vel = changeTwist(1, 0, 0, 0);
-    pub_cmd_vel.publish(msg_vel);
-    ros::Duration(sleepD).sleep();
-}
-
-void backwardx(void)
-{
-    geometry_msgs::Twist msg_vel;
-    msg_vel = changeTwist(-1, 0, 0, 0);
-    pub_cmd_vel.publish(msg_vel);
-    ros::Duration(sleepD).sleep();
-}
-
-void goLeft(void)
-{
-    geometry_msgs::Twist msg_vel;
-    msg_vel = changeTwist(0, 1, 0, 0);
-    pub_cmd_vel.publish(msg_vel);
-    ros::Duration(sleepD).sleep();
-}
-
-void goRight(void)
-{
-    geometry_msgs::Twist msg_vel;
-    msg_vel = changeTwist(0, -1, 0, 0);
-    pub_cmd_vel.publish(msg_vel);
-    ros::Duration(sleepD).sleep();
-}
-
-void goUp(void)
-{
-    geometry_msgs::Twist msg_vel;
-    msg_vel = changeTwist(0, 0, 1, 0);
-    pub_cmd_vel.publish(msg_vel);
-    ros::Duration(sleepD).sleep();
-}
-
-void goDown(void)
-{
-    geometry_msgs::Twist msg_vel;
-    msg_vel = changeTwist(0, 0, -1, 0);
-    pub_cmd_vel.publish(msg_vel);
-    ros::Duration(sleepD).sleep();
-}
-
-void turnAround(double turnTime)
-{
-    geometry_msgs::Twist msg_vel;
-    msg_vel = changeTwist(0, 0, 0, 0.2);
-    pub_cmd_vel.publish(msg_vel);
-    ros::Duration(turnTime).sleep();
-}
-
-void goThrough(void)
-{
-  geometry_msgs::Twist msg_vel;
-  msg_vel = changeTwist(1, 0, 0, 0);
-  pub_cmd_vel.publish(msg_vel);
-  ros::Duration(1).sleep();
-}
-
-void hover(void)
-{
-    geometry_msgs::Twist msg_vel;
-    msg_vel = changeTwist(0, 0, 0, 0);
-    pub_cmd_vel.publish(msg_vel);
-}
-
- void findCircle(){
-    
-    
-    turnAround(0.1);
-  }
-
 // ----------------------  vvv  -----------------------  vvv   OpenCV   vvv  ----------------------  vvv  ----------------------- //
 
 RNG rng(12345);
@@ -415,9 +281,9 @@ int main(int argc, char **argv)
 
   ros::NodeHandle node;
 
-  pub_empty_takeoff   = node.advertise<std_msgs::Empty>     ("/ardrone/takeoff", 1); /* Message queue length is just 1 */
-  pub_empty_land      = node.advertise<std_msgs::Empty>     ("/ardrone/land", 1);
-  pub_cmd_vel         = node.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+  DroneMovement move;
+
+  move.init(node);
 
   ros::Rate loop_rate(10);
 
@@ -453,10 +319,10 @@ int main(int argc, char **argv)
   {
     ros::spinOnce();
 
-    while ((double)ros::Time::now().toSec() < start_time + takeoff_time + 2)
+    while ((double)ros::Time::now().toSec() < move.start_time + move.takeoff_time + 2)
     { //takeoff
         ros::spinOnce();
-        takeoff();
+        move.takeoff();
         ROS_INFO("Drone taking off - Nicki");
     }
 
@@ -626,32 +492,32 @@ int main(int argc, char **argv)
             if (c[2] > aSize.maxSize){
               // Go Back
               message = "Go back ";
-              backwardx();
+              move.backwardx();
             }
             if (c[2] < aSize.minSize){
               // Go Forward
               message = "Go forward ";
-              forwardx();
+              move.forwardx();
             }
             if (c[0] < aSize.maxLeft){
               // Go Left
               message = "Go left ";
-              goLeft();
+              move.goLeft();
             }
              if (c[0] > aSize.maxRight){
               // Go Right
               message = "Go right ";
-              goRight();
+              move.goRight();
             }
              if (c[1] > aSize.maxHeight){
               // GO Down
               message = "Go down ";
-              goDown();
+              move.goDown();
             }
             if (c[1] < aSize.minHeight){
               // Go Up
               message = "Go up ";
-              goUp();
+              move.goUp();
             } 
             // if(message != "" && message != "DEF"){
             if(message != "DEF"){
@@ -660,7 +526,7 @@ int main(int argc, char **argv)
             } else {
                //cout << "Going through the circle" << endl;
               message = "DEF";
-              goThrough();
+              move.goThrough();
             }
             
       // Command section end //
@@ -690,9 +556,9 @@ int main(int argc, char **argv)
       // Setting text on screen end //
     } else {
       // cout << "Hover" << endl;
-      hover();
+      move.hover();
       // cout << "Hover" << endl;
-      turnAround(0.1);
+      move.turnAround(0.1);
     }
 
     imshow("Detected circles", frame);

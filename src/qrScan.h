@@ -4,4 +4,4 @@
 
 using namespace cv;
 
-string zbarScan(Mat frame, int width, int height);
+std::string zbarScan(Mat frame, int width, int height);

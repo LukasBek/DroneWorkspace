@@ -287,6 +287,7 @@ int main(int argc, char **argv)
 
   ros::Rate loop_rate(10);
 
+
   struct videoSize // Struct for video size //
   {
     int width;
@@ -323,17 +324,22 @@ int main(int argc, char **argv)
        //while ((double)ros::Time::now().toSec() < start_time + takeoff_time + 2) 
     //while ((double)ros::Time::now().toSec() < 7 + 2)
     //{ //takeoff
-    while (b < 1000) {
-      ros::spinOnce();
-      move.takeoff();
-      b++;
-      if (b == 0) {
-        ROS_INFO("Drone taking off - Nicki");
-      }
-    }
+   
+    //cout << "Variabler " << move.takeoff_time << endl;
+   // while (b < 1000) {
+     // ros::spinOnce();
+      //Denne skal udkommenteres for kun at teste kamera og så dronen ikke letter
+     // move.takeoff();
+      //b++;
+      //if (b == 0) {
+       // ROS_INFO("Drone taking off - Nicki");
+      //}
+    //}
+
 
     if (frameRBG.empty())
       break; // end of video stream
+
 
     if (vSize.width == 0 || vSize.height == 0)
     {

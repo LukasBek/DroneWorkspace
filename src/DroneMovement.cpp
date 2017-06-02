@@ -45,13 +45,7 @@ public:
     void findCircle();
 };
 
-double start_time = 2;
-float takeoff_time = 5.0;
-float fly_time = 7.0;
-float land_time = 3.0;
-float kill_time = 2.0;
-float sleepD = 0.1;
-int circleFound;
+
 
 geometry_msgs::Twist changeTwist(float x, float y, float z, float turn)
 {
@@ -69,6 +63,14 @@ void DroneMovement::init(ros::NodeHandle node){
     pub_empty_takeoff = node.advertise<std_msgs::Empty>("/ardrone/takeoff", 1); /* Message queue length is just 1 */
     pub_empty_land = node.advertise<std_msgs::Empty>("/ardrone/land", 1);
     pub_cmd_vel = node.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+
+start_time = 2;
+takeoff_time = 5.0;
+fly_time = 7.0;
+land_time = 3.0;
+kill_time = 2.0;
+sleepD = 0.1;
+circleFound;
 }
 
  void DroneMovement::takeoff(void)

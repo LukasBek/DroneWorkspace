@@ -18,7 +18,7 @@ public:
 
 	void land(void);
 
-	void forwardx(void);
+	void forwardx();
 
 	void backwardx(void);
 
@@ -26,13 +26,13 @@ public:
 
 	void goRight(void);
 
-	void goUp(void);
+	void goUp(double time);
 
 	void goDown(void);
 
 	void turnAround(double turnTime);
 
-	void goThrough(void);
+	void goThrough(double time);
 
 	void hover(void);
 

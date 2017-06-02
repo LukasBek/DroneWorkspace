@@ -23,6 +23,7 @@
 #include <geometry_msgs/Twist.h>
 
 #include "qrScan.h"
+#include "featureDetection.h"
 
 using namespace cv;
 using namespace std;
@@ -215,8 +216,8 @@ void hover(void)
 }
 
  void findCircle(){
-    
-    
+
+
     turnAround(0.1);
   }
 
@@ -236,7 +237,8 @@ double eDistance(Vec3i a, Vec3i b)
 }
 
 // Rectangle detection //
-// Has to return the 
+// Has to return the
+/*
 void pRectangle (Mat src){
 
   Mat threshold_output;
@@ -256,30 +258,31 @@ void pRectangle (Mat src){
   // vector<RotatedRect> minEllipse( contours.size() );
 
   for( int i = 0; i < contours.size(); i++ )
-     { minRect[i] = minAreaRect( Mat(contours[i]) );
-      // if( contours[i].size() > 5 )
-      //   { minEllipse[i] = fitEllipse( Mat(contours[i]) ); }
-     }
+  { minRect[i] = minAreaRect( Mat(contours[i]) );
+    // if( contours[i].size() > 5 )
+    //   { minEllipse[i] = fitEllipse( Mat(contours[i]) ); }
+  }
 
   /// Draw contours + rotated rects + ellipses
   Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );
   for( int i = 0; i< contours.size(); i++ )
-     {
-       Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-       // contour
-       drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
-       // ellipse
-       // ellipse( drawing, minEllipse[i], color, 2, 8 );
-       // rotated rectangle
-       Point2f rect_points[4]; minRect[i].points( rect_points );
-       for( int j = 0; j < 4; j++ )
-          line( drawing, rect_points[j], rect_points[(j+1)%4], color, 1, 8 );
-     }
+  {
+    Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+    // contour
+    drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+    // ellipse
+    // ellipse( drawing, minEllipse[i], color, 2, 8 );
+    // rotated rectangle
+    Point2f rect_points[4]; minRect[i].points( rect_points );
+    for( int j = 0; j < 4; j++ )
+    line( drawing, rect_points[j], rect_points[(j+1)%4], color, 1, 8 );
+  }
 
   /// Show in a window
   imshow( "Contours", drawing );
 
 }
+*/
 
 
 // Canny Edge Detection //
@@ -322,7 +325,7 @@ void pRectangle (Mat src){
   float range[] = { 0, 256 } ;
   const float* histRange = { range };
 
-  bool uniform = true; 
+  bool uniform = true;
   bool accumulate = false;
 
   Mat b_hist, g_hist, r_hist;
@@ -354,49 +357,49 @@ void pRectangle (Mat src){
  }
 /*
 string zbarScan(Mat frame, int width, int height){
- 
+
   // See http://blog.ayoungprogrammer.com/2013/07/tutorial-scanning-barcodes-qr-codes.html/ //
   std::string res;
-  zbar::ImageScanner scanner;  
-    scanner.set_config(zbar::ZBAR_NONE, zbar::ZBAR_CFG_ENABLE, 1);  
-      // obtain image data  
-     char file[256];  
-     //cin>>file;  
-     //Mat img = imread(file,0);  
-     Mat imgout;  
-     cvtColor(frame,imgout,CV_GRAY2RGB);  
-     //int width = img.cols;  
-     //int height = img.rows;  
-    uchar *raw = (uchar *)frame.data;  
-    // wrap image data  
-    zbar::Image image(width, height, "Y800", raw, width * height);  
-    // scan the image for barcodes  
+  zbar::ImageScanner scanner;
+    scanner.set_config(zbar::ZBAR_NONE, zbar::ZBAR_CFG_ENABLE, 1);
+      // obtain image data
+     char file[256];
+     //cin>>file;
+     //Mat img = imread(file,0);
+     Mat imgout;
+     cvtColor(frame,imgout,CV_GRAY2RGB);
+     //int width = img.cols;
+     //int height = img.rows;
+    uchar *raw = (uchar *)frame.data;
+    // wrap image data
+    zbar::Image image(width, height, "Y800", raw, width * height);
+    // scan the image for barcodes
     int n = scanner.scan(image);
-    // extract results  
-    for(Image::SymbolIterator symbol = image.symbol_begin();  
-      symbol != image.symbol_end();  
-      ++symbol) {  
-        vector<Point> vp;  
-        // do something useful with results  
-        // cout << "decoded " << symbol->get_type_name() << " symbol " << symbol->get_data() << endl;  
-        int n = symbol->get_location_size();  
-        for(int i=0;i<n;i++){  
-          vp.push_back(Point(symbol->get_location_x(i),symbol->get_location_y(i))); 
-          }  
-        RotatedRect r = minAreaRect(vp);  
-        Point2f pts[4];  
-        r.points(pts);  
-        for(int i=0;i<4;i++){  
-          line(imgout,pts[i],pts[(i+1)%4],Scalar(255,0,0),3);  
-        }  
+    // extract results
+    for(Image::SymbolIterator symbol = image.symbol_begin();
+      symbol != image.symbol_end();
+      ++symbol) {
+        vector<Point> vp;
+        // do something useful with results
+        // cout << "decoded " << symbol->get_type_name() << " symbol " << symbol->get_data() << endl;
+        int n = symbol->get_location_size();
+        for(int i=0;i<n;i++){
+          vp.push_back(Point(symbol->get_location_x(i),symbol->get_location_y(i)));
+          }
+        RotatedRect r = minAreaRect(vp);
+        Point2f pts[4];
+        r.points(pts);
+        for(int i=0;i<4;i++){
+          line(imgout,pts[i],pts[(i+1)%4],Scalar(255,0,0),3);
+        }
           std::stringstream strstream;
           strstream << symbol->get_data();
           strstream >> res;
-        // cout<<"Angle: "<<r.angle<<endl;  
-   }  
-      imshow("Zbar",imgout);  
+        // cout<<"Angle: "<<r.angle<<endl;
+   }
+      imshow("Zbar",imgout);
       return res;
-} // End ZbarScan 
+} // End ZbarScan
 */
 
 int main(int argc, char **argv)
@@ -502,7 +505,7 @@ int main(int argc, char **argv)
     pRectangle(frame);
 
     // pRect //
-    
+
     // Zbar Start //
     // https://github.com/ZBar/ZBar/blob/master/examples/scan_image.cpp
     // http://zbar.sourceforge.net/api/index.html
@@ -511,7 +514,7 @@ int main(int argc, char **argv)
     if (!res.empty()){
       cout << "Symbol: " << zbarScan(frame, vSize.width, vSize.height) << endl;
     }
-  
+
     // Zbar End //
 
 
@@ -532,17 +535,17 @@ int main(int argc, char **argv)
     }
     if (redHue < 0 + variance20){
       redHue = 0;
-    } 
+    }
     Mat1b mask1, mask2;
     inRange(hsv, Scalar(0,   0, 0),Scalar(20, 255, 255), mask1);
     inRange(hsv, Scalar(340, 0, 0),Scalar(0,  255, 255), mask2);
 
     inRange(hsv, Scalar(0, 70, 50), Scalar(10, 500, 255), mask1);
     inRange(hsv, Scalar(170, 70, 50), Scalar(360, 255, 255), mask2);
-    
+
     Mat1b mask = mask1 + mask2;
 
-    imshow("Red Filter",redColorOnly);  
+    imshow("Red Filter",redColorOnly);
     */
 
     // Red Filter start //
@@ -601,7 +604,7 @@ int main(int argc, char **argv)
 
         while (circleQueueTemp.size() > 0){
 
-          // cout << "Round " << iterator << ", Distance " << eDistance(circleQueueTemp.front(),c) << ", max distance " << (iterator/20)*vSize.width << endl; 
+          // cout << "Round " << iterator << ", Distance " << eDistance(circleQueueTemp.front(),c) << ", max distance " << (iterator/20)*vSize.width << endl;
 
           if (eDistance(circleQueueTemp.front(),c) < iterator/20*vSize.width){
             //cout << "Accept circle into que" << endl;
@@ -652,7 +655,7 @@ int main(int argc, char **argv)
               // Go Up
               message = "Go up ";
               goUp();
-            } 
+            }
             // if(message != "" && message != "DEF"){
             if(message != "DEF"){
               //cout << message << endl;
@@ -662,7 +665,7 @@ int main(int argc, char **argv)
               message = "DEF";
               goThrough();
             }
-            
+
       // Command section end //
 
       std::string number0;

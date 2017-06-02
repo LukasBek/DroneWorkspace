@@ -73,14 +73,13 @@ void DroneMovement::init(ros::NodeHandle node){
 
  void DroneMovement::takeoff(void)
 {
-    std_msgs::Empty empty;
+      std_msgs::Empty empty;
     geometry_msgs::Twist msg_vel;
     pub_empty_takeoff.publish(empty);
     ROS_INFO("Starter");
     msg_vel = changeTwist(0, 0, 0, 0);
     pub_cmd_vel.publish(msg_vel);
-    // ros::Duration(3).sleep();
-    ROS_INFO("Starter");
+    ROS_INFO("Efter Starter");
 }
 
 void DroneMovement::land(void)

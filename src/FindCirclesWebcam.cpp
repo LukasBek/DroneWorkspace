@@ -315,15 +315,21 @@ int main(int argc, char **argv)
     aSize.minSize   = 0;
 
   ros::Duration(1).sleep();
+  int b = 0;
   while (ros::ok())
   {
     ros::spinOnce();
 
-    while ((double)ros::Time::now().toSec() < move.start_time + move.takeoff_time + 2)
-    { //takeoff
-        ros::spinOnce();
-        move.takeoff();
+       //while ((double)ros::Time::now().toSec() < start_time + takeoff_time + 2) 
+    //while ((double)ros::Time::now().toSec() < 7 + 2)
+    //{ //takeoff
+    while (b < 1000) {
+      ros::spinOnce();
+      move.takeoff();
+      b++;
+      if (b == 0) {
         ROS_INFO("Drone taking off - Nicki");
+      }
     }
 
     if (frameRBG.empty())

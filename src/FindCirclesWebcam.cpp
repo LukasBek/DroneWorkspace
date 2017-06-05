@@ -219,17 +219,14 @@ int main(int argc, char **argv)
       cout << "Minimum Size     - " << aSize.minSize    << endl;
     }
 
-    noBlurRGB = frameRBG;
+    noBlurRGB = frameRBG.clone();
 
     // Blur and convertion to grayscale //
     blur(frameRBG, frameRBG, Size(5, 5));
 
-
     cvtColor(frameRBG, frame, CV_RGB2GRAY);
 
-    // pRect //
-    imshow("Boxes",minBoundingRotatedBoxes(frame));
-    // pRect //
+
 
     // Zbar Start //
     string res = zbarScan(frame, vSize.width, vSize.height);
@@ -242,7 +239,18 @@ int main(int argc, char **argv)
 
     imshow("SAIJDOIA", redFilter(noBlurRGB));
 
+    // Sobel //
+
+  //  imshow("Sobel", sobel(frame));
+
+    // Sobel //
+
+
     // Red Filter start //
+
+    // pRect //
+     imshow("Boxes",minBoundingRotatedBoxes(redFilter(noBlurRGB)));
+    // pRect //
 
     // putText(frame, "Test", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);
 

@@ -11,10 +11,14 @@ using namespace cv;
 using namespace std;
 
 // Blur and gray the image before call //
-Mat sobel(Mat src){
 
-  Mat src_gray;
-  Mat grad;
+bool Dcompare(const RotatedRect &a, const RotatedRect &b){
+ // TODO Change to area
+  return b.size.width < a.size.width;
+}
+
+void sobel(Mat src_gray, Mat *grad){
+
   int scale = 1;
   int delta = 0;
   int ddepth = CV_16S;
@@ -36,16 +40,17 @@ Mat sobel(Mat src){
   convertScaleAbs( grad_y, abs_grad_y );
 
   /// Total Gradient (approximate)
-  addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, grad );
-
-  return grad;
+  addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, *grad );
 }
 
 // -------------------------------------------------- //
 
 // Blur and gray the image before call //
+
+// TODO change to min not rotatedt rect
 Mat minBoundingRotatedBoxes (Mat src){
 
+  blur(src, src, Size(5, 5));
 
   RNG rng(12345);
 
@@ -59,10 +64,11 @@ Mat minBoundingRotatedBoxes (Mat src){
   threshold(src, threshold_output, thresh, max_thresh, THRESH_BINARY );
 
   /// Find contours
-  findContours( threshold_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+  findContours( threshold_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
 
   /// Find the rotated rectangles and ellipses for each contour
   vector<RotatedRect> minRect( contours.size() );
+
   // vector<RotatedRect> minEllipse( contours.size() );
 
   for( int i = 0; i < contours.size(); i++ )
@@ -71,13 +77,15 @@ Mat minBoundingRotatedBoxes (Mat src){
     //   { minEllipse[i] = fitEllipse( Mat(contours[i]) ); }
   }
 
+  std::sort(minRect.begin(),minRect.end(),Dcompare);
+
   /// Draw contours + rotated rects + ellipses
   Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );
-  for( int i = 0; i< contours.size(); i++ )
+  for( int i = 0; i < 5; i++ )
   {
     Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
     // contour
-    drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+    // drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
     // ellipse
     // ellipse( drawing, minEllipse[i], color, 2, 8 );
     // rotated rectangle
@@ -174,7 +182,7 @@ Mat redFilter(Mat src){
 
   Mat threshold_output;
 
-  int thresh = 10;
+  int thresh = 30;
   int max_thresh = 255;
 
   Mat bgr[3];     //destination array
@@ -184,12 +192,19 @@ Mat redFilter(Mat src){
   // imwrite("blue.png",bgr[0]);   //blue channel
   // imwrite("green.png",bgr[1]);  //green channel
   // imwrite("red.png",bgr[2]);    //red channel
+  Mat temp;
+  //Mat temp2;
+  //addWeighted(bgr[0],0.5,bgr[1],0.5,temp2,0);
 
-  Mat temp = (bgr[2]-(bgr[0]));
+  subtract(bgr[2],bgr[0],temp);
 
   imshow("TEMP",temp);
 
   threshold(temp, threshold_output, thresh, max_thresh, THRESH_BINARY );
+
+  Mat sobelGrad;
+  sobel(temp, &sobelGrad);
+  imshow("Sobel", sobelGrad);
 
   return threshold_output;
 

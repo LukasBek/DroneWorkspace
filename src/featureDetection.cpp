@@ -149,7 +149,6 @@ cout << "DONT WORK" << endl;
   calcHist( &bgr_planes[1], 1, 0, Mat(), g_hist, 1, &histSize, &histRange, uniform, accumulate );
   calcHist( &bgr_planes[2], 1, 0, Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate );
 
-
   /// Normalize the result to [ 0, histImage.rows ]
   //normalize(b_hist, b_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
   //normalize(g_hist, g_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat() );
@@ -169,4 +168,29 @@ cout << "DONT WORK" << endl;
    // cout << "Top: " << top << ", indeks: " << indeks << endl;
 */
    return -1;
+}
+
+Mat redFilter(Mat src){
+
+  Mat threshold_output;
+
+  int thresh = 10;
+  int max_thresh = 255;
+
+  Mat bgr[3];     //destination array
+  split(src,bgr); //split source
+
+  //Note: OpenCV uses BGR color order
+  // imwrite("blue.png",bgr[0]);   //blue channel
+  // imwrite("green.png",bgr[1]);  //green channel
+  // imwrite("red.png",bgr[2]);    //red channel
+
+  Mat temp = (bgr[2]-(bgr[0]));
+
+  imshow("TEMP",temp);
+
+  threshold(temp, threshold_output, thresh, max_thresh, THRESH_BINARY );
+
+  return threshold_output;
+
 }

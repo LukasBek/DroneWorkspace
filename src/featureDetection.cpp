@@ -12,9 +12,9 @@ using namespace std;
 
 // Blur and gray the image before call //
 
-bool Dcompare(const RotatedRect &a, const RotatedRect &b){
+bool Dcompare(const Rect &a, const Rect &b){
  // TODO Change to area
-  return b.size.width < a.size.width;
+  return b.width < a.width;
 }
 
 void sobel(Mat src_gray, Mat *grad){
@@ -47,7 +47,6 @@ void sobel(Mat src_gray, Mat *grad){
 
 // Blur and gray the image before call //
 
-// TODO change to min not rotatedt rect
 Mat minBoundingRotatedBoxes (Mat src){
 
   blur(src, src, Size(5, 5));
@@ -67,32 +66,25 @@ Mat minBoundingRotatedBoxes (Mat src){
   findContours( threshold_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
 
   /// Find the rotated rectangles and ellipses for each contour
-  vector<RotatedRect> minRect( contours.size() );
+  vector<Rect> boundRect( contours.size() );
+  vector<vector<Point> > contours_poly( contours.size() );
 
-  // vector<RotatedRect> minEllipse( contours.size() );
+  // vector<Rect> minEllipse( contours.size() );
 
   for( int i = 0; i < contours.size(); i++ )
-  { minRect[i] = minAreaRect( Mat(contours[i]) );
-    // if( contours[i].size() > 5 )
-    //   { minEllipse[i] = fitEllipse( Mat(contours[i]) ); }
-  }
+    { approxPolyDP( Mat(contours[i]), contours_poly[i], 3, true );
+      boundRect[i] = boundingRect( Mat(contours_poly[i]) );
+    }
 
-  std::sort(minRect.begin(),minRect.end(),Dcompare);
+  std::sort(boundRect.begin(),boundRect.end(),Dcompare);
 
-  /// Draw contours + rotated rects + ellipses
+  /// Draw polygonal contour + bonding rects + circles
   Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );
   for( int i = 0; i < 5; i++ )
-  {
-    Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-    // contour
-    // drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
-    // ellipse
-    // ellipse( drawing, minEllipse[i], color, 2, 8 );
-    // rotated rectangle
-    Point2f rect_points[4]; minRect[i].points( rect_points );
-    for( int j = 0; j < 4; j++ )
-    line( drawing, rect_points[j], rect_points[(j+1)%4], color, 1, 8 );
-  }
+     {
+       Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+       rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
+     }
 
   /// Show in a window
   return drawing;

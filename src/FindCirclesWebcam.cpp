@@ -26,6 +26,8 @@
 #include "featureDetection.h"
 #include "DroneMovement.h"
 
+#include <cmath>
+
 // #include <chrono>
 
 using namespace cv;
@@ -160,6 +162,7 @@ int main(int argc, char **argv)
 
   ros::Duration(1).sleep();
   int b = 0;
+  double baseTime = 0.002;
   // auto t1 = Clock::now();
   // cout << "clock: " << t1 << endl;
   while (ros::ok())
@@ -307,69 +310,84 @@ int main(int argc, char **argv)
       // Command section start //
 
 
-            int H = c[0] - 320;
-            int V = c[1] - 180;
+            double H = c[0] - 320;
+            double V = c[1] - 180;
+            
+cout << "c0=" << c[0] << " time=" << baseTime * H << endl;
 
-            /*
+// Makes sure that even though V or H is negative, it will be a possitive number
+            H = std::abs(H);
+            V = std::abs(V);
 
-            if (!(H > 320 - 20 && H < 320 + 20)){
-              if (H < 0){
-                move.goRight(baseTime * |H|);
-                break;
+            // if (H < 320 - 20 || H > 320 + 20)
+            if (H < -20 || H > 20)
+            {
+              if (H < 0)
+              {
+                cout << "Go right: H=" << H << " time=" << baseTime * H << endl;
+                move.goRight(baseTime * H);
+                continue;
               }
-              else if (H > 0){
-                move.goLeft(baseTime * |H|);
-                break;
+              else if (H > 0)
+              {
+                cout << "Go left: H=" << H << " time=" << baseTime * H << endl;
+                move.goLeft(baseTime * H);
+                continue;
+              }
+            }   
+            //  else if (V < 180 - 20 || V > 180 + 20))
+            else if (V < -20 || V > 20)
+            {
+              if (V < 0)
+              {
+                cout << "Go up: V=" << V << " time=" << baseTime * V << endl;
+                move.goUp(baseTime * V);
+                continue;
+              }
+              if (V > 0)
+              {
+                cout << "Go down: V=" << V << " time=" << baseTime * V << endl;
+                move.goDown(baseTime * V);
+                continue;
               }
             }
 
-            if (!(V > 180 - 20 && V < 180 + 20)){
-              if (V < 0){
-                move.goUp(baseTime * |V|);
-                break;
-              }
-              if (V > 0){
-                move.goDown(baseTime * |V|);
-                break;
-              }
-            }
-*/
             isCentered = false;
 
-            if (c[2] > aSize.maxSize){
-              //Go through
-              cout << "Go through" << endl;
-              move.hover();
-              //move.goThrough(1.7);
-            }
+            // if (c[2] > aSize.maxSize){
+            //   //Go through
+            //   cout << "Go through" << endl;
+            //   move.hover();
+            //   //move.goThrough(1.7);
+            // }
 
-            else if (c[2] < aSize.minSize){
-              // Go Forward
-              cout << "Go forward" << endl;
-              move.forwardx(0.25);
-            }
-            else if (c[0] < aSize.maxLeft){
-              // Go Left
-              cout << "Go left" << endl;
-              move.goLeft(0.25);
-            }
-            else if (c[0] > aSize.maxRight){
-              // Go Right
-              cout << "Go right" << endl;
-              move.goRight(0.25);
-            }
-            else if (c[1] > aSize.maxHeight){
-              // GO Down
-              cout << "Go down" << endl;
-              move.goDown(0.25);
-            }
-            else if (c[1] < aSize.minHeight){
-              // Go Up
-              cout << "Go up" << endl;
-              move.goUp(0.25);
-            }else{
-              isCentered = true;
-            }
+            // else if (c[2] < aSize.minSize){
+            //   // Go Forward
+            //   cout << "Go forward" << endl;
+            //   move.forwardx(0.25);
+            // }
+            // else if (c[0] < aSize.maxLeft){
+            //   // Go Left
+            //   cout << "Go left" << endl;
+            //   move.goLeft(0.25);
+            // }
+            // else if (c[0] > aSize.maxRight){
+            //   // Go Right
+            //   cout << "Go right" << endl;
+            //   move.goRight(0.25);
+            // }
+            // else if (c[1] > aSize.maxHeight){
+            //   // GO Down
+            //   cout << "Go down" << endl;
+            //   move.goDown(0.25);
+            // }
+            // else if (c[1] < aSize.minHeight){
+            //   // Go Up
+            //   cout << "Go up" << endl;
+            //   move.goUp(0.25);
+            // }else{
+            //   isCentered = true;
+            // }
             // if(message != "" && message != "DEF"){
 
             if(isCentered){

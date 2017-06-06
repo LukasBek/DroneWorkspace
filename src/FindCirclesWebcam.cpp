@@ -124,6 +124,7 @@ int main(int argc, char **argv)
   ros::NodeHandle node;
 
   DroneMovement move;
+  Bool isCentered;
 
   move.init(node);
 
@@ -333,46 +334,48 @@ int main(int argc, char **argv)
               }
             }
 */
-
+            isCentered = false;
             if (c[2] > aSize.maxSize){
               //Go through
-              message = "Go Through ";
-              move.goThrough(1.7);
+              cout << "Go through" << endl;
+              //move.goThrough(1.7);
             }
 
-            if (c[2] < aSize.minSize){
+            else if (c[2] < aSize.minSize){
               // Go Forward
-              message = "Go forward ";
+              cout << "Go forward" << endl;
               move.forwardx();
             }
-            if (c[0] < aSize.maxLeft){
+            else if (c[0] < aSize.maxLeft){
               // Go Left
-              message = "Go left ";
+              cout << "Go left" << endl;
               move.goLeft();
             }
-             if (c[0] > aSize.maxRight){
+            else if (c[0] > aSize.maxRight){
               // Go Right
-              message = "Go right ";
+              cout << "Go right" << endl;
               move.goRight();
             }
-             if (c[1] > aSize.maxHeight){
+            else if (c[1] > aSize.maxHeight){
               // GO Down
-              message = "Go down ";
+              cout << "Go down" << endl;
               move.goDown();
             }
-            if (c[1] < aSize.minHeight){
+            else if (c[1] < aSize.minHeight){
               // Go Up
-              message = "Go up ";
+              cout << "Go up" << endl;
               move.goUp(0.1);
+            }else{
+              isCentered = true;
             }
             // if(message != "" && message != "DEF"){
-            if(message != "DEF"){
-              cout << message << endl;
-                message = "DEF";
-            } else {
-               cout << "Going through the circle" << endl;
+            if(isCentered){
+              cout << "Going through the circle" << endl;
               message = "DEF";
-             move.goThrough(1.0);
+              move.hover();
+              //move.goThrough(1.0);
+            } else {
+              move.hover();
             }
 
       // Command section end //

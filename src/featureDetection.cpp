@@ -94,7 +94,7 @@ Mat minBoundingBoxes (Mat src){
 
 // -------------------------------------------------- //
 
-vector<Vec3f> getCircles(Mat src){
+void getCircles(Mat src, vector<Vec3f> *dest){
 
   vector<Vec3f> circles;
   int dp = 1;           // The inverse ratio of resolution
@@ -120,7 +120,10 @@ vector<Vec3f> getCircles(Mat src){
 
   // cout << "Amount of circles: " << circles.size() << endl;
 
-  return circles;
+  imshow("Detected circles from getCircles", src);
+
+  *dest = circles;
+
 }
 
   // Histogram Calculation //

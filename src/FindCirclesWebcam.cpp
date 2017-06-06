@@ -258,7 +258,7 @@ int main(int argc, char **argv)
 
     // HoughCircles Start //
     vector<Vec3f> circles;
-    circles = getCircles(frame);
+    getCircles(frame.clone(), &circles);
     // HoughCircles End //
 
     // Finds the amount of circles in the image
@@ -312,10 +312,10 @@ int main(int argc, char **argv)
 
             double H = c[0] - 320;
             double V = c[1] - 180;
-            
+
 cout << "c0=" << c[0] << endl;
 cout << "c1=" << c[1] << endl;
-/*
+
 // Makes sure that even though V or H is negative, it will be a possitive number
             H = std::abs(H);
             V = std::abs(V);
@@ -334,8 +334,8 @@ cout << "c1=" << c[1] << endl;
                 move.goLeft(baseTime * H);
                 continue;
               }
-            }   
-           
+            }
+
             else if (V < -20 || V > 20)
             {
               if (V < 0)
@@ -362,7 +362,7 @@ cout << "c1=" << c[1] << endl;
             }
 
             isCentered = false;
-*/
+
             // if (c[2] > aSize.maxSize){
             //   //Go through
             //   cout << "Go through" << endl;
@@ -399,8 +399,6 @@ cout << "c1=" << c[1] << endl;
             // }
             // if(message != "" && message != "DEF"){
 
-            
-
       // Command section end //
 
       std::string number0;
@@ -433,7 +431,6 @@ cout << "c1=" << c[1] << endl;
     //  move.turnAroundCounterClockwise(0.1, 0.2);
     }
 
-    imshow("Detected circles", frame);
     loop_rate.sleep();
     // if (waitKey(10) == 27)
     //   break; // stop capturing by pressing ESC

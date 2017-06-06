@@ -198,7 +198,7 @@ Mat redFilter(Mat src){
 
   subtract(bgr[2],bgr[0],temp);
 
-  imshow("TEMP",temp);
+  imshow("Rødfilter",temp);
 
   threshold(temp, threshold_output, thresh, max_thresh, THRESH_BINARY );
 

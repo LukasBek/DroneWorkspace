@@ -34,7 +34,9 @@ using namespace zbar;
 
 // typedef std::chrono::high_resolution_clock Clock;
 
-Mat frameRBG; // Primary working frame from capture //
+Mat frameRBG; // Primary blur working frame from capture //
+Mat frame;    // Primary gray working frame //
+Mat noBlurRGB; //
 
 // -------------------------------------------------------------------------------------------------------------
 //Getting the video stream and converting it to openCV
@@ -111,7 +113,6 @@ int main(int argc, char **argv)
 {
 
   // Main scope variables //
-  Mat frame;                // Primary working frame //
   queue<Vec3i> circleQueue; // Que for circle positions //
   std::string message;      // Message for console prints //
   int variance20 = 20;
@@ -173,7 +174,7 @@ int main(int argc, char **argv)
     {
       ros::spinOnce();
       //// Denne skal udkommenteres for kun at teste kamera og så dronen ikke letter
-      move.takeoff();
+    //  move.takeoff();
 
       if (b == 99)
       {
@@ -190,7 +191,7 @@ int main(int argc, char **argv)
       b++;
     }
 
-    //cout << "TRY ME" << endl;
+    // cout << "TRY ME" << endl;
     if (frameRBG.empty()){
       cout << "No frame from capture, end og video stream" << endl;
       break; // end of video stream
@@ -218,15 +219,12 @@ int main(int argc, char **argv)
       cout << "Minimum Size     - " << aSize.minSize    << endl;
     }
 
+    noBlurRGB = frameRBG.clone();
+
     // Blur and convertion to grayscale //
     blur(frameRBG, frameRBG, Size(5, 5));
 
-
     cvtColor(frameRBG, frame, CV_RGB2GRAY);
-
-    // pRect //
-    imshow("Boxes",minBoundingRotatedBoxes(frame));
-    // pRect //
 
     // Zbar Start //
     string res = zbarScan(frame, vSize.width, vSize.height);
@@ -236,33 +234,21 @@ int main(int argc, char **argv)
     // Zbar End //
 
     // Red Filter start //
-    /*
 
-    Mat redColorOnly;
-    inRange(frameRBG, Scalar(30, 30, 200), Scalar(60, 60, 255), redColorOnly);
+    imshow("Rødfilter threshold", redFilter(noBlurRGB));
 
-    Mat hsv = frameRBG;
-    cvtColor(hsv, hsv, CV_RGB2HSV);
+    // Sobel //
 
-    if (redHue > 255 - variance20){
-      redHue = 255;
-    }
-    if (redHue < 0 + variance20){
-      redHue = 0;
-    }
-    Mat1b mask1, mask2;
-    inRange(hsv, Scalar(0,   0, 0),Scalar(20, 255, 255), mask1);
-    inRange(hsv, Scalar(340, 0, 0),Scalar(0,  255, 255), mask2);
+  //  imshow("Sobel", sobel(frame));
 
-    inRange(hsv, Scalar(0, 70, 50), Scalar(10, 500, 255), mask1);
-    inRange(hsv, Scalar(170, 70, 50), Scalar(360, 255, 255), mask2);
+    // Sobel //
 
-    Mat1b mask = mask1 + mask2;
-
-    imshow("Red Filter",redColorOnly);
-    */
 
     // Red Filter start //
+
+    // pRect //
+     imshow("Boxes",minBoundingRotatedBoxes(redFilter(noBlurRGB)));
+    // pRect //
 
     // putText(frame, "Test", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);
 
@@ -319,12 +305,38 @@ int main(int argc, char **argv)
 
       // Command section start //
 
+/*
+            int H = c[0] - 320;
+            int V = c[1] - 180;
+
+            if (!(H > 320 - 20 && H < 320 + 20)){
+              if (H < 0){
+                move.goRight(baseTime * |H|);
+                break;
+              }
+              if (H > 0){
+                move.goLeft(baseTime * |H|);
+                break;
+              }
+            }
+
+            if (!(V > 180 - 20 && V < 180 + 20)){
+              if (V < 0){
+                move.goUp(baseTime * |V|);
+                break;
+              }
+              if (V > 0){
+                move.goDown(baseTime * |V|);
+                break;
+              }
+            }
+*/
+
             if (c[2] > aSize.maxSize){
               //Go through
               message = "Go Through ";
               move.goThrough(1.7);
             }
-
 
             if (c[2] < aSize.minSize){
               // Go Forward

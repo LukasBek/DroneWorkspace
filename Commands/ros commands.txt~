@@ -17,7 +17,11 @@ rostopic pub ardrone/land std_msgs/Empty
 rosrun ardronepkg FindCirclesWebcam
 
 Git
-Pull: 			~droneWorkspace/src/DroneWorkspace git pull origin master
-New files: 	~droneWorkspace/src/DroneWorkspace git add src/newFile.cpp
-Commit: 		~droneWorkspace/src/DroneWorkspace git commit -m "MESSAGE"
-push: 			~droneWorkspace/src/DroneWorkspace git push origin master
+Pull: 	~droneWorkspace/src/DroneWorkspace git pull origin master
+
+New files:
+	~droneWorkspace/src/DroneWorkspace git add .
+	~droneWorkspace/src/DroneWorkspace git add /src/newFile.cpp
+
+Commit: ~droneWorkspace/src/DroneWorkspace git commit -m "MESSAGE"
+push: 	~droneWorkspace/src/DroneWorkspace git push origin master

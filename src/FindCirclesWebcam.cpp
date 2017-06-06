@@ -124,7 +124,7 @@ int main(int argc, char **argv)
   ros::NodeHandle node;
 
   DroneMovement move;
-  Bool isCentered;
+  bool isCentered;
 
   move.init(node);
 

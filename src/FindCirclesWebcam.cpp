@@ -248,7 +248,7 @@ int main(int argc, char **argv)
     // Red Filter start //
 
     // pRect //
-     imshow("Boxes",minBoundingRotatedBoxes(redFilter(noBlurRGB)));
+     imshow("Boxes",minBoundingBoxes(redFilter(noBlurRGB)));
     // pRect //
 
     // putText(frame, "Test", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);

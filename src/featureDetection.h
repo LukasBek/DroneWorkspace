@@ -11,7 +11,7 @@ using namespace cv;
 
 bool Dcompare(const Rect &a, const Rect &b);
 void sobel(Mat src_gray, Mat *grad);
-Mat minBoundingRotatedBoxes (Mat src);
+Mat minBoundingBoxes (Mat src);
 vector<Vec3f> getCircles(Mat src);
 int histogramCalculation(Mat src);
 Mat redFilter(Mat src);

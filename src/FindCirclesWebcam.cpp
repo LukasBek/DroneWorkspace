@@ -313,13 +313,13 @@ int main(int argc, char **argv)
             double H = c[0] - 320;
             double V = c[1] - 180;
             
-cout << "c0=" << c[0] << " time=" << baseTime * H << endl;
-
+cout << "c0=" << c[0] << endl;
+cout << "c1=" << c[1] << endl;
+/*
 // Makes sure that even though V or H is negative, it will be a possitive number
             H = std::abs(H);
             V = std::abs(V);
 
-            // if (H < 320 - 20 || H > 320 + 20)
             if (H < -20 || H > 20)
             {
               if (H < 0)
@@ -335,7 +335,7 @@ cout << "c0=" << c[0] << " time=" << baseTime * H << endl;
                 continue;
               }
             }   
-            //  else if (V < 180 - 20 || V > 180 + 20))
+           
             else if (V < -20 || V > 20)
             {
               if (V < 0)
@@ -352,8 +352,17 @@ cout << "c0=" << c[0] << " time=" << baseTime * H << endl;
               }
             }
 
-            isCentered = false;
+            if(isCentered){
+              cout << "Going through the circle" << endl;
+              message = "DEF";
+              move.hover();
+              //move.goThrough(1.0);
+            } else {
+              move.hover();
+            }
 
+            isCentered = false;
+*/
             // if (c[2] > aSize.maxSize){
             //   //Go through
             //   cout << "Go through" << endl;
@@ -390,14 +399,7 @@ cout << "c0=" << c[0] << " time=" << baseTime * H << endl;
             // }
             // if(message != "" && message != "DEF"){
 
-            if(isCentered){
-              cout << "Going through the circle" << endl;
-              message = "DEF";
-              move.hover();
-              //move.goThrough(1.0);
-            } else {
-              move.hover();
-            }
+            
 
       // Command section end //
 

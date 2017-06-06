@@ -306,16 +306,18 @@ int main(int argc, char **argv)
 
       // Command section start //
 
-/*
+
             int H = c[0] - 320;
             int V = c[1] - 180;
+
+            /*
 
             if (!(H > 320 - 20 && H < 320 + 20)){
               if (H < 0){
                 move.goRight(baseTime * |H|);
                 break;
               }
-              if (H > 0){
+              else if (H > 0){
                 move.goLeft(baseTime * |H|);
                 break;
               }
@@ -333,6 +335,7 @@ int main(int argc, char **argv)
             }
 */
             isCentered = false;
+
             if (c[2] > aSize.maxSize){
               //Go through
               cout << "Go through" << endl;
@@ -368,15 +371,7 @@ int main(int argc, char **argv)
               isCentered = true;
             }
             // if(message != "" && message != "DEF"){
-<<<<<<< HEAD
-            if(message != "DEF"){
-              cout << message << endl;
-                message = "DEF";
-            } else {
-              cout << "Going through the circle" << endl;
-              message = "DEF";
-             move.goThrough(1.7);
-=======
+
             if(isCentered){
               cout << "Going through the circle" << endl;
               message = "DEF";
@@ -384,7 +379,6 @@ int main(int argc, char **argv)
               //move.goThrough(1.0);
             } else {
               move.hover();
->>>>>>> ea03d4e803af37294ef84430d49c3602dcc20094
             }
 
       // Command section end //

@@ -70,7 +70,7 @@ Mat minBoundingBoxes (Mat src){
   vector<vector<Point> > contours_poly( contours.size() );
 
   // vector<Rect> minEllipse( contours.size() );
-
+  // TODO Perhaps the first if shuld be extended to enclose the whole lot
   if (contours.size() >= 5){
     for( int i = 0; i < 5; i++ )
     { approxPolyDP( contours[i], contours_poly[i], 3, true );
@@ -78,16 +78,19 @@ Mat minBoundingBoxes (Mat src){
     }
   }
 
-  std::sort(boundRect.begin(),boundRect.end(),Dcompare);
+  if (boundRect.size() > 0){
+    std::sort(boundRect.begin(),boundRect.end(),Dcompare);
+  }
 
   /// Draw polygonal contour + bonding rects + circles
   Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );
+  if (contours.size() >= 5){
   for( int i = 0; i < 5; i++ )
      {
        Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
        rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
      }
-
+}
   /// Show in a window
   return drawing;
 }

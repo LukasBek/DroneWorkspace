@@ -238,9 +238,7 @@ int main(int argc, char **argv)
     // Zbar End //
 
     // Red Filter start //
-
     imshow("Rødfilter threshold", redFilter(noBlurRGB));
-
     // Sobel //
 
   //  imshow("Sobel", sobel(frame));
@@ -268,12 +266,12 @@ int main(int argc, char **argv)
     strstream << ul;
     strstream >> numberOfCircles;
 
+
     if (ul != 0)
     {
       Vec3i c = circles[0];
 
       // Queue start // // TODO - May need a check if logic is correct //
-
       if (circleQueue.size() < 5)
       {
         circleQueue.push(c); //  Add some values to the queue
@@ -309,7 +307,6 @@ int main(int argc, char **argv)
 
       // Command section start //
 
-
             double H = c[0] - 320;
             double V = c[1] - 180;
 
@@ -319,7 +316,7 @@ cout << "c1=" << c[1] << endl;
 // Makes sure that even though V or H is negative, it will be a possitive number
             H = std::abs(H);
             V = std::abs(V);
-
+            cout << " Før H " << endl;
             if (H < -20 || H > 20)
             {
               if (H < 0)
@@ -334,10 +331,8 @@ cout << "c1=" << c[1] << endl;
                 move.goLeft(baseTime * H);
                 continue;
               }
-            }
-
-            else if (V < -20 || V > 20)
-            {
+              cout << " V " << endl;
+            } else if (V < -20 || V > 20){
               if (V < 0)
               {
                 cout << "Go up: V=" << V << " time=" << baseTime * V << endl;
@@ -351,7 +346,6 @@ cout << "c1=" << c[1] << endl;
                 continue;
               }
             }
-
             if(isCentered){
               cout << "Going through the circle" << endl;
               message = "DEF";
@@ -360,7 +354,6 @@ cout << "c1=" << c[1] << endl;
             } else {
               move.hover();
             }
-
             isCentered = false;
 
             // if (c[2] > aSize.maxSize){
@@ -426,6 +419,7 @@ cout << "c1=" << c[1] << endl;
       // Setting text on screen end //
     } else {
       // cout << "Hover" << endl;
+      cout << " Sidste move.hover " << endl;
       move.hover();
       // cout << "Hover" << endl;
     //  move.turnAroundCounterClockwise(0.1, 0.2);

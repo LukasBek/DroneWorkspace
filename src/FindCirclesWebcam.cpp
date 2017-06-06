@@ -336,33 +336,34 @@ int main(int argc, char **argv)
             if (c[2] > aSize.maxSize){
               //Go through
               cout << "Go through" << endl;
+              move.hover();
               //move.goThrough(1.7);
             }
 
             else if (c[2] < aSize.minSize){
               // Go Forward
               cout << "Go forward" << endl;
-              move.forwardx();
+              move.forwardx(0.25);
             }
             else if (c[0] < aSize.maxLeft){
               // Go Left
               cout << "Go left" << endl;
-              move.goLeft();
+              move.goLeft(0.25);
             }
             else if (c[0] > aSize.maxRight){
               // Go Right
               cout << "Go right" << endl;
-              move.goRight();
+              move.goRight(0.25);
             }
             else if (c[1] > aSize.maxHeight){
               // GO Down
               cout << "Go down" << endl;
-              move.goDown();
+              move.goDown(0.25);
             }
             else if (c[1] < aSize.minHeight){
               // Go Up
               cout << "Go up" << endl;
-              move.goUp(0.1);
+              move.goUp(0.25);
             }else{
               isCentered = true;
             }

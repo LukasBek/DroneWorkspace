@@ -18,19 +18,19 @@ public:
 
 	void land(void);
 
-	void forwardx();
+	void forwardx(double time);
 
-	void backwardx(void);
+	void backwardx(double time);
 
-	void goLeft(void);
+	void goLeft(double time);
 
-	void goRight(void);
+	void goRight(double time);
 
 	void goUp(double time);
 
-	void goDown(void);
+	void goDown(double time);
 
-	void turnAround(double turnTime);
+	void turnAround(double time);
 
 	void goThrough(double time);
 

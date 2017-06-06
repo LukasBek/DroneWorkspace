@@ -157,7 +157,7 @@ void DroneMovement::turnAroundClockwise(double turnTime, double rotationSpeed)
     geometry_msgs::Twist msg_vel;
     msg_vel = changeTwist(0, 0, 0, -rotationSpeed);
     pub_cmd_vel.publish(msg_vel);
-    ros::Duration(time).sleep();
+    ros::Duration(turnTime).sleep();
 }
 
 void DroneMovement::goThrough(double time)

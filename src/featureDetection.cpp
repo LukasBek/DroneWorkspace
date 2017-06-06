@@ -47,7 +47,7 @@ void sobel(Mat src_gray, Mat *grad){
 
 // Blur and gray the image before call //
 
-Mat minBoundingRotatedBoxes (Mat src){
+Mat minBoundingBoxes (Mat src){
 
   blur(src, src, Size(5, 5));
 
@@ -71,10 +71,12 @@ Mat minBoundingRotatedBoxes (Mat src){
 
   // vector<Rect> minEllipse( contours.size() );
 
-  for( int i = 0; i < contours.size(); i++ )
-    { approxPolyDP( Mat(contours[i]), contours_poly[i], 3, true );
-      boundRect[i] = boundingRect( Mat(contours_poly[i]) );
+  if (contours.size() >= 5){
+    for( int i = 0; i < 5; i++ )
+    { approxPolyDP( contours[i], contours_poly[i], 3, true );
+      boundRect[i] = boundingRect( contours_poly[i] );
     }
+  }
 
   std::sort(boundRect.begin(),boundRect.end(),Dcompare);
 
@@ -174,7 +176,7 @@ Mat redFilter(Mat src){
 
   Mat threshold_output;
 
-  int thresh = 30;
+  int thresh = 25;
   int max_thresh = 255;
 
   Mat bgr[3];     //destination array

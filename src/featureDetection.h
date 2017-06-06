@@ -9,7 +9,7 @@
 
 using namespace cv;
 
-bool Dcompare(const RotatedRect &a, const RotatedRect &b);
+bool Dcompare(const Rect &a, const Rect &b);
 void sobel(Mat src_gray, Mat *grad);
 Mat minBoundingRotatedBoxes (Mat src);
 vector<Vec3f> getCircles(Mat src);

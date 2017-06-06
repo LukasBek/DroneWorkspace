@@ -40,7 +40,8 @@ class DroneMovement
     void goRight(void);
     void goUp(double time);
     void goDown(void);
-    void turnAround(double turnTime);
+    void turnAroundCounterClockwise(double turnTime, double rotationSpeed);
+    void turnAroundClockwise(double turnTime, double rotationSpeed);
     void goThrough(double time);
     void hover(void);
     void findCircle();
@@ -139,10 +140,18 @@ void DroneMovement::goDown(void)
     ros::Duration(sleepD).sleep();
 }
 
-void DroneMovement::turnAround(double turnTime)
+void DroneMovement::turnAroundCounterClockwise(double turnTime, double rotationSpeed)
 {
     geometry_msgs::Twist msg_vel;
-    msg_vel = changeTwist(0, 0, 0, 0.2);
+    msg_vel = changeTwist(0, 0, 0, rotationSpeed);
+    pub_cmd_vel.publish(msg_vel);
+    ros::Duration(turnTime).sleep();
+}
+
+void DroneMovement::turnAroundClockwise(double turnTime, double rotationSpeed)
+{
+    geometry_msgs::Twist msg_vel;
+    msg_vel = changeTwist(0, 0, 0, -rotationSpeed);
     pub_cmd_vel.publish(msg_vel);
     ros::Duration(turnTime).sleep();
 }
@@ -165,5 +174,5 @@ void DroneMovement::hover(void)
 void DroneMovement::findCircle()
 {
 
-    turnAround(0.1);
+    turnAroundClockwise(0.1, 0.2);
 }

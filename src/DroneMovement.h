@@ -30,7 +30,9 @@ public:
 
 	void goDown(void);
 
-	void turnAround(double turnTime);
+	void turnAroundCounterClockwise(double turnTime, double rotationSpeed);
+    
+	void turnAroundClockwise(double turnTime, double rotationSpeed);
 
 	void goThrough(double time);
 

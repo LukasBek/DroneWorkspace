@@ -356,9 +356,9 @@ int main(int argc, char **argv)
               cout << message << endl;
                 message = "DEF";
             } else {
-               cout << "Going through the circle" << endl;
+              cout << "Going through the circle" << endl;
               message = "DEF";
-             move.goThrough(1.0);
+             move.goThrough(1.7);
             }
 
       // Command section end //
@@ -390,7 +390,7 @@ int main(int argc, char **argv)
       // cout << "Hover" << endl;
       move.hover();
       // cout << "Hover" << endl;
-    //  move.turnAround(0.1);
+    //  move.turnAroundCounterClockwise(0.1, 0.2);
     }
 
     imshow("Detected circles", frame);

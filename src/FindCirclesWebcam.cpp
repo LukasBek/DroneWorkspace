@@ -226,8 +226,6 @@ int main(int argc, char **argv)
 
     cvtColor(frameRBG, frame, CV_RGB2GRAY);
 
-
-
     // Zbar Start //
     string res = zbarScan(frame, vSize.width, vSize.height);
     if (!res.empty()){
@@ -237,7 +235,7 @@ int main(int argc, char **argv)
 
     // Red Filter start //
 
-    imshow("SAIJDOIA", redFilter(noBlurRGB));
+    imshow("Rødfilter threshold", redFilter(noBlurRGB));
 
     // Sobel //
 

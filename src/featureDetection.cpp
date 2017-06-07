@@ -70,7 +70,8 @@ Mat minBoundingBoxes (Mat src){
   vector<vector<Point> > contours_poly( contours.size() );
 
   // vector<Rect> minEllipse( contours.size() );
-cout << "Conturs " << contours.size() << endl;
+  // TODO Perhaps the first if shuld be extended to enclose the whole lot
+
   if (contours.size() >= 5){
     for( int i = 0; i < 5; i++ )
     { approxPolyDP( contours[i], contours_poly[i], 3, true );
@@ -78,23 +79,26 @@ cout << "Conturs " << contours.size() << endl;
     }
   }
 
-  std::sort(boundRect.begin(),boundRect.end(),Dcompare);
+  if (boundRect.size() > 0){
+    std::sort(boundRect.begin(),boundRect.end(),Dcompare);
+  }
 
   /// Draw polygonal contour + bonding rects + circles
   Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );
+  if (contours.size() >= 5){
   for( int i = 0; i < 5; i++ )
      {
        Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
        rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
      }
-
+}
   /// Show in a window
   return drawing;
 }
 
 // -------------------------------------------------- //
 
-vector<Vec3f> getCircles(Mat src){
+void getCircles(Mat src, vector<Vec3f> *dest){
 
   vector<Vec3f> circles;
   int dp = 1;           // The inverse ratio of resolution
@@ -120,7 +124,10 @@ vector<Vec3f> getCircles(Mat src){
 
   // cout << "Amount of circles: " << circles.size() << endl;
 
-  return circles;
+  imshow("Detected circles from getCircles", src);
+
+  *dest = circles;
+
 }
 
   // Histogram Calculation //

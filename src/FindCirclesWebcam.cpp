@@ -36,8 +36,8 @@ using namespace zbar;
 
 // typedef std::chrono::high_resolution_clock Clock;
 
-Mat frameRBG; // Primary blur working frame from capture //
-Mat frame;    // Primary gray working frame //
+Mat frameRBG;  // Primary blur working frame from capture //
+Mat frame;     // Primary gray working frame //
 Mat noBlurRGB; //
 
 // -------------------------------------------------------------------------------------------------------------
@@ -104,7 +104,6 @@ int const max_lowThreshold = 200;
 int ratio = 3;
 int kernel_size = 3;
 
-
 // eDistance - Calculates distance between two vectors //
 double eDistance(Vec3i a, Vec3i b)
 {
@@ -119,7 +118,6 @@ int main(int argc, char **argv)
   std::string message;      // Message for console prints //
   int variance20 = 20;
 
-
   ros::init(argc, argv, "image_converter");
   ImageConverter ic;
 
@@ -131,7 +129,6 @@ int main(int argc, char **argv)
   move.init(node);
 
   ros::Rate loop_rate(10);
-
 
   struct videoSize // Struct for video size //
   {
@@ -147,29 +144,35 @@ int main(int argc, char **argv)
     int maxSize;
     int minSize;
   };
- // Ini of structs //
+  // Ini of structs //
   videoSize vSize;
-    vSize.width  = 0;
-    vSize.height = 0;
+  vSize.width = 0;
+  vSize.height = 0;
 
   acceptSize aSize;
-    aSize.minHeight = 0;
-    aSize.maxHeight = 0;
-    aSize.maxLeft   = 0;
-    aSize.maxRight  = 0;
-    aSize.maxSize   = 0;
-    aSize.minSize   = 0;
+  aSize.minHeight = 0;
+  aSize.maxHeight = 0;
+  aSize.maxLeft = 0;
+  aSize.maxRight = 0;
+  aSize.maxSize = 0;
+  aSize.minSize = 0;
 
   ros::Duration(1).sleep();
   int b = 0;
   double baseTime = 0.002;
+  
+  double H;
+  double V;
+
+  double Htime;
+  double Vtime;
   // auto t1 = Clock::now();
   // cout << "clock: " << t1 << endl;
   while (ros::ok())
   {
     ros::spinOnce();
 
-       //while ((double)ros::Time::now().toSec() < start_time + takeoff_time + 2)
+    //while ((double)ros::Time::now().toSec() < start_time + takeoff_time + 2)
     //while ((double)ros::Time::now().toSec() < 7 + 2)
     //{ //takeoff
 
@@ -178,7 +181,7 @@ int main(int argc, char **argv)
     {
       ros::spinOnce();
       //// Denne skal udkommenteres for kun at teste kamera og så dronen ikke letter
-    //  move.takeoff();
+      //  move.takeoff();
 
       if (b == 99)
       {
@@ -196,31 +199,32 @@ int main(int argc, char **argv)
     }
 
     // cout << "TRY ME" << endl;
-    if (frameRBG.empty()){
+    if (frameRBG.empty())
+    {
       cout << "No frame from capture, end og video stream" << endl;
       break; // end of video stream
     }
 
     if (vSize.width == 0 || vSize.height == 0)
     {
-      vSize.width     = frameRBG.cols;
-      vSize.height    = frameRBG.rows;
+      vSize.width = frameRBG.cols;
+      vSize.height = frameRBG.rows;
 
       aSize.minHeight = vSize.height / 2.5;
       aSize.maxHeight = vSize.height / 7;
-      aSize.maxLeft   = vSize.width  / 2.5;
-      aSize.maxRight  = vSize.width  / 1.6;
-      aSize.maxSize   = vSize.height / 4;
+      aSize.maxLeft = vSize.width / 2.5;
+      aSize.maxRight = vSize.width / 1.6;
+      aSize.maxSize = vSize.height / 4;
       //Jo mindre tal, jo tættere på kommer dronen
-      aSize.minSize   = vSize.height / 12;
+      aSize.minSize = vSize.height / 12;
 
-      cout << "Frame Dimensions - " << vSize.width      << " " << vSize.height << endl;
-      cout << "Minimum Height   - " << aSize.minHeight  << endl;
-      cout << "Maximum Height   - " << aSize.maxHeight  << endl;
-      cout << "Maximum Left     - " << aSize.maxLeft    << endl;
-      cout << "Maximum Right    - " << aSize.maxRight   << endl;
-      cout << "Maximum Size     - " << aSize.maxSize    << endl;
-      cout << "Minimum Size     - " << aSize.minSize    << endl;
+      cout << "Frame Dimensions - " << vSize.width << " " << vSize.height << endl;
+      cout << "Minimum Height   - " << aSize.minHeight << endl;
+      cout << "Maximum Height   - " << aSize.maxHeight << endl;
+      cout << "Maximum Left     - " << aSize.maxLeft << endl;
+      cout << "Maximum Right    - " << aSize.maxRight << endl;
+      cout << "Maximum Size     - " << aSize.maxSize << endl;
+      cout << "Minimum Size     - " << aSize.minSize << endl;
     }
 
     noBlurRGB = frameRBG.clone();
@@ -232,31 +236,33 @@ int main(int argc, char **argv)
 
     // Zbar Start //
     string res = zbarScan(frame, vSize.width, vSize.height);
-    if (!res.empty()){
+    if (!res.empty())
+    {
       cout << "Symbol: " << zbarScan(frame, vSize.width, vSize.height) << endl;
     }
     // Zbar End //
 
     // Red Filter start //
+
     imshow("Rødfilter threshold", redFilter(noBlurRGB));
-    // Sobel //
-
-  //  imshow("Sobel", sobel(frame));
 
     // Sobel //
 
+    //  imshow("Sobel", sobel(frame));
+
+    // Sobel //
 
     // Red Filter start //
 
     // pRect //
-     imshow("Boxes",minBoundingBoxes(redFilter(noBlurRGB)));
+    imshow("Boxes", minBoundingBoxes(redFilter(noBlurRGB)));
     // pRect //
 
     // putText(frame, "Test", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);
 
     // HoughCircles Start //
     vector<Vec3f> circles;
-    getCircles(frame.clone(), &circles);
+    circles = getCircles(frame);
     // HoughCircles End //
 
     // Finds the amount of circles in the image
@@ -266,12 +272,12 @@ int main(int argc, char **argv)
     strstream << ul;
     strstream >> numberOfCircles;
 
-
     if (ul != 0)
     {
       Vec3i c = circles[0];
 
       // Queue start // // TODO - May need a check if logic is correct //
+
       if (circleQueue.size() < 5)
       {
         circleQueue.push(c); //  Add some values to the queue
@@ -283,18 +289,21 @@ int main(int argc, char **argv)
         double iterator = 1;
         // cout << "Accept" << endl;
 
-        while (circleQueueTemp.size() > 0){
+        while (circleQueueTemp.size() > 0)
+        {
 
           // cout << "Round " << iterator << ", Distance " << eDistance(circleQueueTemp.front(),c) << ", max distance " << (iterator/20)*vSize.width << endl;
 
-          if (eDistance(circleQueueTemp.front(),c) < iterator/20*vSize.width){
+          if (eDistance(circleQueueTemp.front(), c) < iterator / 20 * vSize.width)
+          {
             //cout << "Accept circle into que" << endl;
             //cout << "Accept" << endl;
             circleQueue.pop();
             circleQueue.push(c);
             break;
           }
-          else {
+          else
+          {
             //cout << "Deny circle into que" << endl;
             //cout << "Deny" << endl;
             circleQueueTemp.pop();
@@ -307,90 +316,99 @@ int main(int argc, char **argv)
 
       // Command section start //
 
-            double H = c[0] - 320;
-            double V = c[1] - 180;
+      double H = c[0] - 320;
+      double V = c[1] - 180;
 
-cout << "c0=" << c[0] << endl;
-cout << "c1=" << c[1] << endl;
 
-// Makes sure that even though V or H is negative, it will be a possitive number
-            H = std::abs(H);
-            V = std::abs(V);
-            cout << " Før H " << endl;
-            if (H < -20 || H > 20)
-            {
-              if (H < 0)
-              {
-                cout << "Go right: H=" << H << " time=" << baseTime * H << endl;
-                move.goRight(baseTime * H);
-                continue;
-              }
-              else if (H > 0)
-              {
-                cout << "Go left: H=" << H << " time=" << baseTime * H << endl;
-                move.goLeft(baseTime * H);
-                continue;
-              }
-              cout << " V " << endl;
-            } else if (V < -20 || V > 20){
-              if (V < 0)
-              {
-                cout << "Go up: V=" << V << " time=" << baseTime * V << endl;
-                move.goUp(baseTime * V);
-                continue;
-              }
-              if (V > 0)
-              {
-                cout << "Go down: V=" << V << " time=" << baseTime * V << endl;
-                move.goDown(baseTime * V);
-                continue;
-              }
-            }
-            if(isCentered){
-              cout << "Going through the circle" << endl;
-              message = "DEF";
-              move.hover();
-              //move.goThrough(1.0);
-            } else {
-              move.hover();
-            }
-            isCentered = false;
 
-            // if (c[2] > aSize.maxSize){
-            //   //Go through
-            //   cout << "Go through" << endl;
-            //   move.hover();
-            //   //move.goThrough(1.7);
-            // }
+      cout << "c0=" << c[0] << endl;
+      cout << "c1=" << c[1] << endl;
 
-            // else if (c[2] < aSize.minSize){
-            //   // Go Forward
-            //   cout << "Go forward" << endl;
-            //   move.forwardx(0.25);
-            // }
-            // else if (c[0] < aSize.maxLeft){
-            //   // Go Left
-            //   cout << "Go left" << endl;
-            //   move.goLeft(0.25);
-            // }
-            // else if (c[0] > aSize.maxRight){
-            //   // Go Right
-            //   cout << "Go right" << endl;
-            //   move.goRight(0.25);
-            // }
-            // else if (c[1] > aSize.maxHeight){
-            //   // GO Down
-            //   cout << "Go down" << endl;
-            //   move.goDown(0.25);
-            // }
-            // else if (c[1] < aSize.minHeight){
-            //   // Go Up
-            //   cout << "Go up" << endl;
-            //   move.goUp(0.25);
-            // }else{
-            //   isCentered = true;
-            // }
-            // if(message != "" && message != "DEF"){
+      // Makes sure that even though V or H is negative, it will be a possitive number
+      Htime = std::abs(H);
+      Vtime = std::abs(V);
+
+      if (H < -20 || H > 20)
+      {
+        if (H < 0)
+        {
+          cout << "Go right: H=" << H << " time=" << baseTime * Htime << endl;
+          move.goRight(baseTime * Htime);
+          continue;
+        }
+        else if (H > 0)
+        {
+          cout << "Go left: H=" << H << " time=" << baseTime * Htime << endl;
+          move.goLeft(baseTime * Htime);
+          continue;
+        }
+      }
+
+      else if (V < -20 || V > 20)
+      {
+        if (V < 0)
+        {
+          cout << "Go up: V=" << V << " time=" << baseTime * Vtime << endl;
+          move.goUp(baseTime * Vtime);
+          continue;
+        }
+        if (V > 0)
+        {
+          cout << "Go down: V=" << V << " time=" << baseTime * Vtime << endl;
+          move.goDown(baseTime * Vtime);
+          continue;
+        }
+      }
+
+      if (isCentered)
+      {
+        cout << "Going through the circle" << endl;
+        message = "DEF";
+        move.hover();
+        //move.goThrough(1.0);
+      }
+      else
+      {
+        move.hover();
+      }
+
+      isCentered = false;
+
+      // if (c[2] > aSize.maxSize){
+      //   //Go through
+      //   cout << "Go through" << endl;
+      //   move.hover();
+      //   //move.goThrough(1.7);
+      // }
+
+      // else if (c[2] < aSize.minSize){
+      //   // Go Forward
+      //   cout << "Go forward" << endl;
+      //   move.forwardx(0.25);
+      // }
+      // else if (c[0] < aSize.maxLeft){
+      //   // Go Left
+      //   cout << "Go left" << endl;
+      //   move.goLeft(0.25);
+      // }
+      // else if (c[0] > aSize.maxRight){
+      //   // Go Right
+      //   cout << "Go right" << endl;
+      //   move.goRight(0.25);
+      // }
+      // else if (c[1] > aSize.maxHeight){
+      //   // GO Down
+      //   cout << "Go down" << endl;
+      //   move.goDown(0.25);
+      // }
+      // else if (c[1] < aSize.minHeight){
+      //   // Go Up
+      //   cout << "Go up" << endl;
+      //   move.goUp(0.25);
+      // }else{
+      //   isCentered = true;
+      // }
+      // if(message != "" && message != "DEF"){
 
       // Command section end //
 
@@ -417,14 +435,16 @@ cout << "c1=" << c[1] << endl;
       putText(frame, number, cvPoint(30, 60), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255, 255, 255), 1, CV_AA);
 
       // Setting text on screen end //
-    } else {
+    }
+    else
+    {
       // cout << "Hover" << endl;
-      cout << " Sidste move.hover " << endl;
       move.hover();
       // cout << "Hover" << endl;
-    //  move.turnAroundCounterClockwise(0.1, 0.2);
+      //  move.turnAroundCounterClockwise(0.1, 0.2);
     }
 
+    imshow("Detected circles", frame);
     loop_rate.sleep();
     // if (waitKey(10) == 27)
     //   break; // stop capturing by pressing ESC

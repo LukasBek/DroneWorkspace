@@ -14,7 +14,7 @@ using namespace std;
 
 bool Dcompare(const Rect &a, const Rect &b){
  // TODO Change to area
-  return b.width < a.width;
+  return b.area() < a.area();
 }
 
 void sobel(Mat src_gray, Mat *grad){
@@ -47,7 +47,7 @@ void sobel(Mat src_gray, Mat *grad){
 
 // Blur and gray the image before call //
 
-Mat minBoundingBoxes (Mat src){
+void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
 
   blur(src, src, Size(5, 5));
 
@@ -92,8 +92,20 @@ Mat minBoundingBoxes (Mat src){
        rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
      }
 }
-  /// Show in a window
-  return drawing;
+  int rectWidth = 0;
+  int rectHeight = 0;
+  int rectY = 0;
+  int rectX = 0;
+
+
+  imshow("Boxes from minBoundingBoxes", drawing);
+
+  /// retrun to pointers
+   *width   = rectWidth;
+   *height  = rectHeight;
+   *x       = rectX;
+   *y       = rectY;
+
 }
 
 // -------------------------------------------------- //

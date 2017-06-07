@@ -49,10 +49,16 @@ void sobel(Mat src_gray, Mat *grad){
 
 void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
 
+  // imshow("Før moF", src);
+
+  int moF = morphologyFilter(&src, 8);
+
+  // imshow("Efter MoF", src);
+
   blur(src, src, Size(5, 5));
 
-  namedWindow("Blur from minBoundingBoxes");
-  imshow("Blur from minBoundingBoxes ", src);
+  //namedWindow("Blur from minBoundingBoxes");
+  //imshow("Blur from minBoundingBoxes ", src);
 
   RNG rng(12345);
 
@@ -75,7 +81,7 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
   // vector<Rect> minEllipse( contours.size() );
   // TODO Perhaps the first if shuld be extended to enclose the whole lot
 
-  if (contours.size() >= 5){
+  if (contours.size() > 0){
     for( int i = 0; i < contours.size(); i++ )
     { approxPolyDP( contours[i], contours_poly[i], 3, true );
       boundRect[i] = boundingRect( contours_poly[i] );
@@ -83,22 +89,24 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
     std::sort(boundRect.begin(),boundRect.end(),Dcompare);
   }
 
-
-
+  int rectWidth   = 0;
+  int rectHeight  = 0;
+  int rectY       = 0;
+  int rectX       = 0;
 
   /// Draw polygonal contour + bonding rects + circles
   Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );
-  if (contours.size() >= 5){
-  for( int i = 0; i < 5; i++ )
+  if (contours.size() > 0){
+  for( int i = 0; i < 1; i++ )
      {
        Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
        rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
      }
+     rectWidth   = boundRect[0].width;
+     rectHeight  = boundRect[0].height;
+     rectY       = boundRect[0].y;
+     rectX       = boundRect[0].x;
 }
-  int rectWidth   = boundRect[0].width;
-  int rectHeight  = boundRect[0].height;
-  int rectY       = boundRect[0].y;
-  int rectX       = boundRect[0].x;
 
   namedWindow("Boxes from minBoundingBoxes");
   imshow("Boxes from minBoundingBoxes", drawing);
@@ -138,7 +146,7 @@ void getCircles(Mat src, std::vector<Vec3f> *dest){
   }
 
   // cout << "Amount of circles: " << circles.size() << endl;
-  namedWindow("Detected circles from getCircles");
+  //namedWindow("Detected circles from getCircles");
   imshow("Detected circles from getCircles", src);
 
   *dest = circles;
@@ -214,16 +222,50 @@ Mat redFilter(Mat src){
 
   subtract(bgr[2],bgr[1],temp);
 
-  namedWindow("Rødfilter");
-  imshow("Rødfilter",temp);
+  //namedWindow("Rødfilter");
+  //imshow("Rødfilter",temp);
 
   threshold(temp, threshold_output, thresh, max_thresh, THRESH_BINARY );
 
+  // int moF = morphologyFilter(&threshold_output, 3);
+
   Mat sobelGrad;
   sobel(temp, &sobelGrad);
-  namedWindow("Sobel");
-  imshow("Sobel", sobelGrad);
+  //namedWindow("Sobel");
+  //imshow("Sobel", sobelGrad);
 
   return threshold_output;
 
+}
+
+
+
+// Author: Niclas Atzen //
+// Methods: morphologyFilter, erodeImage, dilateImage
+
+int morphologyFilter(cv::Mat *src, int filterSize = 1) {
+  dilateImage(src, filterSize);
+	//erodeImage(src, filterSize);
+	return 0;
+}
+
+int erodeImage(cv::Mat *src, int erosionSize = 1) {
+	// Erodes image(src) with ellipse element //
+	int erosion_type = cv::MORPH_RECT;
+	int const max_kernel_size = 21;
+
+	cv::Mat element = cv::getStructuringElement(erosion_type, cv::Size(erosionSize * 2 + 1, erosionSize * 2 + 1), cv::Point(erosionSize, erosionSize));
+	erode(*src, *src, element);
+	element.release();
+	return 0;
+}
+
+int dilateImage(cv::Mat *src, int dilationSize = 1) {
+	// dilates image(src) with ellipse element //
+	int dilation_type = cv::MORPH_ELLIPSE;
+	int const max_kernel_size = 21;
+
+	cv::Mat element = cv::getStructuringElement(dilation_type, cv::Size(dilationSize * 2 + 1, dilationSize * 2 + 1), cv::Point(dilationSize, dilationSize));
+	dilate(*src, *src, element);
+	return 0;
 }

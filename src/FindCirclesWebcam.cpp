@@ -160,7 +160,7 @@ int main(int argc, char **argv)
   ros::Duration(1).sleep();
   int b = 0;
   double baseTime = 0.002;
-  
+
   double H;
   double V;
 
@@ -268,7 +268,7 @@ int main(int argc, char **argv)
 
     // HoughCircles Start //
     vector<Vec3f> circles;
-    circles = getCircles(frame);
+    getCircles(frame, &circles);
     // HoughCircles End //
 
     // Finds the amount of circles in the image

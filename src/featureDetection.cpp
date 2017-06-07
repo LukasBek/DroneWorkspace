@@ -71,6 +71,7 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
 
   // vector<Rect> minEllipse( contours.size() );
   // TODO Perhaps the first if shuld be extended to enclose the whole lot
+
   if (contours.size() >= 5){
     for( int i = 0; i < 5; i++ )
     { approxPolyDP( contours[i], contours_poly[i], 3, true );

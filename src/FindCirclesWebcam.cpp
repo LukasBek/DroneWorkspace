@@ -255,13 +255,11 @@ int main(int argc, char **argv)
     // Red Filter start //
 
     // pRect //
-
     int  rectWidth;
     int  rectHeight;
     int  rectX;
     int  rectY;
     minBoundingBoxes(redFilter(noBlurRGB), &rectWidth, &rectHeight, &rectX, &rectY);
-
     // pRect //
 
     // putText(frame, "Test", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);

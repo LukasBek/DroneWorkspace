@@ -92,10 +92,10 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
        rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
      }
 }
-  int rectWidth = 0;
-  int rectHeight = 0;
-  int rectY = 0;
-  int rectX = 0;
+  int rectWidth   = 0;
+  int rectHeight  = 0;
+  int rectY       = 0;
+  int rectX       = 0;
 
 
   imshow("Boxes from minBoundingBoxes", drawing);

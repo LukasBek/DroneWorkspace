@@ -168,11 +168,12 @@ int main(int argc, char **argv)
   double Vtime;
 
   // true = clockwise
-  bool bTurnClockwise = false;
-  double rectLastWidth = 0;
-  double rectLastHeight = 0;
-  double rectLastComparison = 0;
-  double rectComparison = 0;
+
+  // bool bTurnClockwise = false;
+  // double rectLastWidth = 0;
+  // double rectLastHeight = 0;
+  // double rectLastComparison = 0;
+  // double rectComparison = 0;
 
   while (ros::ok())
   {
@@ -267,12 +268,12 @@ int main(int argc, char **argv)
     int rectY;
     minBoundingBoxes(redFilter(noBlurRGB), &rectWidth, &rectHeight, &rectX, &rectY);
 
-    cout << "--------------" << endl;
-    cout << "Width:  " << rectWidth   << endl;
-    cout << "Height: " << rectHeight  << endl;
-    cout << "Y:      " << rectY       << endl;
-    cout << "X:      " << rectX       << endl;
-    cout << "--------------" << endl;
+    // cout << "--------------" << endl;
+    // cout << "Width:  " << rectWidth   << endl;
+    // cout << "Height: " << rectHeight  << endl;
+    // cout << "Y:      " << rectY       << endl;
+    // cout << "X:      " << rectX       << endl;
+    // cout << "--------------" << endl;
 
 
     // pRect //
@@ -291,49 +292,51 @@ int main(int argc, char **argv)
     strstream << ul;
     strstream >> numberOfCircles;
 
-    rectComparison = rectHeight / rectWidth;
+    // rectComparison = rectHeight / rectWidth;
 
     
 
-    if (rectWidth + 20 < rectHeight)
-    {
-      if (rectComparison > rectLastComparison)
-      {
-        bTurnClockwise = !bTurnClockwise;
-        if (bTurnClockwise)
-        {
-          cout << "Turn clockwise" << endl;
-          move.turnAroundClockwise(0.1, 0.2);
-          cout << "rect go left" << endl;
-          move.goLeft(0.1);
-        }
-        else
-        {
-          cout << "Turn Counter clockwise" << endl;
-          move.turnAroundCounterClockwise(0.1, 0.2);
-          move.goRight(0.1);
-        }
-      }
-      if (rectComparison < rectLastComparison)
-      {
-        if (bTurnClockwise)
-        {
-          cout << "Turn Counter clockwise" << endl;
-          move.turnAroundCounterClockwise(0.1, 0.2);
-          cout << "rect go right" << endl;
-          move.goRight(0.1);
-        }
-        else
-        {
-          cout << "Turn clockwise" << endl;
-          move.turnAroundClockwise(0.1, 0.2);
-          cout << "rect go left" << endl;
-          move.goLeft(0.1);
-        }
-      }
-      rectLastComparison = rectComparison;
-    }
-    else if (ul != 0)
+    // if (rectWidth + 20 < rectHeight)
+    // {
+    //   if (rectComparison > rectLastComparison)
+    //   {
+    //     bTurnClockwise = !bTurnClockwise;
+    //     if (bTurnClockwise)
+    //     {
+    //       cout << "Turn clockwise" << endl;
+    //       move.turnAroundClockwise(0.1, 0.2);
+    //       cout << "rect go left" << endl;
+    //       move.goLeft(0.1);
+    //     }
+    //     else
+    //     {
+    //       cout << "Turn Counter clockwise" << endl;
+    //       move.turnAroundCounterClockwise(0.1, 0.2);
+    //       move.goRight(0.1);
+    //     }
+    //   }
+    //   if (rectComparison < rectLastComparison)
+    //   {
+    //     if (bTurnClockwise)
+    //     {
+    //       cout << "Turn Counter clockwise" << endl;
+    //       move.turnAroundCounterClockwise(0.1, 0.2);
+    //       cout << "rect go right" << endl;
+    //       move.goRight(0.1);
+    //     }
+    //     else
+    //     {
+    //       cout << "Turn clockwise" << endl;
+    //       move.turnAroundClockwise(0.1, 0.2);
+    //       cout << "rect go left" << endl;
+    //       move.goLeft(0.1);
+    //     }
+    //   }
+    //   rectLastComparison = rectComparison;
+    // }
+    // else if (ul != 0)
+
+    if (ul != 0)
     {
       Vec3i c = circles[0];
 
@@ -505,7 +508,7 @@ int main(int argc, char **argv)
     else
     {
       //resets the rectLastWidth
-      rectLastWidth = 0;
+      // rectLastWidth = 0;
 
       // cout << "Hover" << endl;
       move.hover();

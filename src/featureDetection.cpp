@@ -70,7 +70,7 @@ Mat minBoundingBoxes (Mat src){
   vector<vector<Point> > contours_poly( contours.size() );
 
   // vector<Rect> minEllipse( contours.size() );
-
+cout << "Conturs " << contours.size() << endl;
   if (contours.size() >= 5){
     for( int i = 0; i < 5; i++ )
     { approxPolyDP( contours[i], contours_poly[i], 3, true );

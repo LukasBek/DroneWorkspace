@@ -267,7 +267,7 @@ int main(int argc, char **argv)
     // putText(frame, "Test", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);
 
     // HoughCircles Start //
-    vector<Vec3f> circles;
+    std::vector<Vec3f> circles;
     getCircles(frame, &circles);
     // HoughCircles End //
 

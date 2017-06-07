@@ -51,6 +51,8 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
 
   blur(src, src, Size(5, 5));
 
+  imshow("Blur from minBoundingBoxes ", src);
+
   RNG rng(12345);
 
   Mat threshold_output;
@@ -92,12 +94,17 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
        rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
      }
 }
-  int rectWidth   = 0;
-  int rectHeight  = 0;
-  int rectY       = 0;
-  int rectX       = 0;
+  int rectWidth   = boundRect[0].width;
+  int rectHeight  = boundRect[0].height;
+  int rectY       = boundRect[0].y;
+  int rectX       = boundRect[0].x;
 
-
+  cout << "--------------" << endl;
+  cout << "Width:  " << rectWidth   << endl;
+  cout << "Height: " << rectHeight  << endl;
+  cout << "Y:      " << rectY       << endl;
+  cout << "X:      " << rectX       << endl;
+  cout << "--------------" << endl;
   imshow("Boxes from minBoundingBoxes", drawing);
 
   /// retrun to pointers
@@ -110,7 +117,7 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
 
 // -------------------------------------------------- //
 
-void getCircles(Mat src, vector<Vec3f> *dest){
+void getCircles(Mat src, std::vector<Vec3f> *dest){
 
   vector<Vec3f> circles;
   int dp = 1;           // The inverse ratio of resolution
@@ -209,7 +216,7 @@ Mat redFilter(Mat src){
   //Mat temp2;
   //addWeighted(bgr[0],0.5,bgr[1],0.5,temp2,0);
 
-  subtract(bgr[2],bgr[0],temp);
+  subtract(bgr[2],bgr[1],temp);
 
   imshow("Rødfilter",temp);
 

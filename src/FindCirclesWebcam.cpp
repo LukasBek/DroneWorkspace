@@ -166,8 +166,14 @@ int main(int argc, char **argv)
 
   double Htime;
   double Vtime;
-  // auto t1 = Clock::now();
-  // cout << "clock: " << t1 << endl;
+
+  // true = clockwise
+  bool bTurnClockwise = false;
+  double rectLastWidth = 0;
+  double rectLastHeight = 0;
+  double rectLastComparison = 0;
+  double rectComparison = 0;
+
   while (ros::ok())
   {
     ros::spinOnce();
@@ -246,6 +252,7 @@ int main(int argc, char **argv)
     int  rectHeight;
     int  rectX;
     int  rectY;
+
     minBoundingBoxes(redFilter(noBlurRGB), &rectWidth, &rectHeight, &rectX, &rectY);
 
     cout << "--------------" << endl;
@@ -271,7 +278,49 @@ int main(int argc, char **argv)
     strstream << ul;
     strstream >> numberOfCircles;
 
-    if (ul != 0)
+    rectComparison = rectHeight / rectWidth;
+
+
+
+    if (rectWidth + 20 < rectHeight)
+    {
+      if (rectComparison > rectLastComparison)
+      {
+        bTurnClockwise = !bTurnClockwise;
+        if (bTurnClockwise)
+        {
+          cout << "Turn clockwise" << endl;
+          move.turnAroundClockwise(0.1, 0.2);
+          cout << "rect go left" << endl;
+          move.goLeft(0.1);
+        }
+        else
+        {
+          cout << "Turn Counter clockwise" << endl;
+          move.turnAroundCounterClockwise(0.1, 0.2);
+          move.goRight(0.1);
+        }
+      }
+      if (rectComparison < rectLastComparison)
+      {
+        if (bTurnClockwise)
+        {
+          cout << "Turn Counter clockwise" << endl;
+          move.turnAroundCounterClockwise(0.1, 0.2);
+          cout << "rect go right" << endl;
+          move.goRight(0.1);
+        }
+        else
+        {
+          cout << "Turn clockwise" << endl;
+          move.turnAroundClockwise(0.1, 0.2);
+          cout << "rect go left" << endl;
+          move.goLeft(0.1);
+        }
+      }
+      rectLastComparison = rectComparison;
+    }
+    else if (ul != 0)
     {
       Vec3i c = circles[0];
 
@@ -315,55 +364,60 @@ int main(int argc, char **argv)
 
       // Command section start //
 
-      double H = c[0] - 320;
-      double V = c[1] - 180;
-
-
-
-      cout << "c0=" << c[0] << endl;
-      cout << "c1=" << c[1] << endl;
-
+      // Circle start
+      H = c[0] - 320;
+      V = c[1] - 180;
       // Makes sure that even though V or H is negative, it will be a possitive number
       Htime = std::abs(H);
       Vtime = std::abs(V);
+      // Circle end
 
-      if (H < -20 || H > 20)
+      if (H < -40 || H > 40)
       {
-        if (H < 0)
+        if (H > 0)
         {
-          cout << "Go right: H=" << H << " time=" << baseTime * Htime << endl;
+          cout << "Go right: H=" << H << " time=" << baseTime * Htime << " c0=" << c[0] << endl;
           move.goRight(baseTime * Htime);
           continue;
         }
-        else if (H > 0)
+        else if (H < 0)
         {
-          cout << "Go left: H=" << H << " time=" << baseTime * Htime << endl;
+          cout << "Go left: H=" << H << " time=" << baseTime * Htime << " c0=" << c[0] << endl;
           move.goLeft(baseTime * Htime);
           continue;
         }
       }
 
-      else if (V < -20 || V > 20)
+      else if (V < -40 || V > 40)
       {
         if (V < 0)
         {
-          cout << "Go up: V=" << V << " time=" << baseTime * Vtime << endl;
+          cout << "Go up: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
           move.goUp(baseTime * Vtime);
           continue;
         }
         if (V > 0)
         {
-          cout << "Go down: V=" << V << " time=" << baseTime * Vtime << endl;
+          cout << "Go down: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
           move.goDown(baseTime * Vtime);
           continue;
         }
+      }
+      else if (c[2] < aSize.minSize)
+      {
+        cout << "Go forward: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
+        move.forwardx(0.25);
+      }
+      else if (c[2] < aSize.maxSize)
+      {
+        isCentered = true;
       }
 
       if (isCentered)
       {
         cout << "Going through the circle" << endl;
         message = "DEF";
-        move.hover();
+        // move.hover();
         //move.goThrough(1.0);
       }
       else
@@ -437,6 +491,9 @@ int main(int argc, char **argv)
     }
     else
     {
+      //resets the rectLastWidth
+      rectLastWidth = 0;
+
       // cout << "Hover" << endl;
       move.hover();
       // cout << "Hover" << endl;

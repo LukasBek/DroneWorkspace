@@ -243,7 +243,7 @@ int main(int argc, char **argv)
     // Zbar End //
 
     // Red Filter start //
-
+    namedWindow("Rødfilter threshold");
     imshow("Rødfilter threshold", redFilter(noBlurRGB));
 
     // Sobel //
@@ -261,6 +261,13 @@ int main(int argc, char **argv)
     int  rectX;
     int  rectY;
     minBoundingBoxes(redFilter(noBlurRGB), &rectWidth, &rectHeight, &rectX, &rectY);
+
+    cout << "--------------" << endl;
+    cout << "Width:  " << rectWidth   << endl;
+    cout << "Height: " << rectHeight  << endl;
+    cout << "Y:      " << rectY       << endl;
+    cout << "X:      " << rectX       << endl;
+    cout << "--------------" << endl;
 
     // pRect //
 
@@ -450,6 +457,7 @@ int main(int argc, char **argv)
       //  move.turnAroundCounterClockwise(0.1, 0.2);
     }
 
+    namedWindow("Detected circles");
     imshow("Detected circles", frame);
     loop_rate.sleep();
     // if (waitKey(10) == 27)

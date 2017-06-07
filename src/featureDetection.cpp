@@ -51,6 +51,7 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
 
   blur(src, src, Size(5, 5));
 
+  namedWindow("Blur from minBoundingBoxes");
   imshow("Blur from minBoundingBoxes ", src);
 
   RNG rng(12345);
@@ -75,15 +76,15 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
   // TODO Perhaps the first if shuld be extended to enclose the whole lot
 
   if (contours.size() >= 5){
-    for( int i = 0; i < 5; i++ )
+    for( int i = 0; i < contours.size(); i++ )
     { approxPolyDP( contours[i], contours_poly[i], 3, true );
       boundRect[i] = boundingRect( contours_poly[i] );
     }
-  }
-
-  if (boundRect.size() > 0){
     std::sort(boundRect.begin(),boundRect.end(),Dcompare);
   }
+
+
+
 
   /// Draw polygonal contour + bonding rects + circles
   Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );
@@ -99,12 +100,7 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
   int rectY       = boundRect[0].y;
   int rectX       = boundRect[0].x;
 
-  cout << "--------------" << endl;
-  cout << "Width:  " << rectWidth   << endl;
-  cout << "Height: " << rectHeight  << endl;
-  cout << "Y:      " << rectY       << endl;
-  cout << "X:      " << rectX       << endl;
-  cout << "--------------" << endl;
+  namedWindow("Boxes from minBoundingBoxes");
   imshow("Boxes from minBoundingBoxes", drawing);
 
   /// retrun to pointers
@@ -142,7 +138,7 @@ void getCircles(Mat src, std::vector<Vec3f> *dest){
   }
 
   // cout << "Amount of circles: " << circles.size() << endl;
-
+  namedWindow("Detected circles from getCircles");
   imshow("Detected circles from getCircles", src);
 
   *dest = circles;
@@ -218,12 +214,14 @@ Mat redFilter(Mat src){
 
   subtract(bgr[2],bgr[1],temp);
 
+  namedWindow("Rødfilter");
   imshow("Rødfilter",temp);
 
   threshold(temp, threshold_output, thresh, max_thresh, THRESH_BINARY );
 
   Mat sobelGrad;
   sobel(temp, &sobelGrad);
+  namedWindow("Sobel");
   imshow("Sobel", sobelGrad);
 
   return threshold_output;

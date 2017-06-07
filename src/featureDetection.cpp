@@ -51,6 +51,9 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
 
   blur(src, src, Size(5, 5));
 
+  namedWindow("Blur from minBoundingBoxes");
+  imshow("Blur from minBoundingBoxes ", src);
+
   RNG rng(12345);
 
   Mat threshold_output;
@@ -73,15 +76,15 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
   // TODO Perhaps the first if shuld be extended to enclose the whole lot
 
   if (contours.size() >= 5){
-    for( int i = 0; i < 5; i++ )
+    for( int i = 0; i < contours.size(); i++ )
     { approxPolyDP( contours[i], contours_poly[i], 3, true );
       boundRect[i] = boundingRect( contours_poly[i] );
     }
-  }
-
-  if (boundRect.size() > 0){
     std::sort(boundRect.begin(),boundRect.end(),Dcompare);
   }
+
+
+
 
   /// Draw polygonal contour + bonding rects + circles
   Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );
@@ -92,12 +95,12 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
        rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
      }
 }
-  int rectWidth   = 0;
-  int rectHeight  = 0;
-  int rectY       = 0;
-  int rectX       = 0;
+  int rectWidth   = boundRect[0].width;
+  int rectHeight  = boundRect[0].height;
+  int rectY       = boundRect[0].y;
+  int rectX       = boundRect[0].x;
 
-
+  namedWindow("Boxes from minBoundingBoxes");
   imshow("Boxes from minBoundingBoxes", drawing);
 
   /// retrun to pointers
@@ -110,7 +113,7 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
 
 // -------------------------------------------------- //
 
-void getCircles(Mat src, vector<Vec3f> *dest){
+void getCircles(Mat src, std::vector<Vec3f> *dest){
 
   vector<Vec3f> circles;
   int dp = 1;           // The inverse ratio of resolution
@@ -135,7 +138,7 @@ void getCircles(Mat src, vector<Vec3f> *dest){
   }
 
   // cout << "Amount of circles: " << circles.size() << endl;
-
+  namedWindow("Detected circles from getCircles");
   imshow("Detected circles from getCircles", src);
 
   *dest = circles;
@@ -209,14 +212,16 @@ Mat redFilter(Mat src){
   //Mat temp2;
   //addWeighted(bgr[0],0.5,bgr[1],0.5,temp2,0);
 
-  subtract(bgr[2],bgr[0],temp);
+  subtract(bgr[2],bgr[1],temp);
 
+  namedWindow("Rødfilter");
   imshow("Rødfilter",temp);
 
   threshold(temp, threshold_output, thresh, max_thresh, THRESH_BINARY );
 
   Mat sobelGrad;
   sobel(temp, &sobelGrad);
+  namedWindow("Sobel");
   imshow("Sobel", sobelGrad);
 
   return threshold_output;

@@ -47,6 +47,6 @@ std::string zbarScan(Mat frame, int width, int height){
           strstream >> res;
         // cout<<"Angle: "<<r.angle<<endl;
    }
-      imshow("Zbar",imgout);
+      //imshow("Zbar",imgout);
       return res;
 } // End ZbarScan

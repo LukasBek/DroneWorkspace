@@ -15,3 +15,7 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y);
 void getCircles(Mat src, std::vector<Vec3f> *dest);
 int histogramCalculation(Mat src);
 Mat redFilter(Mat src);
+
+int morphologyFilter(cv::Mat *src, int filterSize);
+int erodeImage(cv::Mat *src, int erosionSize);
+int dilateImage(cv::Mat *src, int dilationSize);

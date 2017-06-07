@@ -242,20 +242,6 @@ int main(int argc, char **argv)
     }
     // Zbar End //
 
-    // Red Filter start //
-    namedWindow("Rødfilter threshold");
-    imshow("Rødfilter threshold", redFilter(noBlurRGB));
-
-    // Sobel //
-
-    //  imshow("Sobel", sobel(frame));
-
-    // Sobel //
-
-    // Red Filter start //
-
-    // pRect //
-
     int  rectWidth;
     int  rectHeight;
     int  rectX;
@@ -457,8 +443,6 @@ int main(int argc, char **argv)
       //  move.turnAroundCounterClockwise(0.1, 0.2);
     }
 
-    namedWindow("Detected circles");
-    imshow("Detected circles", frame);
     loop_rate.sleep();
     // if (waitKey(10) == 27)
     //   break; // stop capturing by pressing ESC

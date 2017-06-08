@@ -320,8 +320,6 @@ void isCircle(cv::Mat src, int *width, int *height, int *x, int *y, bool *res) {
     }
     nSum = ceil(sum / 25);
 
-    cout << " -------------nSUM " << nSum << endl;
-
     if (nSum <= 10){
       *res = true;
     }

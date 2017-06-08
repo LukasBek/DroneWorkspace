@@ -169,11 +169,12 @@ int main(int argc, char **argv)
 
   // true = clockwise
 
-  bool bTurnClockwise = false;
+  bool bGoLeft = false;
   double rectLastWidth = 0;
   double rectLastHeight = 0;
   double rectLastComparison = 0;
   double rectComparison = 0;
+  bool bFindRect = false;
 
   while (ros::ok())
   {
@@ -223,7 +224,7 @@ int main(int argc, char **argv)
       aSize.maxRight = vSize.width / 1.6;
       aSize.maxSize = vSize.height / 4;
       //Jo mindre tal, jo tættere på kommer dronen
-      aSize.minSize = vSize.height / 12;
+      aSize.minSize = vSize.height / 10;
 
       cout << "Frame Dimensions - " << vSize.width << " " << vSize.height << endl;
       cout << "Minimum Height   - " << aSize.minHeight << endl;
@@ -279,58 +280,16 @@ int main(int argc, char **argv)
     strstream << ul;
     strstream >> numberOfCircles;
 
-    bool bFindRect = false;
+    bFindRect = false;
     if (!(rectWidth == 0 || rectHeight == 0))
     {
       rectComparison = rectHeight / rectWidth;
       bFindRect = true;
     }
 
-        if (bFindRect)
-        {
-          if (rectWidth + 20 < rectHeight)
-          {
-            if (rectComparison > rectLastComparison)
-            {
-              bTurnClockwise = !bTurnClockwise;
-              if (bTurnClockwise)
-              {
-                cout << "Turn clockwise" << endl;
-                move.turnAroundClockwise(0.1, 0.2);
-                cout << "rect go left" << endl;
-                move.goLeft(0.1);
-              }
-              else
-              {
-                cout << "Turn Counter clockwise" << endl;
-                move.turnAroundCounterClockwise(0.1, 0.2);
-                move.goRight(0.1);
-              }
-            }
-            if (rectComparison < rectLastComparison)
-            {
-              if (bTurnClockwise)
-              {
-                cout << "Turn Counter clockwise" << endl;
-                move.turnAroundCounterClockwise(0.1, 0.2);
-                cout << "rect go right" << endl;
-                move.goRight(0.1);
-              }
-              else
-              {
-                cout << "Turn clockwise" << endl;
-                move.turnAroundClockwise(0.1, 0.2);
-                cout << "rect go left" << endl;
-                move.goLeft(0.1);
-              }
-            }
-            rectLastComparison = rectComparison;
-          }
-        }
-        else if (ul != 0)
-
-    // if (ul != 0)
+    if (ul != 0)
     {
+
       Vec3i c = circles[0];
 
       // Queue start // // TODO - May need a check if logic is correct //
@@ -373,7 +332,7 @@ int main(int argc, char **argv)
 
       // Command section start //
 
-      // Circle start
+      // Midten af cirklens placering i framen
       H = c[0] - 320;
       V = c[1] - 180;
       // Makes sure that even though V or H is negative, it will be a possitive number
@@ -397,7 +356,7 @@ int main(int argc, char **argv)
         }
       }
 
-      else if (V < -40 || V > 40)
+      else if (V < -20 || V > 20)
       {
         if (V < 0)
         {
@@ -415,9 +374,9 @@ int main(int argc, char **argv)
       else if (c[2] < aSize.minSize)
       {
         cout << "Go forward: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
-        move.forwardx(0.25);
+        move.forwardx(0.15);
       }
-      else if (c[2] < aSize.maxSize)
+      else if (c[2] > aSize.maxSize)
       {
         isCentered = true;
       }
@@ -497,6 +456,72 @@ int main(int argc, char **argv)
       putText(frame, number, cvPoint(30, 60), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255, 255, 255), 1, CV_AA);
 
       // Setting text on screen end //
+    }
+    else if (bFindRect)
+    {
+      if (rectWidth + 20 < rectHeight)
+      {
+        //------------------------------------------------
+
+        // Midten af firkantens placering i framen
+        H = rectX - 320;
+        V = rectY - 180;
+        // Makes sure that even though V or H is negative, it will be a possitive number
+        Htime = std::abs(H);
+        Vtime = std::abs(V);
+        // Circle end
+
+        if (H < -40 || H > 40)
+        {
+          if (H > 0)
+          {
+            cout << "Turn clock: H=" << H << " time=" << baseTime * Htime << endl;
+            move.turnAroundCounterClockwise(0.1, 0.2);
+            continue;
+          }
+          else if (H < 0)
+          {
+            cout << "turn counterclock: H=" << H << " time=" << baseTime * Htime << endl;
+            move.turnAroundClockwise(0.1, 0.2);
+            continue;
+          }
+        }
+
+        else if (V < -20 || V > 20)
+        {
+          if (V < 0)
+          {
+            cout << "rect Go up: V=" << V << " time=" << baseTime * Vtime << endl;
+            move.goUp(baseTime * Vtime);
+            continue;
+          }
+          if (V > 0)
+          {
+            cout << "rect Go down: V=" << V << " time=" << baseTime * Vtime << endl;
+            move.goDown(baseTime * Vtime);
+            continue;
+          }
+        }
+
+        //-------------------------------------------------------------------------
+
+        if (rectComparison > rectLastComparison)
+        {
+          bGoLeft = !bGoLeft;
+		} 
+		  if (bGoLeft)
+          {
+            cout << "rect go left" << endl;
+            move.goLeft(0.1);
+          }
+          else
+          {
+            cout << "rect go right" << endl;
+            move.goRight(0.1);
+          }
+
+        rectLastComparison = rectComparison;
+      }
     }
     else
     {

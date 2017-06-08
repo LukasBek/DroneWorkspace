@@ -6,6 +6,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/opencv.hpp"
+#include <math.h>
 
 using namespace cv;
 using namespace std;
@@ -79,7 +80,6 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
   vector<vector<Point> > contours_poly( contours.size() );
 
   // vector<Rect> minEllipse( contours.size() );
-  // TODO Perhaps the first if shuld be extended to enclose the whole lot
 
   if (contours.size() > 0){
     for( int i = 0; i < contours.size(); i++ )
@@ -93,6 +93,7 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
   int rectHeight  = 0;
   int rectY       = 0;
   int rectX       = 0;
+  bool isCircleRes = false;
 
   /// Draw polygonal contour + bonding rects + circles
   Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );
@@ -106,10 +107,19 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
      rectHeight  = boundRect[0].height;
      rectY       = boundRect[0].y;
      rectX       = boundRect[0].x;
+     isCircle(src, &rectWidth, &rectHeight, &rectX, &rectY, &isCircleRes);
+
 }
 
   namedWindow("Boxes from minBoundingBoxes");
   imshow("Boxes from minBoundingBoxes", drawing);
+
+  if (isCircleRes == false){
+    rectWidth   = 0;
+    rectHeight  = 0;
+    rectY       = 0;
+    rectX       = 0;
+  }
 
   /// retrun to pointers
    *width   = rectWidth;
@@ -212,13 +222,7 @@ Mat redFilter(Mat src){
   Mat bgr[3];     //destination array
   split(src,bgr); //split source
 
-  //Note: OpenCV uses BGR color order
-  // imwrite("blue.png",bgr[0]);   //blue channel
-  // imwrite("green.png",bgr[1]);  //green channel
-  // imwrite("red.png",bgr[2]);    //red channel
   Mat temp;
-  //Mat temp2;
-  //addWeighted(bgr[0],0.5,bgr[1],0.5,temp2,0);
 
   subtract(bgr[2],bgr[1],temp);
 
@@ -229,8 +233,8 @@ Mat redFilter(Mat src){
 
   // int moF = morphologyFilter(&threshold_output, 3);
 
-  Mat sobelGrad;
-  sobel(temp, &sobelGrad);
+  //Mat sobelGrad;
+  //sobel(temp, &sobelGrad);
   //namedWindow("Sobel");
   //imshow("Sobel", sobelGrad);
 
@@ -238,7 +242,73 @@ Mat redFilter(Mat src){
 
 }
 
+void isCircle(cv::Mat src, int *width, int *height, int *x, int *y, bool *res) {
 
+  if (*width > 0 && *height > 0 && *x > 0 && *y > 0){
+
+  int rectWidth   = *width;
+  int rectHeight  = *height;
+
+  int offsetX = *x;
+  int offsetY = *y;
+
+  //cv::Point A = Point(rectWidth*3/16  ,rectHeight/2     );
+    cv::Point B = Point(rectWidth/4     ,rectHeight/2     );
+    cv::Point C = Point(rectWidth*3/8   ,rectHeight/2     );
+    cv::Point D = Point(rectWidth/2     ,rectHeight/2     );
+    cv::Point E = Point(rectWidth*5/8   ,rectHeight/2     );
+    cv::Point F = Point(rectWidth*3/4   ,rectHeight/2     );
+  //cv::Point G = Point(rectWidth*13/16 ,rectHeight/2     );
+    cv::Point H = Point(rectWidth/2     ,rectHeight*5/8   );
+  //cv::Point I = Point(rectWidth/4     ,rectHeight*3/4   );
+    cv::Point J = Point(rectWidth/2     ,rectHeight*3/4   );
+  //cv::Point K = Point(rectWidth*3/4   ,rectHeight*3/4   );
+  //cv::Point L = Point(rectWidth/2     ,rectHeight*13/16 );
+    cv::Point M = Point(rectWidth/2     ,rectHeight*3/8   );
+  //cv::Point N = Point(rectWidth/4     ,rectHeight/4     );
+    cv::Point O = Point(rectWidth/2     ,rectHeight/4     );
+  //cv::Point P = Point(rectWidth*3/4   ,rectHeight/4     );
+  //cv::Point Q = Point(rectWidth/2     ,rectHeight*3/16  );
+
+  cv::Point2f points [17] = {B, C, D, E, F, H, J, M, O};
+
+  for (int i = 0 ; i < 9 ; i++){
+    points[i].x = points[i].x + offsetX;
+    points[i].y = points[i].y + offsetY;
+  }
+  float f1 = 1.0;
+  float f2 = 1/2;
+  float f3 = 1/3;
+  float f4 = 1/4;
+
+  float weight [] = {f3,f2,f1,f2,f3,f2,f3,f2,f3};
+  int   value [9];
+
+  for (int i = 0 ; i < 9 ; i++){
+
+    Scalar intensity = src.at<uchar>(points[i]);
+    value[i] = ceil(intensity[0] * weight[i]);
+
+  }
+
+  for (int i = 0 ; i < 9 ; i++){
+    circle(src, points[i], 1, Scalar(150, 150, 150), 2, CV_AA);
+  }
+
+    int sum   = 0;
+    int nSum  = 0;
+    for (int i = 0 ; i < 9 ; i++){
+      sum = (sum + value[i]);
+    }
+    nSum = ceil(sum / 9);
+
+    if (nSum <= 2){
+      *res = true;
+    }
+
+  imshow("Point", src);
+  }
+}
 
 // Author: Niclas Atzen //
 // Methods: morphologyFilter, erodeImage, dilateImage

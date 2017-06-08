@@ -180,6 +180,7 @@ int main(int argc, char **argv)
 
     while (ros::ok())
     {
+		loop_rate.sleep();
 	ros::spinOnce();
 
 	//while ((double)ros::Time::now().toSec() < start_time + takeoff_time + 2)
@@ -285,7 +286,7 @@ int main(int argc, char **argv)
 	bFindRect = false;
 	if (!(rectWidth == 0 || rectHeight == 0))
 	{
-	    rectComparison = rectHeight / rectWidth;
+	    rectComparison = (double)rectHeight / (double)rectWidth;
 	    bFindRect = true;
 	}
 
@@ -376,18 +377,18 @@ int main(int argc, char **argv)
 	    }
 	    else if (c[2] < aSize.minSize)
 	    {
-		cout << "Go forward: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
-		move.forwardx(0.15);
+			cout << "Go forward: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
+			move.forwardx(0.15);
 	    }
 	    else if (c[2] > aSize.maxSize)
 	    {
-		isCentered = true;
+			isCentered = true;
 	    }
 
 	    if (isCentered)
 	    {
-		cout << "Going through the circle" << endl;
-		message = "DEF";
+			cout << "Going through the circle" << endl;
+			message = "DEF";
 		// move.hover();
 		//move.goThrough(1.0);
 	    }
@@ -455,28 +456,29 @@ int main(int argc, char **argv)
 		    }
 		}
 
-		else if (V < -20 || V > 20)
-		{
-		    if (V < 0)
-		    {
-			cout << "rect Go up: V=" << V << " time=" << baseTime * Vtime << endl;
-			move.goUp(baseTime * Vtime);
-			continue;
-		    }
-		    if (V > 0)
-		    {
-			cout << "rect Go down: V=" << V << " time=" << baseTime * Vtime << endl;
-			move.goDown(baseTime * Vtime);
-			continue;
-		    }
-		}
+		// else if (V < -20 || V > 20)
+		// {
+		//     if (V < 0)
+		//     {
+		// 	cout << "rect Go up: V=" << V << " time=" << baseTime * Vtime << endl;
+		// 	move.goUp(baseTime * Vtime);
+		// 	continue;
+		//     }
+		//     if (V > 0)
+		//     {
+		// 	cout << "rect Go down: V=" << V << " time=" << baseTime * Vtime << endl;
+		// 	move.goDown(baseTime * Vtime);
+		// 	continue;
+		//     }
+		// }
 
 		//-------------------------------------------------------------------------
-
+		cout << "rectComparison=" << rectComparison << " rectLASTCOM=" << rectLastComparison << endl;
 		if (rectComparison > rectLastComparison)
 		{
 		    bGoLeft = !bGoLeft;
 		}
+
 		if (bGoLeft)
 		{
 		    cout << "rect go left" << endl;
@@ -493,25 +495,25 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-	    cout << "Hover" << endl;
-	    move.hover();
+	    // cout << "Hover" << endl;
+	    // move.hover();
 	    //resets the rectLastWidth
 	    // rectLastWidth = 0;
 
-	    if (turnCounter = > 5 && count < 15)
-	    {
-		cout << "nothing found - turning clockwise" << endl;
-		move.turnAroundClockwise(0.1, 0.2)
-	    }
-	    if (turnCounter < 5)
-	    {
-		cout << "nothing found - turning counter clockwise" << endl;
-		move.turnAroundCounterClockwise(0.1, 0.2)
-	    }
-	    turnCounter++;
+	    // if (turnCounter >= 5 && turnCounter < 15)
+	    // {
+	    // cout << "nothing found - turning clockwise" << endl;
+	    // move.turnAroundClockwise(0.1, 0.2);
+	    // }
+	    // if (turnCounter < 5)
+	    // {
+	    // cout << "nothing found - turning counter clockwise" << endl;
+	    // move.turnAroundCounterClockwise(0.1, 0.2);
+	    // }
+	    // turnCounter++;
 	}
 
-	loop_rate.sleep();
+	
 	// if (waitKey(10) == 27)
 	//   break; // stop capturing by pressing ESC
     }

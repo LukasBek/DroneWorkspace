@@ -255,57 +255,77 @@ void isCircle(cv::Mat src, int *width, int *height, int *x, int *y, bool *res) {
   int offsetX = *x;
   int offsetY = *y;
 
-  //cv::Point A = Point(rectWidth*3/16  ,rectHeight/2     );
+    cv::Point p1  = Point(rectWidth*10/20   ,rectHeight*10/20 );
+    cv::Point p2  = Point(rectWidth*10/20   ,rectHeight*9/20  );
+    cv::Point p3  = Point(rectWidth*11/20   ,rectHeight*10/20 );
+    cv::Point p4  = Point(rectWidth*10/20   ,rectHeight*11/20 );
+    cv::Point p5  = Point(rectWidth*9/20    ,rectHeight*10/20 );
+    cv::Point p6  = Point(rectWidth*11/20   ,rectHeight*9/20  );
+    cv::Point p7  = Point(rectWidth*11/20   ,rectHeight*11/20 );
+    cv::Point p8  = Point(rectWidth*9/20    ,rectHeight*11/20 );
+    cv::Point p9  = Point(rectWidth*9/20    ,rectHeight*9/20  );
+    cv::Point p10 = Point(rectWidth*10/20   ,rectHeight*8/20  );
+    cv::Point p11 = Point(rectWidth*12/20   ,rectHeight*10/20 );
+    cv::Point p12 = Point(rectWidth*10/20   ,rectHeight*12/20 );
+    cv::Point p13 = Point(rectWidth*8/20    ,rectHeight*10/20 );
+    cv::Point p14 = Point(rectWidth*14/20   ,rectHeight*10/20 );
+    cv::Point p15 = Point(rectWidth*10/20   ,rectHeight*14/20 );
+    cv::Point p16 = Point(rectWidth*6/20    ,rectHeight*10/20 );
+    cv::Point p17 = Point(rectWidth*10/20   ,rectHeight*6/20  );
+    cv::Point p22 = Point(rectWidth*12/20   ,rectHeight*7/20  );
+    cv::Point p23 = Point(rectWidth*13/20   ,rectHeight*8/20  );
+    cv::Point p24 = Point(rectWidth*13/20   ,rectHeight*12/20 );
+    cv::Point p25 = Point(rectWidth*12/20   ,rectHeight*13/20 );
+    cv::Point p26 = Point(rectWidth*8/20    ,rectHeight*13/20 );
+    cv::Point p27 = Point(rectWidth*7/20    ,rectHeight*12/20 );
+    cv::Point p28 = Point(rectWidth*7/20    ,rectHeight*8/20  );
+    cv::Point p29 = Point(rectWidth*8/20    ,rectHeight*7/20  );
+/*
     cv::Point B = Point(rectWidth/4     ,rectHeight/2     );
     cv::Point C = Point(rectWidth*3/8   ,rectHeight/2     );
     cv::Point D = Point(rectWidth/2     ,rectHeight/2     );
     cv::Point E = Point(rectWidth*5/8   ,rectHeight/2     );
     cv::Point F = Point(rectWidth*3/4   ,rectHeight/2     );
-  //cv::Point G = Point(rectWidth*13/16 ,rectHeight/2     );
     cv::Point H = Point(rectWidth/2     ,rectHeight*5/8   );
-  //cv::Point I = Point(rectWidth/4     ,rectHeight*3/4   );
     cv::Point J = Point(rectWidth/2     ,rectHeight*3/4   );
-  //cv::Point K = Point(rectWidth*3/4   ,rectHeight*3/4   );
-  //cv::Point L = Point(rectWidth/2     ,rectHeight*13/16 );
     cv::Point M = Point(rectWidth/2     ,rectHeight*3/8   );
-  //cv::Point N = Point(rectWidth/4     ,rectHeight/4     );
     cv::Point O = Point(rectWidth/2     ,rectHeight/4     );
-  //cv::Point P = Point(rectWidth*3/4   ,rectHeight/4     );
-  //cv::Point Q = Point(rectWidth/2     ,rectHeight*3/16  );
+*/
+  cv::Point2f points [25] = {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p22, p23, p24, p25, p26, p27, p28, p29};
 
-  cv::Point2f points [17] = {B, C, D, E, F, H, J, M, O};
-
-  for (int i = 0 ; i < 9 ; i++){
+  for (int i = 0 ; i < 25 ; i++){
     points[i].x = points[i].x + offsetX;
     points[i].y = points[i].y + offsetY;
   }
   float f1 = 1.0;
-  float f2 = 1/2;
-  float f3 = 1/3;
-  float f4 = 1/4;
+  float f2 = 0.8;
+  float f3 = 0.4;
+  float f4 = 0.2;
 
-  float weight [] = {f3,f2,f1,f2,f3,f2,f3,f2,f3};
-  int   value [9];
+  float weight [] = {f1, f1, f1, f1, f1, f1, f1, f1, f1, f2, f2, f2, f2, f3, f3, f3, f3, f3, f3, f3, f3, f3, f3, f3, f3};
+  int   value [25];
 
-  for (int i = 0 ; i < 9 ; i++){
+  for (int i = 0 ; i < 25 ; i++){
 
     Scalar intensity = src.at<uchar>(points[i]);
     value[i] = ceil(intensity[0] * weight[i]);
 
   }
 
-  for (int i = 0 ; i < 9 ; i++){
+  for (int i = 0 ; i < 25 ; i++){
     circle(src, points[i], 1, Scalar(150, 150, 150), 2, CV_AA);
   }
 
     int sum   = 0;
     int nSum  = 0;
-    for (int i = 0 ; i < 9 ; i++){
+    for (int i = 0 ; i < 25 ; i++){
       sum = (sum + value[i]);
     }
-    nSum = ceil(sum / 9);
+    nSum = ceil(sum / 25);
 
-    if (nSum <= 2){
+    cout << " -------------nSUM " << nSum << endl;
+
+    if (nSum <= 10){
       *res = true;
     }
 

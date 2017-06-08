@@ -111,9 +111,12 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
 
 }
 
-  namedWindow("Boxes from minBoundingBoxes");
-  imshow("Boxes from minBoundingBoxes", drawing);
+  if (isCircleRes == true){
+    namedWindow("Boxes from minBoundingBoxes");
+    imshow("Boxes from minBoundingBoxes", drawing);
 
+  }
+  
   if (isCircleRes == false){
     rectWidth   = 0;
     rectHeight  = 0;

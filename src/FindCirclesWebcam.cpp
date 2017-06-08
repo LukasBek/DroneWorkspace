@@ -48,52 +48,52 @@ static const std::string OPENCV_WINDOW = "Image window";
 class ImageConverter
 {
 
-public:
-  cv_bridge::CvImagePtr cv_ptr;
-  ros::NodeHandle nh_;
-  image_transport::ImageTransport it_;
-  image_transport::Subscriber image_sub_;
-  image_transport::Publisher image_pub_;
+  public:
+    cv_bridge::CvImagePtr cv_ptr;
+    ros::NodeHandle nh_;
+    image_transport::ImageTransport it_;
+    image_transport::Subscriber image_sub_;
+    image_transport::Publisher image_pub_;
 
-public:
-  ImageConverter()
-      : it_(nh_)
-  {
-
-    // Subscrive to input video feed and publish output video feed
-    image_sub_ = it_.subscribe("/ardrone/front/image_raw", 1,
-                               &ImageConverter::imageCb, this);
-    // image_pub_ = it_.advertise("/image_converter/output_video", 1);
-
-    // cv::namedWindow(OPENCV_WINDOW);
-  }
-
-  ~ImageConverter()
-  {
-    // cv::destroyWindow(OPENCV_WINDOW);
-  }
-
-  void imageCb(const sensor_msgs::ImageConstPtr &msg)
-  {
-    // public cv_bridge::CvImagePtr cv_ptr;
-    try
+  public:
+    ImageConverter()
+	: it_(nh_)
     {
-      cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-    }
-    catch (cv_bridge::Exception &e)
-    {
-      ROS_ERROR("cv_bridge exception: %s", e.what());
-      return;
+
+	// Subscrive to input video feed and publish output video feed
+	image_sub_ = it_.subscribe("/ardrone/front/image_raw", 1,
+				   &ImageConverter::imageCb, this);
+	// image_pub_ = it_.advertise("/image_converter/output_video", 1);
+
+	// cv::namedWindow(OPENCV_WINDOW);
     }
 
-    // Update GUI Window
-    frameRBG = cv_ptr->image;
+    ~ImageConverter()
+    {
+	// cv::destroyWindow(OPENCV_WINDOW);
+    }
 
-    cv::waitKey(3);
+    void imageCb(const sensor_msgs::ImageConstPtr &msg)
+    {
+	// public cv_bridge::CvImagePtr cv_ptr;
+	try
+	{
+	    cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+	}
+	catch (cv_bridge::Exception &e)
+	{
+	    ROS_ERROR("cv_bridge exception: %s", e.what());
+	    return;
+	}
 
-    // Output modified video stream
-    // image_pub_.publish(cv_ptr->toImageMsg());
-  }
+	// Update GUI Window
+	frameRBG = cv_ptr->image;
+
+	cv::waitKey(3);
+
+	// Output modified video stream
+	// image_pub_.publish(cv_ptr->toImageMsg());
+    }
 };
 
 // ----------------------  vvv  -----------------------  vvv   OpenCV   vvv  ----------------------  vvv  ----------------------- //
@@ -107,438 +107,415 @@ int kernel_size = 3;
 // eDistance - Calculates distance between two vectors //
 double eDistance(Vec3i a, Vec3i b)
 {
-  return sqrt(pow(a[0] - b[0], 2) + pow(a[1] - b[1], 2));
+    return sqrt(pow(a[0] - b[0], 2) + pow(a[1] - b[1], 2));
 }
 
 int main(int argc, char **argv)
 {
 
-  // Main scope variables //
-  queue<Vec3i> circleQueue; // Que for circle positions //
-  std::string message;      // Message for console prints //
-  int variance20 = 20;
+    // Main scope variables //
+    queue<Vec3i> circleQueue; // Que for circle positions //
+    std::string message;      // Message for console prints //
+    int variance20 = 20;
 
-  ros::init(argc, argv, "image_converter");
-  ImageConverter ic;
+    ros::init(argc, argv, "image_converter");
+    ImageConverter ic;
 
-  ros::NodeHandle node;
+    ros::NodeHandle node;
 
-  DroneMovement move;
-  bool isCentered;
+    DroneMovement move;
+    bool isCentered;
 
-  move.init(node);
+    move.init(node);
 
-  ros::Rate loop_rate(10);
+    ros::Rate loop_rate(10);
 
-  struct videoSize // Struct for video size //
-  {
-    int width;
-    int height;
-  };
-  struct acceptSize // Dimensions for accept //
-  {
-    int minHeight;
-    int maxHeight;
-    int maxLeft;
-    int maxRight;
-    int maxSize;
-    int minSize;
-  };
-  // Ini of structs //
-  videoSize vSize;
-  vSize.width = 0;
-  vSize.height = 0;
-
-  acceptSize aSize;
-  aSize.minHeight = 0;
-  aSize.maxHeight = 0;
-  aSize.maxLeft = 0;
-  aSize.maxRight = 0;
-  aSize.maxSize = 0;
-  aSize.minSize = 0;
-
-  ros::Duration(1).sleep();
-  int b = 0;
-  double baseTime = 0.002;
-
-  double H;
-  double V;
-
-  double Htime;
-  double Vtime;
-
-  // true = clockwise
-
-  bool bGoLeft = false;
-  double rectLastWidth = 0;
-  double rectLastHeight = 0;
-  double rectLastComparison = 0;
-  double rectComparison = 0;
-  bool bFindRect = false;
-
-  while (ros::ok())
-  {
-    ros::spinOnce();
-
-    //while ((double)ros::Time::now().toSec() < start_time + takeoff_time + 2)
-    //while ((double)ros::Time::now().toSec() < 7 + 2)
-    //{ //takeoff
-
-    //cout << "Variabler " << move.takeoff_time << endl;
-    // while (b < 100)
-    // {
-    //   ros::spinOnce();
-    //   //// Denne skal udkommenteres for kun at teste kamera og så dronen ikke letter
-    //     move.takeoff();
-
-    //   if (b == 99)
-    //   {
-    //     cout << "Taking off" << endl;
-    //     ros::Duration(6).sleep();
-    //   }
-    //   b++;
-    // }
-    // while (b < 101)
-    // {
-    //   cout << "OPSADASSE!" << endl;
-    //   ros::spinOnce();
-    //   move.goUp(1.6);
-    //   b++;
-    // }
-
-    // cout << "TRY ME" << endl;
-    if (frameRBG.empty())
+    struct videoSize // Struct for video size //
     {
-      cout << "No frame from capture, end og video stream" << endl;
-      break; // end of video stream
-    }
-
-    if (vSize.width == 0 || vSize.height == 0)
+	int width;
+	int height;
+    };
+    struct acceptSize // Dimensions for accept //
     {
-      vSize.width = frameRBG.cols;
-      vSize.height = frameRBG.rows;
+	int minHeight;
+	int maxHeight;
+	int maxLeft;
+	int maxRight;
+	int maxSize;
+	int minSize;
+    };
+    // Ini of structs //
+    videoSize vSize;
+    vSize.width = 0;
+    vSize.height = 0;
 
-      aSize.minHeight = vSize.height / 2.5;
-      aSize.maxHeight = vSize.height / 7;
-      aSize.maxLeft = vSize.width / 2.5;
-      aSize.maxRight = vSize.width / 1.6;
-      aSize.maxSize = vSize.height / 4;
-      //Jo mindre tal, jo tættere på kommer dronen
-      aSize.minSize = vSize.height / 10;
+    acceptSize aSize;
+    aSize.minHeight = 0;
+    aSize.maxHeight = 0;
+    aSize.maxLeft = 0;
+    aSize.maxRight = 0;
+    aSize.maxSize = 0;
+    aSize.minSize = 0;
 
-      cout << "Frame Dimensions - " << vSize.width << " " << vSize.height << endl;
-      cout << "Minimum Height   - " << aSize.minHeight << endl;
-      cout << "Maximum Height   - " << aSize.maxHeight << endl;
-      cout << "Maximum Left     - " << aSize.maxLeft << endl;
-      cout << "Maximum Right    - " << aSize.maxRight << endl;
-      cout << "Maximum Size     - " << aSize.maxSize << endl;
-      cout << "Minimum Size     - " << aSize.minSize << endl;
-    }
+    ros::Duration(1).sleep();
+    int b = 0;
+    double baseTime = 0.002;
 
-    noBlurRGB = frameRBG.clone();
+    double H;
+    double V;
 
-    // Blur and convertion to grayscale //
-    blur(frameRBG, frameRBG, Size(5, 5));
+    double Htime;
+    double Vtime;
 
-    cvtColor(frameRBG, frame, CV_RGB2GRAY);
+    // true = clockwise
 
-    // Zbar Start //
-    string res = zbarScan(frame, vSize.width, vSize.height);
-    if (!res.empty())
+    bool bGoLeft = false;
+    double rectLastWidth = 0;
+    double rectLastHeight = 0;
+    double rectLastComparison = 0;
+    double rectComparison = 0;
+    bool bFindRect = false;
+
+    int turnCounter = 0;
+
+    while (ros::ok())
     {
-      cout << "Symbol: " << zbarScan(frame, vSize.width, vSize.height) << endl;
+	ros::spinOnce();
+
+	//while ((double)ros::Time::now().toSec() < start_time + takeoff_time + 2)
+	//while ((double)ros::Time::now().toSec() < 7 + 2)
+	//{ //takeoff
+
+	//cout << "Variabler " << move.takeoff_time << endl;
+	// while (b < 100)
+	// {
+	//   ros::spinOnce();
+	//   //// Denne skal udkommenteres for kun at teste kamera og så dronen ikke letter
+	//     move.takeoff();
+
+	//   if (b == 99)
+	//   {
+	//     cout << "Taking off" << endl;
+	//     ros::Duration(6).sleep();
+	//   }
+	//   b++;
+	// }
+	// while (b < 101)
+	// {
+	//   cout << "OPSADASSE!" << endl;
+	//   ros::spinOnce();
+	//   move.goUp(1.6);
+	//   b++;
+	// }
+
+	// cout << "TRY ME" << endl;
+	if (frameRBG.empty())
+	{
+	    cout << "No frame from capture, end og video stream" << endl;
+	    break; // end of video stream
+	}
+
+	if (vSize.width == 0 || vSize.height == 0)
+	{
+	    vSize.width = frameRBG.cols;
+	    vSize.height = frameRBG.rows;
+
+	    aSize.minHeight = vSize.height / 2.5;
+	    aSize.maxHeight = vSize.height / 7;
+	    aSize.maxLeft = vSize.width / 2.5;
+	    aSize.maxRight = vSize.width / 1.6;
+	    aSize.maxSize = vSize.height / 4;
+	    //Jo mindre tal, jo tættere på kommer dronen
+	    aSize.minSize = vSize.height / 10;
+
+	    cout << "Frame Dimensions - " << vSize.width << " " << vSize.height << endl;
+	    cout << "Minimum Height   - " << aSize.minHeight << endl;
+	    cout << "Maximum Height   - " << aSize.maxHeight << endl;
+	    cout << "Maximum Left     - " << aSize.maxLeft << endl;
+	    cout << "Maximum Right    - " << aSize.maxRight << endl;
+	    cout << "Maximum Size     - " << aSize.maxSize << endl;
+	    cout << "Minimum Size     - " << aSize.minSize << endl;
+	}
+
+	noBlurRGB = frameRBG.clone();
+
+	// Blur and convertion to grayscale //
+	blur(frameRBG, frameRBG, Size(5, 5));
+
+	cvtColor(frameRBG, frame, CV_RGB2GRAY);
+
+	// Zbar Start //
+	string res = zbarScan(frame, vSize.width, vSize.height);
+	if (!res.empty())
+	{
+	    cout << "Symbol: " << zbarScan(frame, vSize.width, vSize.height) << endl;
+	}
+	// Zbar End //
+
+	int rectWidth;
+	int rectHeight;
+	int rectX;
+	int rectY;
+
+	minBoundingBoxes(redFilter(noBlurRGB), &rectWidth, &rectHeight, &rectX, &rectY);
+
+	// cout << "--------------" << endl;
+	// cout << "Width:  " << rectWidth   << endl;
+	// cout << "Height: " << rectHeight  << endl;
+	// cout << "Y:      " << rectY       << endl;
+	// cout << "X:      " << rectX       << endl;
+	// cout << "--------------" << endl;
+
+	// pRect //
+
+	// putText(frame, "Test", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);
+
+	// HoughCircles Start //
+	std::vector<Vec3f> circles;
+	getCircles(frame, &circles);
+	// HoughCircles End //
+
+	// Finds the amount of circles in the image
+	unsigned long ul = circles.size();
+	std::string numberOfCircles;
+	std::stringstream strstream;
+	strstream << ul;
+	strstream >> numberOfCircles;
+
+	bFindRect = false;
+	if (!(rectWidth == 0 || rectHeight == 0))
+	{
+	    rectComparison = rectHeight / rectWidth;
+	    bFindRect = true;
+	}
+
+	if (ul != 0)
+	{
+	    turnCounter = 0;
+
+	    Vec3i c = circles[0];
+
+	    // Queue start // // TODO - May need a check if logic is correct //
+
+	    if (circleQueue.size() < 5)
+	    {
+		circleQueue.push(c); //  Add some values to the queue
+	    }
+	    else
+	    {
+		queue<Vec3i> circleQueueTemp;
+		circleQueueTemp = circleQueue;
+		double iterator = 1;
+		// cout << "Accept" << endl;
+
+		while (circleQueueTemp.size() > 0)
+		{
+
+		    // cout << "Round " << iterator << ", Distance " << eDistance(circleQueueTemp.front(),c) << ", max distance " << (iterator/20)*vSize.width << endl;
+
+		    if (eDistance(circleQueueTemp.front(), c) < iterator / 20 * vSize.width)
+		    {
+			//cout << "Accept circle into que" << endl;
+			//cout << "Accept" << endl;
+			circleQueue.pop();
+			circleQueue.push(c);
+			break;
+		    }
+		    else
+		    {
+			//cout << "Deny circle into que" << endl;
+			//cout << "Deny" << endl;
+			circleQueueTemp.pop();
+		    }
+		    iterator++;
+		}
+	    }
+
+	    // Queue end //
+
+	    // Command section start //
+
+	    // Midten af cirklens placering i framen
+	    H = c[0] - 320;
+	    V = c[1] - 180;
+	    // Makes sure that even though V or H is negative, it will be a possitive number
+	    Htime = std::abs(H);
+	    Vtime = std::abs(V);
+	    // Circle end
+
+	    if (H < -40 || H > 40)
+	    {
+		if (H > 0)
+		{
+		    cout << "Go right: H=" << H << " time=" << baseTime * Htime << " c0=" << c[0] << endl;
+		    move.goRight(baseTime * Htime);
+		    continue;
+		}
+		else if (H < 0)
+		{
+		    cout << "Go left: H=" << H << " time=" << baseTime * Htime << " c0=" << c[0] << endl;
+		    move.goLeft(baseTime * Htime);
+		    continue;
+		}
+	    }
+
+	    else if (V < -20 || V > 20)
+	    {
+		if (V < 0)
+		{
+		    cout << "Go up: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
+		    move.goUp(baseTime * Vtime);
+		    continue;
+		}
+		if (V > 0)
+		{
+		    cout << "Go down: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
+		    move.goDown(baseTime * Vtime);
+		    continue;
+		}
+	    }
+	    else if (c[2] < aSize.minSize)
+	    {
+		cout << "Go forward: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
+		move.forwardx(0.15);
+	    }
+	    else if (c[2] > aSize.maxSize)
+	    {
+		isCentered = true;
+	    }
+
+	    if (isCentered)
+	    {
+		cout << "Going through the circle" << endl;
+		message = "DEF";
+		// move.hover();
+		//move.goThrough(1.0);
+	    }
+	    else
+	    {
+		move.hover();
+	    }
+
+	    isCentered = false;
+
+	    // Command section end //
+
+	    std::string number0;
+	    std::string number1;
+	    std::string number2;
+
+	    std::stringstream strstream0;
+	    std::stringstream strstream1;
+	    std::stringstream strstream2;
+
+	    strstream0 << c[0];
+	    strstream0 >> number0;
+
+	    strstream1 << c[1];
+	    strstream1 >> number1;
+
+	    strstream2 << c[2];
+	    strstream2 >> number2;
+
+	    std::string number = "Horizontal " + number0 + " Vertical " + number1 + " Size " + number2;
+
+	    putText(frame, "Circles " + numberOfCircles, cvPoint(30, 30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255, 255, 255), 1, CV_AA);
+	    putText(frame, number, cvPoint(30, 60), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255, 255, 255), 1, CV_AA);
+
+	    // Setting text on screen end //
+	}
+	else if (bFindRect)
+	{
+	    if (rectWidth + 20 < rectHeight)
+	    {
+		turnCounter = 0;
+		//------------------------------------------------
+
+		// Midten af firkantens placering i framen
+		H = rectX - 320;
+		V = rectY - 180;
+		// Makes sure that even though V or H is negative, it will be a possitive number
+		Htime = std::abs(H);
+		Vtime = std::abs(V);
+		// Circle end
+
+		if (H < -40 || H > 40)
+		{
+		    if (H > 0)
+		    {
+			cout << "Turn clock: H=" << H << " time=" << baseTime * Htime << endl;
+			move.turnAroundCounterClockwise(0.1, 0.2);
+			continue;
+		    }
+		    else if (H < 0)
+		    {
+			cout << "turn counterclock: H=" << H << " time=" << baseTime * Htime << endl;
+			move.turnAroundClockwise(0.1, 0.2);
+			continue;
+		    }
+		}
+
+		else if (V < -20 || V > 20)
+		{
+		    if (V < 0)
+		    {
+			cout << "rect Go up: V=" << V << " time=" << baseTime * Vtime << endl;
+			move.goUp(baseTime * Vtime);
+			continue;
+		    }
+		    if (V > 0)
+		    {
+			cout << "rect Go down: V=" << V << " time=" << baseTime * Vtime << endl;
+			move.goDown(baseTime * Vtime);
+			continue;
+		    }
+		}
+
+		//-------------------------------------------------------------------------
+
+		if (rectComparison > rectLastComparison)
+		{
+		    bGoLeft = !bGoLeft;
+		}
+		if (bGoLeft)
+		{
+		    cout << "rect go left" << endl;
+		    move.goLeft(0.1);
+		}
+		else
+		{
+		    cout << "rect go right" << endl;
+		    move.goRight(0.1);
+		}
+
+		rectLastComparison = rectComparison;
+	    }
+	}
+	else
+	{
+	    cout << "Hover" << endl;
+	    move.hover();
+	    //resets the rectLastWidth
+	    // rectLastWidth = 0;
+
+	    if (turnCounter = > 5 && count < 15)
+	    {
+		cout << "nothing found - turning clockwise" << endl;
+		move.turnAroundClockwise(0.1, 0.2)
+	    }
+	    if (turnCounter < 5)
+	    {
+		cout << "nothing found - turning counter clockwise" << endl;
+		move.turnAroundCounterClockwise(0.1, 0.2)
+	    }
+	    turnCounter++;
+	}
+
+	loop_rate.sleep();
+	// if (waitKey(10) == 27)
+	//   break; // stop capturing by pressing ESC
     }
-    // Zbar End //
-
-    int rectWidth;
-    int rectHeight;
-    int rectX;
-    int rectY;
-
-    minBoundingBoxes(redFilter(noBlurRGB), &rectWidth, &rectHeight, &rectX, &rectY);
-
-    // cout << "--------------" << endl;
-    // cout << "Width:  " << rectWidth   << endl;
-    // cout << "Height: " << rectHeight  << endl;
-    // cout << "Y:      " << rectY       << endl;
-    // cout << "X:      " << rectX       << endl;
-    // cout << "--------------" << endl;
-
-    // pRect //
-
-    // putText(frame, "Test", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);
-
-    // HoughCircles Start //
-    std::vector<Vec3f> circles;
-    getCircles(frame, &circles);
-    // HoughCircles End //
-
-    // Finds the amount of circles in the image
-    unsigned long ul = circles.size();
-    std::string numberOfCircles;
-    std::stringstream strstream;
-    strstream << ul;
-    strstream >> numberOfCircles;
-
-    bFindRect = false;
-    if (!(rectWidth == 0 || rectHeight == 0))
-    {
-      rectComparison = rectHeight / rectWidth;
-      bFindRect = true;
-    }
-
-    if (ul != 0)
-    {
-
-      Vec3i c = circles[0];
-
-      // Queue start // // TODO - May need a check if logic is correct //
-
-      if (circleQueue.size() < 5)
-      {
-        circleQueue.push(c); //  Add some values to the queue
-      }
-      else
-      {
-        queue<Vec3i> circleQueueTemp;
-        circleQueueTemp = circleQueue;
-        double iterator = 1;
-        // cout << "Accept" << endl;
-
-        while (circleQueueTemp.size() > 0)
-        {
-
-          // cout << "Round " << iterator << ", Distance " << eDistance(circleQueueTemp.front(),c) << ", max distance " << (iterator/20)*vSize.width << endl;
-
-          if (eDistance(circleQueueTemp.front(), c) < iterator / 20 * vSize.width)
-          {
-            //cout << "Accept circle into que" << endl;
-            //cout << "Accept" << endl;
-            circleQueue.pop();
-            circleQueue.push(c);
-            break;
-          }
-          else
-          {
-            //cout << "Deny circle into que" << endl;
-            //cout << "Deny" << endl;
-            circleQueueTemp.pop();
-          }
-          iterator++;
-        }
-      }
-
-      // Queue end //
-
-      // Command section start //
-
-      // Midten af cirklens placering i framen
-      H = c[0] - 320;
-      V = c[1] - 180;
-      // Makes sure that even though V or H is negative, it will be a possitive number
-      Htime = std::abs(H);
-      Vtime = std::abs(V);
-      // Circle end
-
-      if (H < -40 || H > 40)
-      {
-        if (H > 0)
-        {
-          cout << "Go right: H=" << H << " time=" << baseTime * Htime << " c0=" << c[0] << endl;
-          move.goRight(baseTime * Htime);
-          continue;
-        }
-        else if (H < 0)
-        {
-          cout << "Go left: H=" << H << " time=" << baseTime * Htime << " c0=" << c[0] << endl;
-          move.goLeft(baseTime * Htime);
-          continue;
-        }
-      }
-
-      else if (V < -20 || V > 20)
-      {
-        if (V < 0)
-        {
-          cout << "Go up: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
-          move.goUp(baseTime * Vtime);
-          continue;
-        }
-        if (V > 0)
-        {
-          cout << "Go down: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
-          move.goDown(baseTime * Vtime);
-          continue;
-        }
-      }
-      else if (c[2] < aSize.minSize)
-      {
-        cout << "Go forward: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
-        move.forwardx(0.15);
-      }
-      else if (c[2] > aSize.maxSize)
-      {
-        isCentered = true;
-      }
-
-      if (isCentered)
-      {
-        cout << "Going through the circle" << endl;
-        message = "DEF";
-        // move.hover();
-        //move.goThrough(1.0);
-      }
-      else
-      {
-        move.hover();
-      }
-
-      isCentered = false;
-
-      // if (c[2] > aSize.maxSize){
-      //   //Go through
-      //   cout << "Go through" << endl;
-      //   move.hover();
-      //   //move.goThrough(1.7);
-      // }
-
-      // else if (c[2] < aSize.minSize){
-      //   // Go Forward
-      //   cout << "Go forward" << endl;
-      //   move.forwardx(0.25);
-      // }
-      // else if (c[0] < aSize.maxLeft){
-      //   // Go Left
-      //   cout << "Go left" << endl;
-      //   move.goLeft(0.25);
-      // }
-      // else if (c[0] > aSize.maxRight){
-      //   // Go Right
-      //   cout << "Go right" << endl;
-      //   move.goRight(0.25);
-      // }
-      // else if (c[1] > aSize.maxHeight){
-      //   // GO Down
-      //   cout << "Go down" << endl;
-      //   move.goDown(0.25);
-      // }
-      // else if (c[1] < aSize.minHeight){
-      //   // Go Up
-      //   cout << "Go up" << endl;
-      //   move.goUp(0.25);
-      // }else{
-      //   isCentered = true;
-      // }
-      // if(message != "" && message != "DEF"){
-
-      // Command section end //
-
-      std::string number0;
-      std::string number1;
-      std::string number2;
-
-      std::stringstream strstream0;
-      std::stringstream strstream1;
-      std::stringstream strstream2;
-
-      strstream0 << c[0];
-      strstream0 >> number0;
-
-      strstream1 << c[1];
-      strstream1 >> number1;
-
-      strstream2 << c[2];
-      strstream2 >> number2;
-
-      std::string number = "Horizontal " + number0 + " Vertical " + number1 + " Size " + number2;
-
-      putText(frame, "Circles " + numberOfCircles, cvPoint(30, 30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255, 255, 255), 1, CV_AA);
-      putText(frame, number, cvPoint(30, 60), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255, 255, 255), 1, CV_AA);
-
-      // Setting text on screen end //
-    }
-    else if (bFindRect)
-    {
-      if (rectWidth + 20 < rectHeight)
-      {
-        //------------------------------------------------
-
-        // Midten af firkantens placering i framen
-        H = rectX - 320;
-        V = rectY - 180;
-        // Makes sure that even though V or H is negative, it will be a possitive number
-        Htime = std::abs(H);
-        Vtime = std::abs(V);
-        // Circle end
-
-        if (H < -40 || H > 40)
-        {
-          if (H > 0)
-          {
-            cout << "Turn clock: H=" << H << " time=" << baseTime * Htime << endl;
-            move.turnAroundCounterClockwise(0.1, 0.2);
-            continue;
-          }
-          else if (H < 0)
-          {
-            cout << "turn counterclock: H=" << H << " time=" << baseTime * Htime << endl;
-            move.turnAroundClockwise(0.1, 0.2);
-            continue;
-          }
-        }
-
-        else if (V < -20 || V > 20)
-        {
-          if (V < 0)
-          {
-            cout << "rect Go up: V=" << V << " time=" << baseTime * Vtime << endl;
-            move.goUp(baseTime * Vtime);
-            continue;
-          }
-          if (V > 0)
-          {
-            cout << "rect Go down: V=" << V << " time=" << baseTime * Vtime << endl;
-            move.goDown(baseTime * Vtime);
-            continue;
-          }
-        }
-
-        //-------------------------------------------------------------------------
-
-        if (rectComparison > rectLastComparison)
-        {
-          bGoLeft = !bGoLeft;
-		} 
-		  if (bGoLeft)
-          {
-            cout << "rect go left" << endl;
-            move.goLeft(0.1);
-          }
-          else
-          {
-            cout << "rect go right" << endl;
-            move.goRight(0.1);
-          }
-
-        rectLastComparison = rectComparison;
-      }
-    }
-    else
-    {
-      //resets the rectLastWidth
-      // rectLastWidth = 0;
-
-      // cout << "Hover" << endl;
-      move.hover();
-      // cout << "Hover" << endl;
-      //  move.turnAroundCounterClockwise(0.1, 0.2);
-    }
-
-    loop_rate.sleep();
-    // if (waitKey(10) == 27)
-    //   break; // stop capturing by pressing ESC
-  }
-  // the camera will be closed automatically upon exit
-  //cap.close();
-  return 0;
+    // the camera will be closed automatically upon exit
+    //cap.close();
+    return 0;
 }

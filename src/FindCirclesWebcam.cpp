@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 
     move.init(node);
 
-    ros::Rate loop_rate(10);
+    ros::Rate loop_rate(2);
 
     struct videoSize // Struct for video size //
     {
@@ -180,7 +180,7 @@ int main(int argc, char **argv)
 
     while (ros::ok())
     {
-		loop_rate.sleep();
+	loop_rate.sleep();
 	ros::spinOnce();
 
 	//while ((double)ros::Time::now().toSec() < start_time + takeoff_time + 2)
@@ -188,26 +188,26 @@ int main(int argc, char **argv)
 	//{ //takeoff
 
 	//cout << "Variabler " << move.takeoff_time << endl;
-	// while (b < 100)
-	// {
-	//   ros::spinOnce();
-	//   //// Denne skal udkommenteres for kun at teste kamera og så dronen ikke letter
-	//     move.takeoff();
+	while (b < 50)
+	{
+	    ros::spinOnce();
+	    //// Denne skal udkommenteres for kun at teste kamera og så dronen ikke letter
+	    move.takeoff();
 
-	//   if (b == 99)
-	//   {
-	//     cout << "Taking off" << endl;
-	//     ros::Duration(6).sleep();
-	//   }
-	//   b++;
-	// }
-	// while (b < 101)
-	// {
-	//   cout << "OPSADASSE!" << endl;
-	//   ros::spinOnce();
-	//   move.goUp(1.6);
-	//   b++;
-	// }
+	    if (b == 49)
+	    {
+		cout << "Taking off" << endl;
+		ros::Duration(6).sleep();
+	    }
+	    b++;
+	}
+	while (b < 51)
+	{
+	    cout << "OPSADASSE!" << endl;
+	    ros::spinOnce();
+	    move.goUp(1.6);
+	    b++;
+	}
 
 	// cout << "TRY ME" << endl;
 	if (frameRBG.empty())
@@ -377,20 +377,20 @@ int main(int argc, char **argv)
 	    }
 	    else if (c[2] < aSize.minSize)
 	    {
-			cout << "Go forward: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
-			move.forwardx(0.15);
+		cout << "Go forward" << endl;
+		move.forwardx(0.15);
 	    }
 	    else if (c[2] > aSize.maxSize)
 	    {
-			isCentered = true;
+		isCentered = true;
 	    }
 
 	    if (isCentered)
 	    {
-			cout << "Going through the circle" << endl;
-			message = "DEF";
+		cout << "Going through the circle" << endl;
+		// message = "DEF"
 		// move.hover();
-		//move.goThrough(1.0);
+		move.goThrough(1.0);
 	    }
 	    else
 	    {
@@ -425,95 +425,100 @@ int main(int argc, char **argv)
 
 	    // Setting text on screen end //
 	}
-	else if (bFindRect)
-	{
-	    if (rectWidth + 20 < rectHeight)
-	    {
-		turnCounter = 0;
-		//------------------------------------------------
+	// else if (bFindRect)
+	// {
+	//     // if (rectWidth + 20 < rectHeight)
+	//     // {
+	//     turnCounter = 0;
+	//     //------------------------------------------------
 
-		// Midten af firkantens placering i framen
-		H = rectX - 320;
-		V = rectY - 180;
-		// Makes sure that even though V or H is negative, it will be a possitive number
-		Htime = std::abs(H);
-		Vtime = std::abs(V);
-		// Circle end
+	//     // Midten af firkantens placering i framen
+	//     H = rectX - 320;
+	//     V = rectY - 180;
+	//     // Makes sure that even though V or H is negative, it will be a possitive number
+	//     Htime = std::abs(H);
+	//     Vtime = std::abs(V);
+	//     // Circle end
 
-		if (H < -40 || H > 40)
-		{
-		    if (H > 0)
-		    {
-			cout << "Turn clock: H=" << H << " time=" << baseTime * Htime << endl;
-			move.turnAroundCounterClockwise(0.1, 0.2);
-			continue;
-		    }
-		    else if (H < 0)
-		    {
-			cout << "turn counterclock: H=" << H << " time=" << baseTime * Htime << endl;
-			move.turnAroundClockwise(0.1, 0.2);
-			continue;
-		    }
-		}
+	//     if (H < -40 || H > 40)
+	//     {
+	// 	if (H > 0)
+	// 	{
+	// 	    cout << "Turn Counterclock: H=" << H << " time=" << baseTime * Htime << endl;
+	// 	    move.turnAroundCounterClockwise(0.05, 0.2);
+	// 	    continue;
+	// 	}
+	// 	else if (H < 0)
+	// 	{
+	// 	    cout << "turn clock: H=" << H << " time=" << baseTime * Htime << endl;
+	// 	    move.turnAroundClockwise(0.05, 0.2);
+	// 	    continue;
+	// 	}
+	//     }
 
-		// else if (V < -20 || V > 20)
-		// {
-		//     if (V < 0)
-		//     {
-		// 	cout << "rect Go up: V=" << V << " time=" << baseTime * Vtime << endl;
-		// 	move.goUp(baseTime * Vtime);
-		// 	continue;
-		//     }
-		//     if (V > 0)
-		//     {
-		// 	cout << "rect Go down: V=" << V << " time=" << baseTime * Vtime << endl;
-		// 	move.goDown(baseTime * Vtime);
-		// 	continue;
-		//     }
-		// }
+	//     // else if (V < -20 || V > 20)
+	//     // {
+	//     //     if (V < 0)
+	//     //     {
+	//     // 	cout << "rect Go up: V=" << V << " time=" << baseTime * Vtime << endl;
+	//     // 	move.goUp(baseTime * Vtime);
+	//     // 	continue;
+	//     //     }
+	//     //     if (V > 0)
+	//     //     {
+	//     // 	cout << "rect Go down: V=" << V << " time=" << baseTime * Vtime << endl;
+	//     // 	move.goDown(baseTime * Vtime);
+	//     // 	continue;
+	//     //     }
+	//     // }
 
-		//-------------------------------------------------------------------------
-		cout << "rectComparison=" << rectComparison << " rectLASTCOM=" << rectLastComparison << endl;
-		if (rectComparison > rectLastComparison)
-		{
-		    bGoLeft = !bGoLeft;
-		}
+	//     //-------------------------------------------------------------------------
+	//     cout << "rectComparison=" << rectComparison << " rectLASTCOM=" << rectLastComparison << endl;
+	//     if (rectComparison > rectLastComparison)
+	//     {
+	// 	bGoLeft = !bGoLeft;
+	//     }
 
-		if (bGoLeft)
-		{
-		    cout << "rect go left" << endl;
-		    move.goLeft(0.1);
-		}
-		else
-		{
-		    cout << "rect go right" << endl;
-		    move.goRight(0.1);
-		}
+	//     if (bGoLeft)
+	//     {
+	// 	cout << "rect go left" << endl;
+	// 	move.goLeft(0.2);
+	//     }
+	//     else
+	//     {
+	// 	cout << "rect go right" << endl;
+	// 	move.goRight(0.2);
+	//     }
 
-		rectLastComparison = rectComparison;
-	    }
-	}
+	//     rectLastComparison = rectComparison;
+	//     // }
+	// }
 	else
 	{
-	    // cout << "Hover" << endl;
-	    // move.hover();
-	    //resets the rectLastWidth
+	    cout << "Hover" << endl;
+	    move.hover();
+		//  cout << "turn around... " << endl;
+		// move.turnAroundClockwise(0.1, 0.2);
+	    // resets the rectLastWidth
 	    // rectLastWidth = 0;
 
-	    // if (turnCounter >= 5 && turnCounter < 15)
+	    // if (turnCounter >= 12 && turnCounter < 25)
 	    // {
-	    // cout << "nothing found - turning clockwise" << endl;
-	    // move.turnAroundClockwise(0.1, 0.2);
+		// cout << "nothing found - turning clockwise" << endl;
+		// move.turnAroundClockwise(0.1, 0.2);
+		// if (turnCounter == 14)
+		// {
+		//     turnCounter = 0;
+		// }
 	    // }
-	    // if (turnCounter < 5)
+	    // if (turnCounter < 12)
 	    // {
-	    // cout << "nothing found - turning counter clockwise" << endl;
-	    // move.turnAroundCounterClockwise(0.1, 0.2);
+		// cout << "nothing found - turning counter clockwise" << endl;
+		// move.turnAroundCounterClockwise(0.1, 0.2);
 	    // }
 	    // turnCounter++;
 	}
 
-	
 	// if (waitKey(10) == 27)
 	//   break; // stop capturing by pressing ESC
     }

@@ -253,18 +253,23 @@ int main(int argc, char **argv)
 	}
 	// Zbar End //
 
-	int rectWidth;
-	int rectHeight;
-	int rectX;
-	int rectY;
+  bool  rectFoundCircle;
+  bool  houghFoundCircle;
+	int   rectWidth;
+	int   rectHeight;
+	int   rectPosX;
+	int   rectPosY;
+  int   houghPosX;
+  int   houghPosY;
+  int   houghSize;
 
-	minBoundingBoxes(redFilter(noBlurRGB), &rectWidth, &rectHeight, &rectX, &rectY);
+	minBoundingBoxes(redFilter(noBlurRGB), frame, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
 
 	// cout << "--------------" << endl;
 	// cout << "Width:  " << rectWidth   << endl;
 	// cout << "Height: " << rectHeight  << endl;
-	// cout << "Y:      " << rectY       << endl;
-	// cout << "X:      " << rectX       << endl;
+	// cout << "Y:      " << rectPosY       << endl;
+	// cout << "X:      " << rectPosX       << endl;
 	// cout << "--------------" << endl;
 
 	// pRect //
@@ -433,8 +438,8 @@ int main(int argc, char **argv)
 	//     //------------------------------------------------
 
 	//     // Midten af firkantens placering i framen
-	//     H = rectX - 320;
-	//     V = rectY - 180;
+	//     H = rectPosX - 320;
+	//     V = rectPosY - 180;
 	//     // Makes sure that even though V or H is negative, it will be a possitive number
 	//     Htime = std::abs(H);
 	//     Vtime = std::abs(V);

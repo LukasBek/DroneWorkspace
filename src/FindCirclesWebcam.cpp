@@ -159,7 +159,7 @@ int main(int argc, char **argv)
 
     ros::Duration(1).sleep();
     int b = 0;
-    double baseTime = 0.002;
+    double baseTime = 0.001;
 
     double H;
     double V;
@@ -187,7 +187,6 @@ int main(int argc, char **argv)
 	//while ((double)ros::Time::now().toSec() < 7 + 2)
 	//{ //takeoff
 
-	//cout << "Variabler " << move.takeoff_time << endl;
 	while (b < 50)
 	{
 	    ros::spinOnce();
@@ -205,7 +204,7 @@ int main(int argc, char **argv)
 	{
 	    cout << "OPSADASSE!" << endl;
 	    ros::spinOnce();
-	    move.goUp(1.6);
+	    move.goUp(1.8);
 	    b++;
 	}
 
@@ -390,7 +389,7 @@ int main(int argc, char **argv)
 		cout << "Going through the circle" << endl;
 		// message = "DEF"
 		// move.hover();
-		move.goThrough(1.0);
+		move.goThrough(1.5);
 	    }
 	    else
 	    {
@@ -425,96 +424,99 @@ int main(int argc, char **argv)
 
 	    // Setting text on screen end //
 	}
-	// else if (bFindRect)
-	// {
-	//     // if (rectWidth + 20 < rectHeight)
-	//     // {
-	//     turnCounter = 0;
-	//     //------------------------------------------------
+	else if (bFindRect)
+	{
+	    // if (rectWidth + 20 < rectHeight)
+	    // {
+	    turnCounter = 0;
+	    //------------------------------------------------
 
-	//     // Midten af firkantens placering i framen
-	//     H = rectX - 320;
-	//     V = rectY - 180;
-	//     // Makes sure that even though V or H is negative, it will be a possitive number
-	//     Htime = std::abs(H);
-	//     Vtime = std::abs(V);
-	//     // Circle end
+	    // Midten af firkantens placering i framen
+	    H = rectX - 220;
+	    V = rectY - 180;
+	    // Makes sure that even though V or H is negative, it will be a possitive number, so time wont be negative.
+	    Htime = std::abs(H);
+	    Vtime = std::abs(V);
+	    // Circle end
 
-	//     if (H < -40 || H > 40)
-	//     {
-	// 	if (H > 0)
-	// 	{
-	// 	    cout << "Turn Counterclock: H=" << H << " time=" << baseTime * Htime << endl;
-	// 	    move.turnAroundCounterClockwise(0.05, 0.2);
-	// 	    continue;
-	// 	}
-	// 	else if (H < 0)
-	// 	{
-	// 	    cout << "turn clock: H=" << H << " time=" << baseTime * Htime << endl;
-	// 	    move.turnAroundClockwise(0.05, 0.2);
-	// 	    continue;
-	// 	}
-	//     }
+	    if (H < -40 || H > 40)
+	    {
+		if (H > 0)
+		{
+		    cout << "Turn clock: H=" << H << " time=" << baseTime * Htime << endl;
+		    move.turnAroundClockwise(0.05, 0.1);
+			cout << " - X= " << rectX <<  " bredden =" << rectX + rectWidth/2  <<  endl;
+		    continue;
+		}
+		else if (H < 0)
+		{
+		    cout << "turn Counter clock: H=" << H << " time=" << baseTime * Htime << endl;
+		    move.turnAroundCounterClockwise(0.05, 0.1);
+			cout << " - X= " << rectX << " bredden =" << rectX - rectWidth/2 <<  endl;
 
-	//     // else if (V < -20 || V > 20)
-	//     // {
-	//     //     if (V < 0)
-	//     //     {
-	//     // 	cout << "rect Go up: V=" << V << " time=" << baseTime * Vtime << endl;
-	//     // 	move.goUp(baseTime * Vtime);
-	//     // 	continue;
-	//     //     }
-	//     //     if (V > 0)
-	//     //     {
-	//     // 	cout << "rect Go down: V=" << V << " time=" << baseTime * Vtime << endl;
-	//     // 	move.goDown(baseTime * Vtime);
-	//     // 	continue;
-	//     //     }
-	//     // }
+		    continue;
+		}
+	    } else if (V < -20 || V > 20)
+	    {
+	        if (V < 0)
+	        {
+	    	cout << "rect Go up: V=" << V << " time=" << baseTime * Vtime << endl;
+	    	move.goUp(baseTime * Vtime);
+	    	continue;
+	        }
+	        if (V > 0)
+	        {
+	    	cout << "rect Go down: V=" << V << " time=" << baseTime * Vtime << endl;
+	    	move.goDown(baseTime * Vtime);
+	    	continue;
+	        }
+	    }
 
-	//     //-------------------------------------------------------------------------
-	//     cout << "rectComparison=" << rectComparison << " rectLASTCOM=" << rectLastComparison << endl;
-	//     if (rectComparison > rectLastComparison)
-	//     {
-	// 	bGoLeft = !bGoLeft;
-	//     }
+	    //-------------------------------------------------------------------------
+	    cout << "rectComparison=" << rectComparison << " rectLASTCOM=" << rectLastComparison << endl;
+	    // if (rectComparison > rectLastComparison)
+	    // {
+		// bGoLeft = !bGoLeft;
+	    // }
 
-	//     if (bGoLeft)
-	//     {
-	// 	cout << "rect go left" << endl;
-	// 	move.goLeft(0.2);
-	//     }
-	//     else
-	//     {
-	// 	cout << "rect go right" << endl;
-	// 	move.goRight(0.2);
-	//     }
+	    // if (bGoLeft)
+	    // {
+		// cout << "rect go left" << endl;
+		// move.goLeft(0.2);
+	    // }
+	    // else
+	    // {
+		// cout << "rect go right" << endl;
+		// move.goRight(0.2);
+	    // }
 
-	//     rectLastComparison = rectComparison;
-	//     // }
-	// }
+	    // rectLastComparison = rectComparison;
+	    // // }
+	}
+
+
 	else
 	{
 	    cout << "Hover" << endl;
 	    move.hover();
-		//  cout << "turn around... " << endl;
-		// move.turnAroundClockwise(0.1, 0.2);
+	    //  cout << "turn around... " << endl;
+	    // move.turnAroundClockwise(0.1, 0.2);
 	    // resets the rectLastWidth
 	    // rectLastWidth = 0;
 
 	    // if (turnCounter >= 12 && turnCounter < 25)
 	    // {
-		// cout << "nothing found - turning clockwise" << endl;
-		// move.turnAroundClockwise(0.1, 0.2);
-		// if (turnCounter == 14)
-		// {
-		//     turnCounter = 0;
-		// }
+	    // cout << "nothing found - turning clockwise" << endl;
+	    // move.turnAroundClockwise(0.1, 0.2);
+	    // if (turnCounter == 14)
+	    // {
+	    //     turnCounter = 0;
+	    // }
 	    // }
 	    // if (turnCounter < 12)
 	    // {
-		// cout << "nothing found - turning counter clockwise" << endl;
-		// move.turnAroundCounterClockwise(0.1, 0.2);
+	    // cout << "nothing found - turning counter clockwise" << endl;
+	    // move.turnAroundCounterClockwise(0.1, 0.2);
 	    // }
 	    // turnCounter++;
 	}

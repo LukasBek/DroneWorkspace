@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 
     move.init(node);
 
-    ros::Rate loop_rate(2);
+    ros::Rate loop_rate(500);
 
     struct videoSize // Struct for video size //
     {
@@ -187,26 +187,26 @@ int main(int argc, char **argv)
 	//while ((double)ros::Time::now().toSec() < 7 + 2)
 	//{ //takeoff
 
-	while (b < 50)
-	{
-	    ros::spinOnce();
-	    //// Denne skal udkommenteres for kun at teste kamera og så dronen ikke letter
-	    move.takeoff();
+	// while (b < 50)
+	// {
+	//     ros::spinOnce();
+	//     //// Denne skal udkommenteres for kun at teste kamera og så dronen ikke letter
+	//     move.takeoff();
 
-	    if (b == 49)
-	    {
-		cout << "Taking off" << endl;
-		ros::Duration(4).sleep();
-	    }
-	    b++;
-	}
-	while (b < 51)
-	{
-	    cout << "OPSADASSE!" << endl;
-	    ros::spinOnce();
-	    move.goUp(1.8);
-	    b++;
-	}
+	//     if (b == 49)
+	//     {
+	// 	cout << "Taking off" << endl;
+	// 	ros::Duration(4).sleep();
+	//     }
+	//     b++;
+	// }
+	// while (b < 51)
+	// {
+	//     cout << "OPSADASSE!" << endl;
+	//     ros::spinOnce();
+	//     move.goUp(1.6);
+	//     b++;
+	// }
 
 	// cout << "TRY ME" << endl;
 	if (frameRBG.empty())
@@ -252,15 +252,15 @@ int main(int argc, char **argv)
 	}
 	// Zbar End //
 
-  bool  rectFoundCircle;
-  bool  houghFoundCircle;
-	int   rectWidth;
-	int   rectHeight;
-	int   rectPosX;
-	int   rectPosY;
-  int   houghPosX;
-  int   houghPosY;
-  int   houghSize;
+	bool rectFoundCircle;
+	bool houghFoundCircle;
+	int rectWidth;
+	int rectHeight;
+	int rectPosX;
+	int rectPosY;
+	int houghPosX;
+	int houghPosY;
+	int houghSize;
 
 	minBoundingBoxes(redFilter(noBlurRGB), frame, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
 
@@ -352,13 +352,13 @@ int main(int argc, char **argv)
 	    {
 		if (H > 0)
 		{
-		    cout << "Go right: H=" << H << " time=" << baseTime * Htime << " c0=" << c[0] << endl;
+		    // cout << "Go right: H=" << H << " time=" << baseTime * Htime << " c0=" << c[0] << endl;
 		    move.goRight(baseTime * Htime);
 		    continue;
 		}
 		else if (H < 0)
 		{
-		    cout << "Go left: H=" << H << " time=" << baseTime * Htime << " c0=" << c[0] << endl;
+		    // cout << "Go left: H=" << H << " time=" << baseTime * Htime << " c0=" << c[0] << endl;
 		    move.goLeft(baseTime * Htime);
 		    continue;
 		}
@@ -368,20 +368,20 @@ int main(int argc, char **argv)
 	    {
 		if (V < 0)
 		{
-		    cout << "Go up: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
+		    // cout << "Go up: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
 		    move.goUp(baseTime * Vtime);
 		    continue;
 		}
 		if (V > 0)
 		{
-		    cout << "Go down: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
+		    // cout << "Go down: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
 		    move.goDown(baseTime * Vtime);
 		    continue;
 		}
 	    }
 	    else if (c[2] < aSize.minSize)
 	    {
-		cout << "Go forward" << endl;
+		// cout << "Go forward" << endl;
 		move.forwardx(0.15);
 	    }
 	    else if (c[2] > aSize.maxSize)
@@ -391,7 +391,7 @@ int main(int argc, char **argv)
 
 	    if (isCentered)
 	    {
-		cout << "Going through the circle" << endl;
+		// cout << "Going through the circle" << endl;
 		// message = "DEF"
 		// move.hover();
 		move.goThrough(1.5);
@@ -449,51 +449,64 @@ int main(int argc, char **argv)
 	    {
 		if (H > 0)
 		{
-		    cout << "Turn clock: H=" << H << " time=" << baseTime * Htime << endl;
+		    // cout << "Turn clock: H=" << H << " time=" << baseTime * Htime << endl;
 		    move.turnAroundClockwise(0.05, 0.1);
-			// cout << " - X= " << rectPosX <<  " bredden =" << rectPosX + rectWidth/2  <<  endl;
+		    // cout << " - X= " << rectPosX <<  " bredden =" << rectPosX + rectWidth/2  <<  endl;
 		    continue;
 		}
 		else if (H < 0)
 		{
-		    cout << "turn Counter clock: H=" << H << " time=" << baseTime * Htime << endl;
+		    // cout << "turn Counter clock: H=" << H << " time=" << baseTime * Htime << endl;
 		    move.turnAroundCounterClockwise(0.05, 0.1);
-			// cout << " - X= " << rectPosX << " bredden =" << rectPosX - rectWidth/2 <<  endl;
+		    // cout << " - X= " << rectPosX << " bredden =" << rectPosX - rectWidth/2 <<  endl;
 
 		    continue;
 		}
-	    } else if (V < -20 || V > 20)
+	    }
+	    else if (V < -20 || V > 20)
 	    {
-	        if (V < 0)
-	        {
-	    	cout << "rect Go up: V=" << V << " time=" << baseTime * Vtime << endl;
-	    	move.goUp(0.1);
-	    	continue;
-	        }
-	        if (V > 0)
-	        {
-	    	cout << "rect Go down: V=" << V << " time=" << baseTime * Vtime << endl;
-	    	move.goDown(0.1);
-	    	continue;
-	        }
+		if (V < 0)
+		{
+		    // cout << "rect Go up: V=" << V << " time=" << baseTime * Vtime << endl;
+		    move.goUp(0.1);
+		    continue;
+		}
+		if (V > 0)
+		{
+		    // cout << "rect Go down: V=" << V << " time=" << baseTime * Vtime << endl;
+		    move.goDown(0.1);
+		    continue;
+		}
 	    }
 
 	    //-------------------------------------------------------------------------
+	    int picCounter = 0;
+	    int arrayRectWidth[5];
+	    int arrayRectHeight[5];
+	    while (picCounter < 6)
+	    {
+		ros::spinOnce();
+		minBoundingBoxes(redFilter(noBlurRGB), frame, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
+		arrayRectWidth[picCounter] = rectWidth;
+		cout << "while rectwidth =" << arrayRectWidth[picCounter];
+	    }
+
 	    cout << "rectComparison=" << rectComparison << " rectLASTCOM=" << rectLastComparison << endl;
-	    if (rectComparison > rectLastComparison)
+	    // if (rectComparison > rectLastComparison)
+	    if (< rectLastWidth)
 	    {
 		bGoLeft = !bGoLeft;
 	    }
 
 	    if (bGoLeft)
 	    {
-		cout << "rect go left" << endl;
-		move.goLeft(0.2);
+		// cout << "rect go left" << endl;
+		move.goLeft(0.1);
 	    }
 	    else
 	    {
-		cout << "rect go right" << endl;
-		move.goRight(0.2);
+		// cout << "rect go right" << endl;
+		move.goRight(0.1);
 	    }
 
 	    rectLastComparison = rectComparison;
@@ -501,7 +514,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-	    cout << "Hover" << endl;
+	    // cout << "Hover" << endl;
 	    move.hover();
 	    //  cout << "turn around... " << endl;
 	    // move.turnAroundClockwise(0.1, 0.2);

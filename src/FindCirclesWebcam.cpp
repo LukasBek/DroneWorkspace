@@ -192,7 +192,7 @@ int main(int argc, char **argv)
 	{
 	    ros::spinOnce();
 	    //// Denne skal udkommenteres for kun at teste kamera og så dronen ikke letter
-	    move.takeoff();
+	    //move.takeoff();
 
 	    if (b == 49)
 	    {

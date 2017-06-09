@@ -12,7 +12,7 @@ using namespace cv;
 
 bool Dcompare(const Rect &a, const Rect &b);
 void sobel(Mat src_gray, Mat *grad);
-void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y);
+void minBoundingBoxes (cv::Mat redFrame, cv::Mat grayFrame, int *rectWidth, int *rectHeight, int *rectPosX, int *rectPosY, int *houghPosX, int *houghPosY, int *houghSize, bool *rectFoundCircle, bool *houghFoundCircle);
 void getCircles(Mat src, std::vector<Vec3f> *dest);
 int histogramCalculation(Mat src);
 Mat redFilter(Mat src);

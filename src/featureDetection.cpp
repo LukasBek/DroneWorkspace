@@ -11,7 +11,10 @@
 using namespace cv;
 using namespace std;
 
-// Blur and gray the image before call //
+double eDistance(int x1, int y1, int x2, int y2)
+{
+    return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+}
 
 bool Dcompare(const Rect &a, const Rect &b){
  // TODO Change to area
@@ -46,20 +49,18 @@ void sobel(Mat src_gray, Mat *grad){
 
 // -------------------------------------------------- //
 
-// Blur and gray the image before call //
+void minBoundingBoxes (cv::Mat redFrame, cv::Mat grayFrame, int *rectWidth, int *rectHeight, int *rectPosX, int *rectPosY, int *houghPosX, int *houghPosY, int *houghSize, bool *rectFoundCircle, bool *houghFoundCircle){
 
-void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
+  // imshow("Før moF", redFrame);
 
-  // imshow("Før moF", src);
+  int moF = morphologyFilter(&redFrame, 8);
 
-  int moF = morphologyFilter(&src, 8);
+  // imshow("Efter MoF", redFrame);
 
-  // imshow("Efter MoF", src);
-
-  blur(src, src, Size(5, 5));
+  blur(redFrame, redFrame, Size(5, 5));
 
   //namedWindow("Blur from minBoundingBoxes");
-  //imshow("Blur from minBoundingBoxes ", src);
+  //imshow("Blur from minBoundingBoxes ", redFrame);
 
   RNG rng(12345);
 
@@ -70,10 +71,11 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
   int thresh = 100;
   int max_thresh = 255;
   /// Detect edges using Threshold
-  threshold(src, threshold_output, thresh, max_thresh, THRESH_BINARY );
+  threshold(redFrame, threshold_output, thresh, max_thresh, THRESH_BINARY );
+
 
   /// Find contours
-  findContours( threshold_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+  findContours( threshold_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 
   /// Find the rotated rectangles and ellipses for each contour
   vector<Rect> boundRect( contours.size() );
@@ -89,10 +91,10 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
     std::sort(boundRect.begin(),boundRect.end(),Dcompare);
   }
 
-  int rectWidth   = 0;
-  int rectHeight  = 0;
-  int rectY       = 0;
-  int rectX       = 0;
+  int methodRectWidth   = 0;
+  int methodRectHeight  = 0;
+  int methodRectY       = 0;
+  int methodRectX       = 0;
   bool isCircleRes = false;
 
   /// Draw polygonal contour + bonding rects + circles
@@ -103,12 +105,13 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
        Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
        rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
      }
-     rectWidth   = boundRect[0].width;
-     rectHeight  = boundRect[0].height;
-     rectY       = boundRect[0].y;
-     rectX       = boundRect[0].x;
-     isCircle(src, &rectWidth, &rectHeight, &rectX, &rectY, &isCircleRes);
+     methodRectWidth   = boundRect[0].width;
+     methodRectHeight  = boundRect[0].height;
+     methodRectY       = boundRect[0].y + (methodRectHeight / 2);
+     methodRectX       = boundRect[0].x + (methodRectWidth / 2);
+     cout << "Centrum " << methodRectX << ", " << methodRectY << endl;
 
+     isCircle(redFrame, &methodRectWidth, &methodRectHeight, &boundRect[0].x, &boundRect[0].y, &isCircleRes);
 }
 
   if (isCircleRes){
@@ -116,20 +119,26 @@ void minBoundingBoxes (Mat src, int *width, int *height, int *x, int *y){
     imshow("Boxes from minBoundingBoxes", drawing);
 
   }
-  
+
   if (!isCircleRes){
-    rectWidth   = 0;
-    rectHeight  = 0;
-    rectY       = 0;
-    rectX       = 0;
+    methodRectWidth   = 0;
+    methodRectHeight  = 0;
+    methodRectY       = 0;
+    methodRectX       = 0;
   }
 
   /// retrun to pointers
-   *width   = rectWidth;
-   *height  = rectHeight;
-   *x       = rectX;
-   *y       = rectY;
-
+   *rectWidth         = methodRectWidth;
+   *rectHeight        = methodRectHeight;
+   *rectPosX          = methodRectX;
+   *rectPosY          = methodRectY;
+   /*
+   *houghPosX         =
+   *houghPosY         =
+   *houghSize         =
+   *rectFoundCircle   =
+   *houghFoundCircle  =
+*/
 }
 
 // -------------------------------------------------- //
@@ -255,6 +264,8 @@ void isCircle(cv::Mat src, int *width, int *height, int *x, int *y, bool *res) {
   int offsetX = *x;
   int offsetY = *y;
 
+  //cout << "offset " << offsetX << ", " << offsetY << endl;
+
     cv::Point p1  = Point(rectWidth*10/20   ,rectHeight*10/20 );
     cv::Point p2  = Point(rectWidth*10/20   ,rectHeight*9/20  );
     cv::Point p3  = Point(rectWidth*11/20   ,rectHeight*10/20 );
@@ -280,22 +291,15 @@ void isCircle(cv::Mat src, int *width, int *height, int *x, int *y, bool *res) {
     cv::Point p27 = Point(rectWidth*7/20    ,rectHeight*12/20 );
     cv::Point p28 = Point(rectWidth*7/20    ,rectHeight*8/20  );
     cv::Point p29 = Point(rectWidth*8/20    ,rectHeight*7/20  );
-/*
-    cv::Point B = Point(rectWidth/4     ,rectHeight/2     );
-    cv::Point C = Point(rectWidth*3/8   ,rectHeight/2     );
-    cv::Point D = Point(rectWidth/2     ,rectHeight/2     );
-    cv::Point E = Point(rectWidth*5/8   ,rectHeight/2     );
-    cv::Point F = Point(rectWidth*3/4   ,rectHeight/2     );
-    cv::Point H = Point(rectWidth/2     ,rectHeight*5/8   );
-    cv::Point J = Point(rectWidth/2     ,rectHeight*3/4   );
-    cv::Point M = Point(rectWidth/2     ,rectHeight*3/8   );
-    cv::Point O = Point(rectWidth/2     ,rectHeight/4     );
-*/
+
   cv::Point2f points [25] = {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p22, p23, p24, p25, p26, p27, p28, p29};
 
   for (int i = 0 ; i < 25 ; i++){
+//    points[i].x = points[i].x;
+//    points[i].y = points[i].y;
     points[i].x = points[i].x + offsetX;
     points[i].y = points[i].y + offsetY;
+
   }
   float f1 = 1.0;
   float f2 = 0.8;
@@ -330,6 +334,48 @@ void isCircle(cv::Mat src, int *width, int *height, int *x, int *y, bool *res) {
   imshow("Point", src);
   }
 }
+/*
+bool que(int x, int y){
+
+
+  if (circleQueue.size() < 5)
+  {
+circleQueue.push(c); //  Add some values to the queue
+  }
+  else
+  {
+queue<Vec3i> circleQueueTemp;
+circleQueueTemp = circleQueue;
+double iterator = 1;
+// cout << "Accept" << endl;
+
+while (circleQueueTemp.size() > 0)
+{
+
+    // cout << "Round " << iterator << ", Distance " << eDistance(circleQueueTemp.front(),c) << ", max distance " << (iterator/20)*vSize.width << endl;
+
+    if (eDistance(circleQueueTemp.front(), c) < iterator / 20 * vSize.width)
+    {
+  //cout << "Accept circle into que" << endl;
+  //cout << "Accept" << endl;
+  circleQueue.pop();
+  circleQueue.push(c);
+  break;
+    }
+    else
+    {
+  //cout << "Deny circle into que" << endl;
+  //cout << "Deny" << endl;
+  circleQueueTemp.pop();
+    }
+    iterator++;
+}
+  }
+
+
+}
+
+*/
 
 // Author: Niclas Atzen //
 // Methods: morphologyFilter, erodeImage, dilateImage

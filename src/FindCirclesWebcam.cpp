@@ -191,12 +191,12 @@ int main(int argc, char **argv)
 	{
 	    ros::spinOnce();
 	    //// Denne skal udkommenteres for kun at teste kamera og så dronen ikke letter
-	    //move.takeoff();
+	    move.takeoff();
 
 	    if (b == 49)
 	    {
 		cout << "Taking off" << endl;
-		ros::Duration(6).sleep();
+		ros::Duration(4).sleep();
 	    }
 	    b++;
 	}
@@ -438,8 +438,8 @@ int main(int argc, char **argv)
 	    //------------------------------------------------
 
 	    // Midten af firkantens placering i framen
-	    H = rectX - 320;
-	    V = rectY - 180;
+	    H = rectPosX - 320;
+	    V = rectPosY - 180;
 	    // Makes sure that even though V or H is negative, it will be a possitive number, so time wont be negative.
 	    Htime = std::abs(H);
 	    Vtime = std::abs(V);
@@ -451,14 +451,14 @@ int main(int argc, char **argv)
 		{
 		    cout << "Turn clock: H=" << H << " time=" << baseTime * Htime << endl;
 		    move.turnAroundClockwise(0.05, 0.1);
-			cout << " - X= " << rectX <<  " bredden =" << rectX + rectWidth/2  <<  endl;
+			// cout << " - X= " << rectPosX <<  " bredden =" << rectPosX + rectWidth/2  <<  endl;
 		    continue;
 		}
 		else if (H < 0)
 		{
 		    cout << "turn Counter clock: H=" << H << " time=" << baseTime * Htime << endl;
 		    move.turnAroundCounterClockwise(0.05, 0.1);
-			cout << " - X= " << rectX << " bredden =" << rectX - rectWidth/2 <<  endl;
+			// cout << " - X= " << rectPosX << " bredden =" << rectPosX - rectWidth/2 <<  endl;
 
 		    continue;
 		}
@@ -467,37 +467,37 @@ int main(int argc, char **argv)
 	        if (V < 0)
 	        {
 	    	cout << "rect Go up: V=" << V << " time=" << baseTime * Vtime << endl;
-	    	move.goUp(baseTime * Vtime);
+	    	move.goUp(0.1);
 	    	continue;
 	        }
 	        if (V > 0)
 	        {
 	    	cout << "rect Go down: V=" << V << " time=" << baseTime * Vtime << endl;
-	    	move.goDown(baseTime * Vtime);
+	    	move.goDown(0.1);
 	    	continue;
 	        }
 	    }
 
 	    //-------------------------------------------------------------------------
 	    cout << "rectComparison=" << rectComparison << " rectLASTCOM=" << rectLastComparison << endl;
-	    // if (rectComparison > rectLastComparison)
-	    // {
-		// bGoLeft = !bGoLeft;
-	    // }
+	    if (rectComparison > rectLastComparison)
+	    {
+		bGoLeft = !bGoLeft;
+	    }
 
-	    // if (bGoLeft)
-	    // {
-		// cout << "rect go left" << endl;
-		// move.goLeft(0.2);
-	    // }
-	    // else
-	    // {
-		// cout << "rect go right" << endl;
-		// move.goRight(0.2);
-	    // }
+	    if (bGoLeft)
+	    {
+		cout << "rect go left" << endl;
+		move.goLeft(0.2);
+	    }
+	    else
+	    {
+		cout << "rect go right" << endl;
+		move.goRight(0.2);
+	    }
 
-	    // rectLastComparison = rectComparison;
-	    // // }
+	    rectLastComparison = rectComparison;
+	    // }
 	}
 	else
 	{

@@ -109,7 +109,6 @@ void minBoundingBoxes (cv::Mat redFrame, cv::Mat grayFrame, int *rectWidth, int 
      methodRectHeight  = boundRect[0].height;
      methodRectY       = boundRect[0].y + (methodRectHeight / 2);
      methodRectX       = boundRect[0].x + (methodRectWidth / 2);
-     cout << "Centrum " << methodRectX << ", " << methodRectY << endl;
 
      isCircle(redFrame, &methodRectWidth, &methodRectHeight, &boundRect[0].x, &boundRect[0].y, &isCircleRes);
 }
@@ -149,7 +148,7 @@ void getCircles(Mat src, std::vector<Vec3f> *dest){
   int dp = 1;           // The inverse ratio of resolution
   int min_dist = 100;   // Minimum distance between detected centers
   int param_1 = 100;    // Upper threshold for the internal Canny edge detector
-  int param_2 =170;     // Threshold for center detection
+  int param_2 =160;     // Threshold for center detection
                         // 200 Has hard time finding perfect circles
                         // 100 Only very clear circles
                         // 80 detects random round suff

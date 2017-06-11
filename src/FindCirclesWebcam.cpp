@@ -262,7 +262,7 @@ int main(int argc, char **argv)
 	int houghPosY;
 	int houghSize;
 
-	minBoundingBoxes(redFilter(noBlurRGB), frame, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
+	minBoundingBoxes(frame, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
 
 	// cout << "--------------" << endl;
 	// cout << "Width:  " << rectWidth   << endl;
@@ -486,14 +486,16 @@ int main(int argc, char **argv)
 	    while (picCounter < 6)
 	    {
 		ros::spinOnce();
-		minBoundingBoxes(redFilter(noBlurRGB), frame, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
+		minBoundingBoxes(noBlurRGB, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
 		arrayRectWidth[picCounter] = rectWidth;
 		cout << "while rectwidth =" << arrayRectWidth[picCounter];
 	    }
 
 	    cout << "rectComparison=" << rectComparison << " rectLASTCOM=" << rectLastComparison << endl;
 	    // if (rectComparison > rectLastComparison)
-	    if (< rectLastWidth)
+      // TODO
+      //if (< rectLastWidth)
+	    if (false)
 	    {
 		bGoLeft = !bGoLeft;
 	    }

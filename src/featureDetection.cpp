@@ -8,6 +8,9 @@
 #include "opencv2/opencv.hpp"
 #include <math.h>
 
+#include <ios>
+#include <fstream>
+
 using namespace cv;
 using namespace std;
 
@@ -17,7 +20,6 @@ double eDistance(int x1, int y1, int x2, int y2)
 }
 
 bool Dcompare(const Rect &a, const Rect &b){
- // TODO Change to area
   return b.area() < a.area();
 }
 
@@ -49,18 +51,23 @@ void sobel(Mat src_gray, Mat *grad){
 
 // -------------------------------------------------- //
 
-void minBoundingBoxes (cv::Mat redFrame, cv::Mat grayFrame, int *rectWidth, int *rectHeight, int *rectPosX, int *rectPosY, int *houghPosX, int *houghPosY, int *houghSize, bool *rectFoundCircle, bool *houghFoundCircle){
+void minBoundingBoxes (cv::Mat original, int *rectWidth, int *rectHeight, int *rectPosX, int *rectPosY, int *houghPosX, int *houghPosY, int *houghSize, bool *rectFoundCircle, bool *houghFoundCircle){
 
-  // imshow("Før moF", redFrame);
+  cv::Mat grayFrame;
+  cv::Mat redFrame;
+  cv::Mat blurFrameRBG;
+  cv::Mat noBlurRGB;
+
+  noBlurRGB = original.clone();
+
+  blur(noBlurRGB, blurFrameRBG, Size(5, 5));
+  cvtColor(blurFrameRBG, grayFrame, CV_RGB2GRAY);
+
+  redFrame = redFilter(noBlurRGB).clone();
 
   int moF = morphologyFilter(&redFrame, 8);
-
-  // imshow("Efter MoF", redFrame);
-
   blur(redFrame, redFrame, Size(5, 5));
 
-  //namedWindow("Blur from minBoundingBoxes");
-  //imshow("Blur from minBoundingBoxes ", redFrame);
 
   RNG rng(12345);
 
@@ -91,11 +98,18 @@ void minBoundingBoxes (cv::Mat redFrame, cv::Mat grayFrame, int *rectWidth, int 
     std::sort(boundRect.begin(),boundRect.end(),Dcompare);
   }
 
-  int methodRectWidth   = 0;
-  int methodRectHeight  = 0;
-  int methodRectY       = 0;
-  int methodRectX       = 0;
-  bool isCircleRes = false;
+  // Rect //
+  int  methodRectWidth        = 0;
+  int  methodRectHeight       = 0;
+  int  methodRectY            = 0;
+  int  methodRectX            = 0;
+  bool metohodRectFoundCircle = false;
+
+  // Hough //
+  int  methodHoughPosX        = 0;
+  int  methodHoughPosY        = 0;
+  int  methodHoughSize        = 0;
+  bool methodHoughFoundCircle = false;
 
   /// Draw polygonal contour + bonding rects + circles
   Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );
@@ -110,34 +124,74 @@ void minBoundingBoxes (cv::Mat redFrame, cv::Mat grayFrame, int *rectWidth, int 
      methodRectY       = boundRect[0].y + (methodRectHeight / 2);
      methodRectX       = boundRect[0].x + (methodRectWidth / 2);
 
-     isCircle(redFrame, &methodRectWidth, &methodRectHeight, &boundRect[0].x, &boundRect[0].y, &isCircleRes);
-}
-
-  if (isCircleRes){
-    namedWindow("Boxes from minBoundingBoxes");
-    imshow("Boxes from minBoundingBoxes", drawing);
-
+     isCircle(redFrame, &methodRectWidth, &methodRectHeight, &boundRect[0].x, &boundRect[0].y, &metohodRectFoundCircle);
   }
 
-  if (!isCircleRes){
+  if (metohodRectFoundCircle){
+    namedWindow("Boxes from minBoundingBoxes");
+    imshow("Boxes from minBoundingBoxes", drawing);
+  }
+
+  if (!metohodRectFoundCircle){
     methodRectWidth   = 0;
     methodRectHeight  = 0;
     methodRectY       = 0;
     methodRectX       = 0;
   }
 
+  std::vector<Vec3f> circles;
+	getCircles(grayFrame, &circles);
+
+  unsigned long amountHoughCircles = circles.size();
+
+  if (amountHoughCircles > 0){
+    methodHoughFoundCircle = true;
+    methodHoughPosX = circles[0][0];
+    methodHoughPosY = circles[0][1];
+  } else {
+    methodHoughFoundCircle = false;
+    methodHoughPosX = 0;
+    methodHoughPosY = 0;
+  }
+
+/*
+  cout << "---------- Values from minBoundingBoxes ----------"  << endl;
+  cout << "------------------- Rectangles -------------------"  << endl;
+  cout << "rectWidth        : " << rectWidth                    << endl;
+  cout << "rectHeight       : " << rectHeight                   << endl;
+  cout << "rectPosX         : " << rectPosX                     << endl;
+  cout << "rectPosY         : " << rectPosY                     << endl;
+  cout << "------------------ HoughCircles ------------------"  << endl;
+  cout << "houghPosX        : " << houghPosX                    << endl;
+  cout << "houghPosY        : " << houghPosY                    << endl;
+  cout << "houghSize        : " << houghSize                    << endl;
+  cout << "---------------------- Bool ----------------------"  << endl;
+  cout << "rectFoundCircle  : " << rectFoundCircle              << endl;
+  cout << "houghFoundCircle : " << houghFoundCircle             << endl;
+  cout << "---------- Values from minBoundingBoxes ----------"  << endl;
+*/
+
+  // TODO Need testing, perhaps log.open()
+  /*
+  std::ofstream log("logfile.txt", std::ios_base::app | std::ios_base::out);
+  log << rectWidth  << ", " << rectHeight       << ", " << rectPosX         << ", "
+      << rectPosY   << ", " << houghPosX        << ", " << houghPosY        << ", "
+      << houghSize  << ", " << rectFoundCircle  << ", " << houghFoundCircle << "\n";
+  log.close();
+  */
+
+
   /// retrun to pointers
    *rectWidth         = methodRectWidth;
    *rectHeight        = methodRectHeight;
    *rectPosX          = methodRectX;
    *rectPosY          = methodRectY;
-   /*
-   *houghPosX         =
-   *houghPosY         =
-   *houghSize         =
-   *rectFoundCircle   =
-   *houghFoundCircle  =
-*/
+   *houghPosX         = methodHoughPosX;
+   *houghPosY         = methodHoughPosY;
+   *houghSize         = methodHoughSize;
+   *rectFoundCircle   = metohodRectFoundCircle;
+   *houghFoundCircle  = methodHoughFoundCircle;
+
 }
 
 // -------------------------------------------------- //

@@ -115,7 +115,7 @@ int main(int argc, char **argv)
 
         // Main scope variables //
         queue<Vec3i> circleQueue; // Que for circle positions //
-        std::string message;  // Message for console prints //
+        std::string message; // Message for console prints //
         int variance20 = 20;
 
         ros::init(argc, argv, "image_converter");

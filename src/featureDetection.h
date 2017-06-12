@@ -8,6 +8,9 @@
 #include "opencv2/opencv.hpp"
 #include <math.h>
 
+#include <ios>
+#include <fstream>
+
 using namespace cv;
 
 bool Dcompare(const Rect &a, const Rect &b);

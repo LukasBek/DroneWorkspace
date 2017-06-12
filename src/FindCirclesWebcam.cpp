@@ -262,7 +262,7 @@ int main(int argc, char **argv)
 	int houghPosY;
 	int houghSize;
 
-	minBoundingBoxes(frame, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
+	minBoundingBoxes(noBlurRGB, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
 
 	// cout << "--------------" << endl;
 	// cout << "Width:  " << rectWidth   << endl;

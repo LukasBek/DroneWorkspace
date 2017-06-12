@@ -101,9 +101,9 @@ void minBoundingBoxes (cv::Mat original, int *rectWidth, int *rectHeight, int *r
   // Rect //
   int  methodRectWidth        = 0;
   int  methodRectHeight       = 0;
-  int  methodRectY            = 0;
-  int  methodRectX            = 0;
-  bool metohodRectFoundCircle = false;
+  int  methodRectPosY         = 0;
+  int  methodRectPosX         = 0;
+  bool methodRectFoundCircle  = false;
 
   // Hough //
   int  methodHoughPosX        = 0;
@@ -121,22 +121,22 @@ void minBoundingBoxes (cv::Mat original, int *rectWidth, int *rectHeight, int *r
      }
      methodRectWidth   = boundRect[0].width;
      methodRectHeight  = boundRect[0].height;
-     methodRectY       = boundRect[0].y + (methodRectHeight / 2);
-     methodRectX       = boundRect[0].x + (methodRectWidth / 2);
+     methodRectPosY    = boundRect[0].y + (methodRectHeight / 2);
+     methodRectPosX    = boundRect[0].x + (methodRectWidth / 2);
 
-     isCircle(redFrame, &methodRectWidth, &methodRectHeight, &boundRect[0].x, &boundRect[0].y, &metohodRectFoundCircle);
+     isCircle(redFrame, &methodRectWidth, &methodRectHeight, &boundRect[0].x, &boundRect[0].y, &methodRectFoundCircle);
   }
 
-  if (metohodRectFoundCircle){
+  if (methodRectFoundCircle){
     namedWindow("Boxes from minBoundingBoxes");
     imshow("Boxes from minBoundingBoxes", drawing);
   }
 
-  if (!metohodRectFoundCircle){
+  if (!methodRectFoundCircle){
     methodRectWidth   = 0;
     methodRectHeight  = 0;
-    methodRectY       = 0;
-    methodRectX       = 0;
+    methodRectPosY    = 0;
+    methodRectPosX    = 0;
   }
 
   std::vector<Vec3f> circles;
@@ -148,6 +148,7 @@ void minBoundingBoxes (cv::Mat original, int *rectWidth, int *rectHeight, int *r
     methodHoughFoundCircle = true;
     methodHoughPosX = circles[0][0];
     methodHoughPosY = circles[0][1];
+    methodHoughSize = circles[0][2];
   } else {
     methodHoughFoundCircle = false;
     methodHoughPosX = 0;
@@ -155,41 +156,41 @@ void minBoundingBoxes (cv::Mat original, int *rectWidth, int *rectHeight, int *r
   }
 
 /*
+*/
   cout << "---------- Values from minBoundingBoxes ----------"  << endl;
   cout << "------------------- Rectangles -------------------"  << endl;
-  cout << "rectWidth        : " << rectWidth                    << endl;
-  cout << "rectHeight       : " << rectHeight                   << endl;
-  cout << "rectPosX         : " << rectPosX                     << endl;
-  cout << "rectPosY         : " << rectPosY                     << endl;
+  cout << "rectWidth        : " << methodRectWidth              << endl;
+  cout << "rectHeight       : " << methodRectHeight             << endl;
+  cout << "rectPosX         : " << methodRectPosX               << endl;
+  cout << "rectPosY         : " << methodRectPosY               << endl;
   cout << "------------------ HoughCircles ------------------"  << endl;
-  cout << "houghPosX        : " << houghPosX                    << endl;
-  cout << "houghPosY        : " << houghPosY                    << endl;
-  cout << "houghSize        : " << houghSize                    << endl;
+  cout << "houghPosX        : " << methodHoughPosX              << endl;
+  cout << "houghPosY        : " << methodHoughPosY              << endl;
+  cout << "houghSize        : " << methodHoughSize              << endl;
   cout << "---------------------- Bool ----------------------"  << endl;
-  cout << "rectFoundCircle  : " << rectFoundCircle              << endl;
-  cout << "houghFoundCircle : " << houghFoundCircle             << endl;
+  cout << "rectFoundCircle  : " << methodRectFoundCircle        << endl;
+  cout << "houghFoundCircle : " << methodHoughFoundCircle       << endl;
   cout << "---------- Values from minBoundingBoxes ----------"  << endl;
-*/
 
   // TODO Need testing, perhaps log.open()
-  /*
-  std::ofstream log("logfile.txt", std::ios_base::app | std::ios_base::out);
-  log << rectWidth  << ", " << rectHeight       << ", " << rectPosX         << ", "
-      << rectPosY   << ", " << houghPosX        << ", " << houghPosY        << ", "
-      << houghSize  << ", " << rectFoundCircle  << ", " << houghFoundCircle << "\n";
+  std::ofstream log("../../../logfile.txt", std::ios_base::app | std::ios_base::out);
+  log << *rectWidth  << ", " << *rectHeight       << ", " << *rectPosX         << ", "
+      << *rectPosY   << ", " << *houghPosX        << ", " << *houghPosY        << ", "
+      << *houghSize  << ", " << *rectFoundCircle  << ", " << *houghFoundCircle << "\n";
   log.close();
+  /*
   */
 
 
   /// retrun to pointers
    *rectWidth         = methodRectWidth;
    *rectHeight        = methodRectHeight;
-   *rectPosX          = methodRectX;
-   *rectPosY          = methodRectY;
+   *rectPosX          = methodRectPosX;
+   *rectPosY          = methodRectPosY;
    *houghPosX         = methodHoughPosX;
    *houghPosY         = methodHoughPosY;
    *houghSize         = methodHoughSize;
-   *rectFoundCircle   = metohodRectFoundCircle;
+   *rectFoundCircle   = methodRectFoundCircle;
    *houghFoundCircle  = methodHoughFoundCircle;
 
 }

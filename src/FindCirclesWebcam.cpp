@@ -36,9 +36,9 @@ using namespace zbar;
 
 // typedef std::chrono::high_resolution_clock Clock;
 
-Mat frameRBG;  // Primary blur working frame from capture //
+Mat blurFrameRGB;  // Primary blur working frame from capture //
 Mat frame;     // Primary gray working frame //
-Mat noBlurRGB; //
+Mat original; //
 
 // -------------------------------------------------------------------------------------------------------------
 //Getting the video stream and converting it to openCV
@@ -87,7 +87,7 @@ class ImageConverter
 	}
 
 	// Update GUI Window
-	frameRBG = cv_ptr->image;
+	original = cv_ptr->image;
 
 	cv::waitKey(3);
 
@@ -209,7 +209,7 @@ int main(int argc, char **argv)
 	// }
 
 	// cout << "TRY ME" << endl;
-	if (frameRBG.empty())
+	if (original.empty())
 	{
 	    cout << "No frame from capture, end og video stream" << endl;
 	    break; // end of video stream
@@ -217,39 +217,41 @@ int main(int argc, char **argv)
 
 	if (vSize.width == 0 || vSize.height == 0)
 	{
-	    vSize.width = frameRBG.cols;
-	    vSize.height = frameRBG.rows;
+	    vSize.width  = original.cols;
+	    vSize.height = original.rows;
 
-	    aSize.minHeight = vSize.height / 2.5;
-	    aSize.maxHeight = vSize.height / 7;
-	    aSize.maxLeft = vSize.width / 2.5;
-	    aSize.maxRight = vSize.width / 1.6;
-	    aSize.maxSize = vSize.height / 4;
+	    aSize.minHeight  = vSize.height / 2.5;
+	    aSize.maxHeight  = vSize.height / 7;
+	    aSize.maxLeft    = vSize.width / 2.5;
+	    aSize.maxRight   = vSize.width / 1.6;
+	    aSize.maxSize    = vSize.height / 4;
 	    //Jo mindre tal, jo tættere på kommer dronen
-	    aSize.minSize = vSize.height / 10;
+	    aSize.minSize    = vSize.height / 10;
 
-	    cout << "Frame Dimensions - " << vSize.width << " " << vSize.height << endl;
+	    cout << "Frame Dimensions - " << vSize.width     << " " << vSize.height << endl;
 	    cout << "Minimum Height   - " << aSize.minHeight << endl;
 	    cout << "Maximum Height   - " << aSize.maxHeight << endl;
-	    cout << "Maximum Left     - " << aSize.maxLeft << endl;
-	    cout << "Maximum Right    - " << aSize.maxRight << endl;
-	    cout << "Maximum Size     - " << aSize.maxSize << endl;
-	    cout << "Minimum Size     - " << aSize.minSize << endl;
+	    cout << "Maximum Left     - " << aSize.maxLeft   << endl;
+	    cout << "Maximum Right    - " << aSize.maxRight  << endl;
+	    cout << "Maximum Size     - " << aSize.maxSize   << endl;
+	    cout << "Minimum Size     - " << aSize.minSize   << endl;
 	}
 
-	noBlurRGB = frameRBG.clone();
+	blurFrameRGB = original.clone();
 
 	// Blur and convertion to grayscale //
-	blur(frameRBG, frameRBG, Size(5, 5));
+	blur(blurFrameRGB, blurFrameRGB, Size(5, 5));
 
-	cvtColor(frameRBG, frame, CV_RGB2GRAY);
+	cvtColor(blurFrameRGB, frame, CV_RGB2GRAY);
 
 	// Zbar Start //
+  /*
 	string res = zbarScan(frame, vSize.width, vSize.height);
 	if (!res.empty())
 	{
 	    cout << "Symbol: " << zbarScan(frame, vSize.width, vSize.height) << endl;
 	}
+  */
 	// Zbar End //
 
 	bool rectFoundCircle;
@@ -262,30 +264,12 @@ int main(int argc, char **argv)
 	int houghPosY;
 	int houghSize;
 
-	minBoundingBoxes(noBlurRGB, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
-
-	// cout << "--------------" << endl;
-	// cout << "Width:  " << rectWidth   << endl;
-	// cout << "Height: " << rectHeight  << endl;
-	// cout << "Y:      " << rectPosY       << endl;
-	// cout << "X:      " << rectPosX       << endl;
-	// cout << "--------------" << endl;
-
-	// pRect //
-
-	// putText(frame, "Test", cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255,255,255), 1, CV_AA);
+	minBoundingBoxes(original, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
 
 	// HoughCircles Start //
 	std::vector<Vec3f> circles;
 	getCircles(frame, &circles);
 	// HoughCircles End //
-
-	// Finds the amount of circles in the image
-	unsigned long ul = circles.size();
-	std::string numberOfCircles;
-	std::stringstream strstream;
-	strstream << ul;
-	strstream >> numberOfCircles;
 
 	bFindRect = false;
 	if (!(rectWidth == 0 || rectHeight == 0))
@@ -294,14 +278,14 @@ int main(int argc, char **argv)
 	    bFindRect = true;
 	}
 
-	if (ul != 0)
+	if (houghFoundCircle)
 	{
 	    turnCounter = 0;
 
 	    Vec3i c = circles[0];
 
 	    // Queue start // // TODO - May need a check if logic is correct //
-
+/*
 	    if (circleQueue.size() < 5)
 	    {
 		circleQueue.push(c); //  Add some values to the queue
@@ -337,7 +321,7 @@ int main(int argc, char **argv)
 	    }
 
 	    // Queue end //
-
+*/
 	    // Command section start //
 
 	    // Midten af cirklens placering i framen
@@ -404,7 +388,7 @@ int main(int argc, char **argv)
 	    isCentered = false;
 
 	    // Command section end //
-
+/*
 	    std::string number0;
 	    std::string number1;
 	    std::string number2;
@@ -426,7 +410,7 @@ int main(int argc, char **argv)
 
 	    putText(frame, "Circles " + numberOfCircles, cvPoint(30, 30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255, 255, 255), 1, CV_AA);
 	    putText(frame, number, cvPoint(30, 60), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255, 255, 255), 1, CV_AA);
-
+*/
 	    // Setting text on screen end //
 	}
 
@@ -486,9 +470,9 @@ int main(int argc, char **argv)
 	    while (picCounter < 6)
 	    {
 		ros::spinOnce();
-		minBoundingBoxes(noBlurRGB, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
+		minBoundingBoxes(original, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
 		arrayRectWidth[picCounter] = rectWidth;
-		cout << "while rectwidth =" << arrayRectWidth[picCounter];
+		cout << "while rectwidth =" << arrayRectWidth[picCounter] << endl;
 	    }
 
 	    cout << "rectComparison=" << rectComparison << " rectLASTCOM=" << rectLastComparison << endl;

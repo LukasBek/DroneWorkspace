@@ -480,6 +480,7 @@ int main(int argc, char **argv)
 		minBoundingBoxes(noBlurRGB, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
 		arrayRectWidth[picCounter] = rectWidth;
 		cout << "while rectwidth =" << arrayRectWidth[picCounter];
+		picCounter++;
 	    }
 
 	    cout << "rectComparison=" << rectComparison << " rectLASTCOM=" << rectLastComparison << endl;

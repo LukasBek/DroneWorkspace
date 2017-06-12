@@ -492,8 +492,8 @@ int main(int argc, char **argv)
 	    }
 
 	    cout << "rectComparison=" << rectComparison << " rectLASTCOM=" << rectLastComparison << endl;
-	    // if (rectComparison > rectLastComparison)
-	    if (< rectLastWidth)
+	    if (rectComparison > rectLastComparison)
+	    // if (< rectLastWidth)
 	    {
 		bGoLeft = !bGoLeft;
 	    }

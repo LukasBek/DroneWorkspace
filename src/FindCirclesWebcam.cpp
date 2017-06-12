@@ -262,7 +262,7 @@ int main(int argc, char **argv)
 	int houghPosY;
 	int houghSize;
 
-	minBoundingBoxes(redFilter(noBlurRGB), frame, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
+	minBoundingBoxes(frame, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
 
 	// cout << "--------------" << endl;
 	// cout << "Width:  " << rectWidth   << endl;
@@ -432,8 +432,6 @@ int main(int argc, char **argv)
 
 	else if (bFindRect)
 	{
-	    // if (rectWidth + 20 < rectHeight)
-	    // {
 	    turnCounter = 0;
 	    //------------------------------------------------
 
@@ -449,17 +447,12 @@ int main(int argc, char **argv)
 	    {
 		if (H > 0)
 		{
-		    // cout << "Turn clock: H=" << H << " time=" << baseTime * Htime << endl;
 		    move.turnAroundClockwise(0.05, 0.1);
-		    // cout << " - X= " << rectPosX <<  " bredden =" << rectPosX + rectWidth/2  <<  endl;
 		    continue;
 		}
 		else if (H < 0)
 		{
-		    // cout << "turn Counter clock: H=" << H << " time=" << baseTime * Htime << endl;
 		    move.turnAroundCounterClockwise(0.05, 0.1);
-		    // cout << " - X= " << rectPosX << " bredden =" << rectPosX - rectWidth/2 <<  endl;
-
 		    continue;
 		}
 	    }
@@ -467,13 +460,11 @@ int main(int argc, char **argv)
 	    {
 		if (V < 0)
 		{
-		    // cout << "rect Go up: V=" << V << " time=" << baseTime * Vtime << endl;
 		    move.goUp(0.1);
 		    continue;
 		}
 		if (V > 0)
 		{
-		    // cout << "rect Go down: V=" << V << " time=" << baseTime * Vtime << endl;
 		    move.goDown(0.1);
 		    continue;
 		}
@@ -486,31 +477,27 @@ int main(int argc, char **argv)
 	    while (picCounter < 6)
 	    {
 		ros::spinOnce();
-		minBoundingBoxes(redFilter(noBlurRGB), frame, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
+		minBoundingBoxes(noBlurRGB, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
 		arrayRectWidth[picCounter] = rectWidth;
 		cout << "while rectwidth =" << arrayRectWidth[picCounter];
 	    }
 
 	    cout << "rectComparison=" << rectComparison << " rectLASTCOM=" << rectLastComparison << endl;
 	    if (rectComparison > rectLastComparison)
-	    // if (< rectLastWidth)
 	    {
 		bGoLeft = !bGoLeft;
 	    }
 
 	    if (bGoLeft)
 	    {
-		// cout << "rect go left" << endl;
 		move.goLeft(0.1);
 	    }
 	    else
 	    {
-		// cout << "rect go right" << endl;
 		move.goRight(0.1);
 	    }
 
 	    rectLastComparison = rectComparison;
-	    // }
 	}
 	else
 	{

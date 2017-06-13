@@ -28,18 +28,13 @@
 
 #include <cmath>
 
-// #include <chrono>
-
 using namespace cv;
 using namespace std;
 using namespace zbar;
 
-// typedef std::chrono::high_resolution_clock Clock;
-
 Mat blurFrameRGB; // Primary blur working frame from capture //
 Mat frame;  // Primary gray working frame //
 Mat original;     //
-
 // -------------------------------------------------------------------------------------------------------------
 //Getting the video stream and converting it to openCV
 
@@ -184,10 +179,6 @@ int main(int argc, char **argv)
                 loop_rate.sleep();
                 ros::spinOnce();
 
-                //while ((double)ros::Time::now().toSec() < start_time + takeoff_time + 2)
-                //while ((double)ros::Time::now().toSec() < 7 + 2)
-                //{ //takeoff
-
                 while (b < 50)
                 {
                         ros::spinOnce();
@@ -197,7 +188,7 @@ int main(int argc, char **argv)
                         if (b == 49)
                         {
                                 cout << "Taking off" << endl;
-                                ros::Duration(4).sleep();
+                                ros::Duration(6).sleep();
                         }
                         b++;
                 }
@@ -205,7 +196,7 @@ int main(int argc, char **argv)
                 {
                         cout << "OPSADASSE!" << endl;
                         ros::spinOnce();
-                        move.goUp(1.6);
+                        move.goUp(1.5);
                         b++;
                 }
 
@@ -429,43 +420,43 @@ int main(int argc, char **argv)
                         Vtime = std::abs(V);
                         // Circle end
 
-                        // if (rectHeight < 200)
-                        // {
-                        // cout << "fheight =" << rectHeight << endl;
-                        // // move.forwardx(0.1);
-                        // continue;
-                        // }
-                        // else if (rectHeight > 300)
-                        // {
-                        // cout << "bheight =" << rectHeight << endl;
-                        // // move.backwardx(0.1);
-                        // continue;
-                        // }
-                        // else if (H < -40 || H > 40)
-
-                        if (H < -40 || H > 40)
+                        if (rectHeight < 150)
+                        {
+                                cout << "fheight =" << rectHeight << endl;
+                                move.forwardx(0.05);
+                                continue;
+                        }
+                        else if (rectHeight > 350)
+                        {
+                                cout << "bheight =" << rectHeight << endl;
+                                move.backwardx(0.5);
+                                continue;
+                        }
+                        else if (H < -40 || H > 40)
+                        // if (H < -40 || H > 40)
                         {
                                 if (H > 0)
                                 {
-                                        move.turnAroundClockwise(0.05, 0.1);
+                                        move.turnAroundClockwise(0.05, 0.2);
                                         continue;
                                 }
                                 else if (H < 0)
                                 {
-                                        move.turnAroundCounterClockwise(0.05, 0.1);
+                                        move.turnAroundCounterClockwise(0.05, 0.2);
                                         continue;
                                 }
+
                         }
-                        else if (V < -20 || V > 20)
+                        else if (V < -30 || V > 30)
                         {
                                 if (V < 0)
                                 {
-                                        move.goUp(0.1);
+                                        move.goUp(0.05);
                                         continue;
                                 }
                                 if (V > 0)
                                 {
-                                        move.goDown(0.1);
+                                        move.goDown(0.05);
                                         continue;
                                 }
                         }
@@ -475,7 +466,7 @@ int main(int argc, char **argv)
                         int rectWidthAverage = 0;
                         int rectHeightAverage = 0;
 
-                        for (int i = 0; i < 12; i++)
+                        for (int i = 0; i < 15; i++)
                         {
                                 ros::spinOnce();
                                 minBoundingBoxes(original, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);

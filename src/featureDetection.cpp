@@ -203,7 +203,7 @@ void getCircles(Mat src, std::vector<Vec3f> *dest){
         int dp = 1;     // The inverse ratio of resolution
         int min_dist = 100; // Minimum distance between detected centers
         int param_1 = 100; // Upper threshold for the internal Canny edge detector
-        int param_2 =170; // Threshold for center detection
+        int param_2 =160; // Threshold for center detection
                           // 200 Has hard time finding perfect circles
                           // 100 Only very clear circles
                           // 80 detects random round suff
@@ -282,7 +282,8 @@ Mat redFilter(Mat src){
 
         Mat threshold_output;
 
-        int thresh = 25;
+// stod originalt på 25
+        int thresh = 35;
         int max_thresh = 255;
 
         Mat bgr[3]; //destination array

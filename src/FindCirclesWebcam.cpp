@@ -98,6 +98,7 @@ int lowThreshold = 60;
 int const max_lowThreshold = 200;
 int ratio = 3;
 int kernel_size = 3;
+int circleReqParam = 190;
 
 // eDistance - Calculates distance between two vectors //
 double eDistance(Vec3i a, Vec3i b)
@@ -189,7 +190,7 @@ int main(int argc, char **argv)
                         if (b == 49)
                         {
                                 cout << "Taking off" << endl;
-                                ros::Duration(6).sleep();
+                                ros::Duration(4).sleep();
                         }
                         b++;
                 }
@@ -218,7 +219,7 @@ int main(int argc, char **argv)
                         aSize.maxHeight = vSize.height / 7;
                         aSize.maxLeft = vSize.width / 2.5;
                         aSize.maxRight = vSize.width / 1.6;
-                        aSize.maxSize = vSize.height / 2.1;
+                        aSize.maxSize = vSize.height / 2.7;
                         //Jo mindre tal, jo tættere på kommer dronen
                         aSize.minSize = vSize.height / 4;
 
@@ -258,12 +259,8 @@ int main(int argc, char **argv)
                 int houghPosY;
                 int houghSize;
 
-                minBoundingBoxes(original, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
+                minBoundingBoxes(original, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle, circleReqParam);
 
-                // HoughCircles Start //
-                std::vector<Vec3f> circles;
-                getCircles(frame, &circles);
-                // HoughCircles End //
 
                 bFindRect = false;
                 if (!(rectWidth == 0 || rectHeight == 0))
@@ -275,8 +272,9 @@ int main(int argc, char **argv)
                 if (houghFoundCircle)
                 {
                         turnCounter = 0;
+                        circleReqParam = 150;
 
-                        Vec3i c = circles[0];
+
 
                         // Queue start // // TODO - May need a check if logic is correct //
                         /*
@@ -319,55 +317,58 @@ int main(int argc, char **argv)
                         // Command section start //
 
                         // Midten af cirklens placering i framen
-                        H = c[0] - 320;
-                        V = c[1] - 180;
+                        H = houghPosX - 320;
+                        V = houghPosY - 180;
                         // Makes sure that even though V or H is negative, it will be a possitive number
                         Htime = std::abs(H);
                         Vtime = std::abs(V);
                         // Circle end
 
-                        cout << "detected circle....... " << c[2] << '\n';
+                        // cout << "detected circle....... " << houghSize << '\n';
 
-                        if (H < -50 || H > 50)
+                        if (H < -30 || H > 30)
                         {
                                 if (H > 0)
                                 {
                                         // cout << "Go right: H=" << H << " time=" << baseTime * Htime << " c0=" << c[0] << endl;
-                                        move.goRight(baseTime * Htime);
+                                        move.goRight(0.1);
                                         continue;
                                 }
                                 else if (H < 0)
                                 {
                                         // cout << "Go left: H=" << H << " time=" << baseTime * Htime << " c0=" << c[0] << endl;
-                                        move.goLeft(baseTime * Htime);
+                                        move.goLeft(0.1);
                                         continue;
                                 }
                         }
 
-                        else if (V < -30 || V > 30)
+                        else if (V < -20 || V > 20)
                         {
                                 if (V < 0)
                                 {
                                         // cout << "Go up: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
-                                        move.goUp(baseTime * Vtime);
+                                        move.goUp(0.2);
                                         continue;
                                 }
                                 if (V > 0)
                                 {
                                         // cout << "Go down: V=" << V << " time=" << baseTime * Vtime << " c1=" << c[1] << endl;
-                                        move.goDown(baseTime * Vtime);
+                                        move.goDown(0.2);
 
                                         continue;
                                 }
                         }
-                        else if (c[2] < aSize.maxSize)
+                        else if (houghSize < aSize.maxSize)
                         {
                                 move.forwardx(0.2);
                         }
-                        else if (c[2] > aSize.maxSize)
+                        else if (houghSize > aSize.maxSize)
                         {
                                 isCentered = true;
                                 move.goThrough(1.4);
+                                ros::Duration(4).sleep();
+                                circleReqParam = 185;
+                                move.land();
                         } else
                         {
                                 move.hover();
@@ -390,7 +391,7 @@ int main(int argc, char **argv)
                         // Circle end
 
 
-                        if (H < -40 || H > 40)
+                        if (H < -50 || H > 50)
                         // if (H < -40 || H > 40)
                         {
                                 if (H > 0)
@@ -417,16 +418,16 @@ int main(int argc, char **argv)
                                         move.goDown(0.05);
                                         continue;
                                 }
-                        }else if (rectHeight < 200)
+                        }else if (rectHeight < 250)
                         {
                                 cout << "fheight =" << rectHeight << endl;
-                                move.forwardx(0.2);
+                                move.forwardx(0.1);
                                 continue;
                         }
                         else if (rectHeight > 350)
                         {
                                 cout << "bheight =" << rectHeight << endl;
-                                move.backwardx(0.2);
+                                move.backwardx(0.1);
                                 continue;
                         }
 
@@ -434,18 +435,39 @@ int main(int argc, char **argv)
                         int picCounter = 0;
                         int rectWidthAverage = 0;
                         int rectHeightAverage = 0;
+                        int rectHeightLast = 0;
+                        int rectWidthLast = 0;
+                        // int rectHeightAverage = 0;
+                        circleReqParam = 185;
 
-                        for (int i = 0; i < 40; i++)
+                        for (int i = 0; i < 12; i++)
                         {
                                 ros::spinOnce();
-                                minBoundingBoxes(original, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
+                                minBoundingBoxes(original, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle, circleReqParam);
 
-                                if (rectFoundCircle)
-                                {
-                                        rectWidthAverage += rectWidth;
-                                        rectHeightAverage += rectHeight;
-                                        picCounter++;
+                                if (houghFoundCircle) {
+                                        break;
                                 }
+                                if (rectFoundCircle) {
+// && !(rectWidth > rectWidthLast + 15)
+                                        if (!(rectHeight > rectHeightLast + 10)) {
+                                                std::cout << "rectHeight=" << rectHeight << " - rectHeightLast=" << rectHeightLast <<  '\n';
+                                                std::cout << "rectWidth=" << rectWidth << " - rectWidthLast=" << rectWidthLast << '\n';
+                                                rectWidthAverage += rectWidth;
+                                                rectHeightAverage += rectHeight;
+                                                picCounter++;
+                                                rectHeightLast = rectHeight;
+                                                rectWidthLast = rectWidth;
+                                        } else if (rectHeightLast == 0 || rectWidthLast == 0) {
+                                                rectHeightLast = rectHeight;
+                                                std::cout << "rectHeight=" << rectHeight << " - rectHeightLast=" << rectHeightLast <<  '\n';
+                                                std::cout << "rectWidth=" << rectWidth << " - rectWidthLast=" << rectWidthLast << '\n';
+                                        }
+                                }
+                        }
+
+                        if (houghFoundCircle) {
+                                continue;
                         }
 
                         rectComparison = (double)rectHeightAverage / (double)rectWidthAverage;
@@ -458,11 +480,11 @@ int main(int argc, char **argv)
 
                         if (bGoLeft)
                         {
-                                move.goLeft(0.4);
+                                move.goLeft(0.5);
                         }
                         else
                         {
-                                move.goRight(0.4);
+                                move.goRight(0.5);
                         }
 
                         rectLastComparison = rectComparison;

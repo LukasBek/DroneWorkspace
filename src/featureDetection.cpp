@@ -51,7 +51,7 @@ void sobel(Mat src_gray, Mat *grad){
 
 // -------------------------------------------------- //
 
-void minBoundingBoxes (cv::Mat original, int *rectWidth, int *rectHeight, int *rectPosX, int *rectPosY, int *houghPosX, int *houghPosY, int *houghSize, bool *rectFoundCircle, bool *houghFoundCircle){
+void minBoundingBoxes (cv::Mat original, int *rectWidth, int *rectHeight, int *rectPosX, int *rectPosY, int *houghPosX, int *houghPosY, int *houghSize, bool *rectFoundCircle, bool *houghFoundCircle, int circleReqParam){
 
         cv::Mat grayFrame;
         cv::Mat redFrame;
@@ -139,7 +139,7 @@ void minBoundingBoxes (cv::Mat original, int *rectWidth, int *rectHeight, int *r
         }
 
         std::vector<Vec3f> circles;
-        getCircles(grayFrame, &circles);
+        getCircles(grayFrame, &circles, circleReqParam);
 
         unsigned long amountHoughCircles = circles.size();
 
@@ -197,13 +197,17 @@ void minBoundingBoxes (cv::Mat original, int *rectWidth, int *rectHeight, int *r
 
 // -------------------------------------------------- //
 
-void getCircles(Mat src, std::vector<Vec3f> *dest){
+void getCircles(Mat src, std::vector<Vec3f> *dest, int circleReqParam){
+// if (circleReqParam == 140) {
+//   std::cout << "------------------------------circleReqParam=" << circleReqParam << '\n';
+// }
+
 
         vector<Vec3f> circles;
         int dp = 1;     // The inverse ratio of resolution
         int min_dist = 100; // Minimum distance between detected centers
         int param_1 = 100; // Upper threshold for the internal Canny edge detector
-        int param_2 =180; // Threshold for center detection
+        int param_2 = circleReqParam; // Threshold for center detection
                           // 200 Has hard time finding perfect circles
                           // 100 Only very clear circles
                           // 80 detects random round suff
@@ -283,7 +287,7 @@ Mat redFilter(Mat src){
         Mat threshold_output;
 
 // stod originalt på 25
-        int thresh = 35;
+        int thresh = 40;
         int max_thresh = 255;
 
         Mat bgr[3]; //destination array

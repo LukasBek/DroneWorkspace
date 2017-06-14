@@ -100,43 +100,47 @@ void DroneMovement::forwardx(double time)
 {
         cout << "D forward" << endl;
         geometry_msgs::Twist msg_vel;
-        msg_vel = changeTwist(1, 0, 0, 0);
+        msg_vel = changeTwist(0.5, 0, 0, 0);
         pub_cmd_vel.publish(msg_vel);
         ros::Duration(time).sleep();
+        hover();
 }
 
 void DroneMovement::backwardx(double time)
 {
         cout << "D backward" << endl;
         geometry_msgs::Twist msg_vel;
-        msg_vel = changeTwist(-1, 0, 0, 0);
+        msg_vel = changeTwist(-0.5, 0, 0, 0);
         pub_cmd_vel.publish(msg_vel);
         ros::Duration(time).sleep();
+        hover();
 }
 
 void DroneMovement::goLeft(double time)
 {
         cout << "D goLeft" << endl;
         geometry_msgs::Twist msg_vel;
-        msg_vel = changeTwist(0, 0.5, 0, 0);
+        msg_vel = changeTwist(0, 0.2, 0, 0);
         pub_cmd_vel.publish(msg_vel);
         ros::Duration(time).sleep();
+        hover();
 }
 
 void DroneMovement::goRight(double time)
 {
         cout << "D goRight" << endl;
         geometry_msgs::Twist msg_vel;
-        msg_vel = changeTwist(0, -0.5, 0, 0);
+        msg_vel = changeTwist(0, -0.2, 0, 0);
         pub_cmd_vel.publish(msg_vel);
         ros::Duration(time).sleep();
+        hover();
 }
 
 void DroneMovement::goUp(double time)
 {
         cout << "D goUp" << endl;
         geometry_msgs::Twist msg_vel;
-        msg_vel = changeTwist(0, 0, 1, 0);
+        msg_vel = changeTwist(0, 0, 0.5, 0);
         pub_cmd_vel.publish(msg_vel);
         ros::Duration(time).sleep();
         hover();
@@ -159,6 +163,7 @@ void DroneMovement::turnAroundCounterClockwise(double turnTime, double rotationS
         msg_vel = changeTwist(0, 0, 0, rotationSpeed);
         pub_cmd_vel.publish(msg_vel);
         ros::Duration(turnTime).sleep();
+        hover();
 }
 
 void DroneMovement::turnAroundClockwise(double turnTime, double rotationSpeed)
@@ -168,6 +173,7 @@ void DroneMovement::turnAroundClockwise(double turnTime, double rotationSpeed)
         msg_vel = changeTwist(0, 0, 0, -rotationSpeed);
         pub_cmd_vel.publish(msg_vel);
         ros::Duration(turnTime).sleep();
+        hover();
 }
 
 void DroneMovement::goThrough(double time)
@@ -177,6 +183,7 @@ void DroneMovement::goThrough(double time)
         msg_vel = changeTwist(0.5, 0, 0, 0);
         pub_cmd_vel.publish(msg_vel);
         ros::Duration(time).sleep();
+        hover();
 }
 
 void DroneMovement::hover(void)

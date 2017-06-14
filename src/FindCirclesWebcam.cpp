@@ -179,6 +179,7 @@ int main(int argc, char **argv)
                 loop_rate.sleep();
                 ros::spinOnce();
 
+// /*
                 while (b < 50)
                 {
                         ros::spinOnce();
@@ -199,6 +200,7 @@ int main(int argc, char **argv)
                         move.goUp(1.5);
                         b++;
                 }
+                // */
 
                 // cout << "TRY ME" << endl;
                 if (original.empty())
@@ -216,9 +218,9 @@ int main(int argc, char **argv)
                         aSize.maxHeight = vSize.height / 7;
                         aSize.maxLeft = vSize.width / 2.5;
                         aSize.maxRight = vSize.width / 1.6;
-                        aSize.maxSize = vSize.height / 4;
+                        aSize.maxSize = vSize.height / 2.1;
                         //Jo mindre tal, jo tættere på kommer dronen
-                        aSize.minSize = vSize.height / 10;
+                        aSize.minSize = vSize.height / 4;
 
                         cout << "Frame Dimensions - " << vSize.width << " " << vSize.height << endl;
                         cout << "Minimum Height   - " << aSize.minHeight << endl;
@@ -324,7 +326,9 @@ int main(int argc, char **argv)
                         Vtime = std::abs(V);
                         // Circle end
 
-                        if (H < -40 || H > 40)
+                        cout << "detected circle....... " << c[2] << '\n';
+
+                        if (H < -50 || H > 50)
                         {
                                 if (H > 0)
                                 {
@@ -340,7 +344,7 @@ int main(int argc, char **argv)
                                 }
                         }
 
-                        else if (V < -20 || V > 20)
+                        else if (V < -30 || V > 30)
                         {
                                 if (V < 0)
                                 {
@@ -356,55 +360,20 @@ int main(int argc, char **argv)
                                         continue;
                                 }
                         }
-                        else if (c[2] < aSize.minSize)
+                        else if (c[2] < aSize.maxSize)
                         {
-                                // cout << "Go forward" << endl;
-                                move.forwardx(0.15);
+                                move.forwardx(0.2);
                         }
                         else if (c[2] > aSize.maxSize)
                         {
                                 isCentered = true;
-                        }
-
-                        if (isCentered)
-                        {
-                                // cout << "Going through the circle" << endl;
-                                // message = "DEF"
-                                // move.hover();
-                                move.goThrough(1.5);
-                        }
-                        else
+                                move.goThrough(1.4);
+                        } else
                         {
                                 move.hover();
                         }
 
                         isCentered = false;
-
-                        // Command section end //
-                        /*
-                           std::string number0;
-                           std::string number1;
-                           std::string number2;
-
-                           std::stringstream strstream0;
-                           std::stringstream strstream1;
-                           std::stringstream strstream2;
-
-                           strstream0 << c[0];
-                           strstream0 >> number0;
-
-                           strstream1 << c[1];
-                           strstream1 >> number1;
-
-                           strstream2 << c[2];
-                           strstream2 >> number2;
-
-                           std::string number = "Horizontal " + number0 + " Vertical " + number1 + " Size " + number2;
-
-                           putText(frame, "Circles " + numberOfCircles, cvPoint(30, 30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255, 255, 255), 1, CV_AA);
-                           putText(frame, number, cvPoint(30, 60), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255, 255, 255), 1, CV_AA);
-                         */
-                        // Setting text on screen end //
                 }
 
                 else if (bFindRect)
@@ -420,19 +389,8 @@ int main(int argc, char **argv)
                         Vtime = std::abs(V);
                         // Circle end
 
-                        if (rectHeight < 150)
-                        {
-                                cout << "fheight =" << rectHeight << endl;
-                                move.forwardx(0.05);
-                                continue;
-                        }
-                        else if (rectHeight > 350)
-                        {
-                                cout << "bheight =" << rectHeight << endl;
-                                move.backwardx(0.5);
-                                continue;
-                        }
-                        else if (H < -40 || H > 40)
+
+                        if (H < -40 || H > 40)
                         // if (H < -40 || H > 40)
                         {
                                 if (H > 0)
@@ -447,7 +405,7 @@ int main(int argc, char **argv)
                                 }
 
                         }
-                        else if (V < -30 || V > 30)
+                        else if (V < -40 || V > 40)
                         {
                                 if (V < 0)
                                 {
@@ -459,6 +417,17 @@ int main(int argc, char **argv)
                                         move.goDown(0.05);
                                         continue;
                                 }
+                        }else if (rectHeight < 200)
+                        {
+                                cout << "fheight =" << rectHeight << endl;
+                                move.forwardx(0.2);
+                                continue;
+                        }
+                        else if (rectHeight > 350)
+                        {
+                                cout << "bheight =" << rectHeight << endl;
+                                move.backwardx(0.2);
+                                continue;
                         }
 
                         //-------------------------------------------------------------------------
@@ -466,7 +435,7 @@ int main(int argc, char **argv)
                         int rectWidthAverage = 0;
                         int rectHeightAverage = 0;
 
-                        for (int i = 0; i < 15; i++)
+                        for (int i = 0; i < 40; i++)
                         {
                                 ros::spinOnce();
                                 minBoundingBoxes(original, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle);
@@ -489,11 +458,11 @@ int main(int argc, char **argv)
 
                         if (bGoLeft)
                         {
-                                move.goLeft(0.05);
+                                move.goLeft(0.4);
                         }
                         else
                         {
-                                move.goRight(0.5);
+                                move.goRight(0.4);
                         }
 
                         rectLastComparison = rectComparison;

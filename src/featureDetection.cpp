@@ -53,6 +53,7 @@ void sobel(Mat src_gray, Mat *grad){
 
 void minBoundingBoxes (cv::Mat original, int *rectWidth, int *rectHeight, int *rectPosX, int *rectPosY, int *houghPosX, int *houghPosY, int *houghSize, bool *rectFoundCircle, bool *houghFoundCircle, int circleReqParam){
 
+std::cout << "/* message */--------------hallo--------------------------------------" << '\n';
         cv::Mat grayFrame;
         cv::Mat redFrame;
         cv::Mat blurFrameRBG;

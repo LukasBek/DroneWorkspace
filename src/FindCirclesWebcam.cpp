@@ -98,7 +98,7 @@ int lowThreshold = 60;
 int const max_lowThreshold = 200;
 int ratio = 3;
 int kernel_size = 3;
-int circleReqParam = 190;
+int circleReqParam = 140;
 
 // eDistance - Calculates distance between two vectors //
 double eDistance(Vec3i a, Vec3i b)
@@ -171,6 +171,7 @@ int main(int argc, char **argv)
         double rectLastComparison = 0;
         double rectComparison = 0;
         bool bFindRect = false;
+        int goThroughCounter = 2;
 
         int turnCounter = 0;
         move.hover();
@@ -180,7 +181,7 @@ int main(int argc, char **argv)
                 loop_rate.sleep();
                 ros::spinOnce();
 
-// /*
+/*
                 while (b < 50)
                 {
                         ros::spinOnce();
@@ -273,7 +274,9 @@ int main(int argc, char **argv)
                 {
                         turnCounter = 0;
                         circleReqParam = 150;
-
+                        if (goThroughCounter == 3) {
+                          goThroughCounter++;
+                        }
 
 
                         // Queue start // // TODO - May need a check if logic is correct //
@@ -324,7 +327,7 @@ int main(int argc, char **argv)
                         Vtime = std::abs(V);
                         // Circle end
 
-                        // cout << "detected circle....... " << houghSize << '\n';
+                        cout << "detected circle....... " << houghSize << '\n';
 
                         if (H < -30 || H > 30)
                         {
@@ -366,9 +369,10 @@ int main(int argc, char **argv)
                         {
                                 isCentered = true;
                                 move.goThrough(1.4);
-                                ros::Duration(4).sleep();
-                                circleReqParam = 185;
-                                move.land();
+                                goThroughCounter++;
+                                ros::Duration(3).sleep();
+                                // circleReqParam = 172;
+                                // move.land();
                         } else
                         {
                                 move.hover();
@@ -380,6 +384,9 @@ int main(int argc, char **argv)
                 else if (bFindRect)
                 {
                         turnCounter = 0;
+                        if (goThroughCounter == 3) {
+                          goThroughCounter++;
+                        }
                         //------------------------------------------------
 
                         // Midten af firkantens placering i framen
@@ -406,7 +413,7 @@ int main(int argc, char **argv)
                                 }
 
                         }
-                        else if (V < -40 || V > 40)
+                        else if (V < -30 || V > 30)
                         {
                                 if (V < 0)
                                 {
@@ -418,16 +425,16 @@ int main(int argc, char **argv)
                                         move.goDown(0.05);
                                         continue;
                                 }
-                        }else if (rectHeight < 250)
+                        }else if (rectHeight / 2 < aSize.maxSize)
                         {
-                                cout << "fheight =" << rectHeight << endl;
-                                move.forwardx(0.1);
+                                cout << "fheight =" << rectHeight / 2 << endl;
+                                move.forwardx(0.2);
                                 continue;
                         }
                         else if (rectHeight > 350)
                         {
-                                cout << "bheight =" << rectHeight << endl;
-                                move.backwardx(0.1);
+                                cout << "bheight =" << rectHeight / 2 << endl;
+                                move.backwardx(0.2);
                                 continue;
                         }
 
@@ -437,10 +444,11 @@ int main(int argc, char **argv)
                         int rectHeightAverage = 0;
                         int rectHeightLast = 0;
                         int rectWidthLast = 0;
+                        double rectComparisonTemp = 0;
                         // int rectHeightAverage = 0;
-                        circleReqParam = 185;
+                        circleReqParam = 170;
 
-                        for (int i = 0; i < 12; i++)
+                        for (int i = 0; i < 30; i++)
                         {
                                 ros::spinOnce();
                                 minBoundingBoxes(original, &rectWidth, &rectHeight, &rectPosX, &rectPosY, &houghPosX, &houghPosY, &houghSize, &rectFoundCircle, &houghFoundCircle, circleReqParam);
@@ -449,10 +457,13 @@ int main(int argc, char **argv)
                                         break;
                                 }
                                 if (rectFoundCircle) {
-// && !(rectWidth > rectWidthLast + 15)
-                                        if (!(rectHeight > rectHeightLast + 10)) {
-                                                std::cout << "rectHeight=" << rectHeight << " - rectHeightLast=" << rectHeightLast <<  '\n';
-                                                std::cout << "rectWidth=" << rectWidth << " - rectWidthLast=" << rectWidthLast << '\n';
+
+                                        rectComparisonTemp = (double)rectHeight / (double)rectWidth;
+
+
+                                        if (!(rectHeight > rectHeightLast + 10) && rectComparisonTemp >= 1) {
+                                                // std::cout << "rectHeight=" << rectHeight << " - rectHeightLast=" << rectHeightLast <<  '\n';
+                                                // std::cout << "rectWidth=" << rectWidth << " - rectWidthLast=" << rectWidthLast << '\n';
                                                 rectWidthAverage += rectWidth;
                                                 rectHeightAverage += rectHeight;
                                                 picCounter++;
@@ -460,13 +471,14 @@ int main(int argc, char **argv)
                                                 rectWidthLast = rectWidth;
                                         } else if (rectHeightLast == 0 || rectWidthLast == 0) {
                                                 rectHeightLast = rectHeight;
-                                                std::cout << "rectHeight=" << rectHeight << " - rectHeightLast=" << rectHeightLast <<  '\n';
-                                                std::cout << "rectWidth=" << rectWidth << " - rectWidthLast=" << rectWidthLast << '\n';
+                                                // std::cout << "rectHeight=" << rectHeight << " - rectHeightLast=" << rectHeightLast <<  '\n';
+                                                // std::cout << "rectWidth=" << rectWidth << " - rectWidthLast=" << rectWidthLast << '\n';
                                         }
                                 }
                         }
 
                         if (houghFoundCircle) {
+                                circleReqParam = 150;
                                 continue;
                         }
 
@@ -478,13 +490,18 @@ int main(int argc, char **argv)
                                 bGoLeft = !bGoLeft;
                         }
 
-                        if (bGoLeft)
-                        {
-                                move.goLeft(0.5);
-                        }
-                        else
-                        {
-                                move.goRight(0.5);
+                        if (bGoLeft) {
+                                if (rectComparison < 1.025) {
+                                        move.goLeft(0.1);
+                                } else {
+                                        move.goLeft(0.5);
+                                }
+                        }else{
+                                if (rectComparison < 1.025) {
+                                        move.goRight(0.1);
+                                } else {
+                                        move.goRight(0.5);
+                                }
                         }
 
                         rectLastComparison = rectComparison;
@@ -493,24 +510,27 @@ int main(int argc, char **argv)
                 {
                         // cout << "Hover" << endl;
                         move.hover();
-                        //  cout << "turn around... " << endl;
+                        if (goThroughCounter == 3) {
+                          move.turnAroundClockwise(0.1, 0.2);
+                        }
+                        // cout << "turn around... " << endl;
                         // move.turnAroundClockwise(0.1, 0.2);
-                        // resets the rectLastWidth
+                        //  resets the rectLastWidth
                         // rectLastWidth = 0;
 
-                        // if (turnCounter >= 12 && turnCounter < 25)
+                        // if (turnCounter >= 30 && turnCounter < 70)
                         // {
-                        // cout << "nothing found - turning clockwise" << endl;
-                        // move.turnAroundClockwise(0.1, 0.2);
-                        // if (turnCounter == 14)
-                        // {
-                        //     turnCounter = 0;
+                        //         cout << "nothing found - turning clockwise" << endl;
+                        //         move.turnAroundClockwise(0.1, 0.2);
+                        //         if (turnCounter == 69)
+                        //         {
+                        //                 turnCounter = 0;
+                        //         }
                         // }
-                        // }
-                        // if (turnCounter < 12)
+                        // if (turnCounter < 30)
                         // {
-                        // cout << "nothing found - turning counter clockwise" << endl;
-                        // move.turnAroundCounterClockwise(0.1, 0.2);
+                        //         cout << "nothing found - turning counter clockwise" << endl;
+                        //         move.turnAroundCounterClockwise(0.1, 0.2);
                         // }
                         // turnCounter++;
                 }

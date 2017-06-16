@@ -118,7 +118,7 @@ void DroneMovement::backwardx(double time)
 
 void DroneMovement::goLeft(double time)
 {
-        cout << "D goLeft" << endl;
+        cout << "D goLeft=" << time << endl;
         geometry_msgs::Twist msg_vel;
         msg_vel = changeTwist(0, 0.2, 0, 0);
         pub_cmd_vel.publish(msg_vel);
@@ -128,7 +128,7 @@ void DroneMovement::goLeft(double time)
 
 void DroneMovement::goRight(double time)
 {
-        cout << "D goRight" << endl;
+        cout << "D goRight=" << time << endl;
         geometry_msgs::Twist msg_vel;
         msg_vel = changeTwist(0, -0.2, 0, 0);
         pub_cmd_vel.publish(msg_vel);

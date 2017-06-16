@@ -68,6 +68,7 @@ void minBoundingBoxes (cv::Mat original, int *rectWidth, int *rectHeight, int *r
         int moF = morphologyFilter(&redFrame, 8);
         blur(redFrame, redFrame, Size(5, 5));
 
+// cv::Mat redFrameforHough = redFrame.clone();
 
         RNG rng(12345);
 
@@ -372,7 +373,6 @@ void isCircle(cv::Mat src, int *width, int *height, int *x, int *y, bool *res) {
 
                         Scalar intensity = src.at<uchar>(points[i]);
                         value[i] = ceil(intensity[0] * weight[i]);
-
                 }
 
                 for (int i = 0; i < 25; i++) {
@@ -387,7 +387,7 @@ void isCircle(cv::Mat src, int *width, int *height, int *x, int *y, bool *res) {
                 nSum = ceil(sum / 25);
 
 //originalt 10
-                if (nSum <= 7) {
+                if (nSum <= 60) {
                         *res = true;
                 }
 

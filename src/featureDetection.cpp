@@ -53,7 +53,6 @@ void sobel(Mat src_gray, Mat *grad){
 
 void minBoundingBoxes (cv::Mat original, int *rectWidth, int *rectHeight, int *rectPosX, int *rectPosY, int *houghPosX, int *houghPosY, int *houghSize, bool *rectFoundCircle, bool *houghFoundCircle, int circleReqParam){
 
-std::cout << "/* message */--------------hallo--------------------------------------" << '\n';
         cv::Mat grayFrame;
         cv::Mat redFrame;
         cv::Mat blurFrameRBG;
@@ -289,7 +288,7 @@ Mat redFilter(Mat src){
         Mat threshold_output;
 
 // stod originalt på 25
-        int thresh = 40;
+        int thresh = 25;
         int max_thresh = 255;
 
         Mat bgr[3]; //destination array

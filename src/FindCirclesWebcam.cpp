@@ -171,7 +171,7 @@ int main(int argc, char **argv)
         double rectLastComparison = 0;
         double rectComparison = 0;
         bool bFindRect = false;
-        int goThroughCounter = 2;
+        int goThroughCounter = 1;
 
         int turnCounter = 0;
         move.hover();
@@ -181,7 +181,7 @@ int main(int argc, char **argv)
                 loop_rate.sleep();
                 ros::spinOnce();
 
-/*
+// /*
                 while (b < 50)
                 {
                         ros::spinOnce();
@@ -273,7 +273,7 @@ int main(int argc, char **argv)
                 if (houghFoundCircle)
                 {
                         turnCounter = 0;
-                        circleReqParam = 150;
+                        circleReqParam = 130;
                         if (goThroughCounter == 3) {
                           goThroughCounter++;
                         }
@@ -368,9 +368,9 @@ int main(int argc, char **argv)
                         else if (houghSize > aSize.maxSize)
                         {
                                 isCentered = true;
-                                move.goThrough(1.4);
+                                move.goThrough(1.7);
                                 goThroughCounter++;
-                                ros::Duration(3).sleep();
+                                ros::Duration(1).sleep();
                                 // circleReqParam = 172;
                                 // move.land();
                         } else
@@ -446,7 +446,7 @@ int main(int argc, char **argv)
                         int rectWidthLast = 0;
                         double rectComparisonTemp = 0;
                         // int rectHeightAverage = 0;
-                        circleReqParam = 170;
+                        circleReqParam = 140;
 
                         for (int i = 0; i < 30; i++)
                         {
@@ -478,7 +478,7 @@ int main(int argc, char **argv)
                         }
 
                         if (houghFoundCircle) {
-                                circleReqParam = 150;
+                                circleReqParam = 140;
                                 continue;
                         }
 

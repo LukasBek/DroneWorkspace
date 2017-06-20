@@ -98,7 +98,7 @@ int lowThreshold = 60;
 int const max_lowThreshold = 200;
 int ratio = 3;
 int kernel_size = 3;
-int circleReqParam = 140;
+int circleReqParam = 160;
 
 // eDistance - Calculates distance between two vectors //
 double eDistance(Vec3i a, Vec3i b)
@@ -171,7 +171,7 @@ int main(int argc, char **argv)
         double rectLastComparison = 0;
         double rectComparison = 0;
         bool bFindRect = false;
-        int goThroughCounter = 1;
+        int goThroughCounter = 0;
 
         int turnCounter = 0;
         move.hover();
@@ -199,7 +199,7 @@ int main(int argc, char **argv)
                 {
                         cout << "OPSADASSE!" << endl;
                         ros::spinOnce();
-                        move.goUp(1.5);
+                        move.goUp(2.0);
                         b++;
                 }
                 // */

@@ -216,7 +216,7 @@ void getCircles(Mat src, std::vector<Vec3f> *dest, int circleReqParam){
                           // 50 sees faces
                           // 40 sees circles in square objects
                           // 20 or below, finds circles everywhere
-        int min_radius = 20; // Minimum radio to be detected. If unknown, put zero as default
+        int min_radius = 80; // Minimum radio to be detected. If unknown, put zero as default
         int max_radius = 200; // Maximum radius to be detected. If unknown, put zero as default
         HoughCircles(src, circles, CV_HOUGH_GRADIENT, dp, min_dist, param_1, param_2, min_radius, max_radius);
         for (size_t i = 0; i < circles.size(); i++)
@@ -387,7 +387,7 @@ void isCircle(cv::Mat src, int *width, int *height, int *x, int *y, bool *res) {
                 nSum = ceil(sum / 25);
 
 //originalt 10
-                if (nSum <= 60) {
+                if (nSum <= 80) {
                         *res = true;
                 }
 
